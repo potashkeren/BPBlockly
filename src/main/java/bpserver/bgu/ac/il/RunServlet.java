@@ -52,11 +52,34 @@ public class RunServlet extends HttpServlet {
 
 		BufferedReader br = request.getReader();
 
-		String s = null;
-
+		//String s = null;
+		String s = "var beforeSeven = bp.EventSet( \"got7\", function(evt) {\n" +
+				"    var nxt = \"\"+ (parseInt(evt.name) + 1);\n" +
+				"    return (parseInt(nxt) % 7 === 0 )\n" +
+				"});\n" +
+				"\n" +
+				"var number = bp.EventSet( \"num\", function(evt) {\n" +
+				"    return isNumber(evt.name)\n" +
+				"});\n" +
+				"\n" +
+				"var boom = bp.Event(\"booom\");\n" +
+				"\n" +
+				"\n" +
+				"bp.registerBThread(\"7boom\", function(){\n" +
+				"    for(var i=1; i<=100; i++) {\n" +
+				"        bp.sync({request:bp.Event(i), waitFor: boom})\n" +
+				"    }\n" +
+				"});\n" +
+				"\n" +
+				"bp.registerBThread(\"counter\", function(){\n" +
+				"    while(true){\n" +
+				"        bp.sync({waitFor: beforeSeven});\n" +
+				"        bp.sync({request: boom , block: number});\n" +
+				"    }\n" +
+				"});";
 		String code = IOUtils.toString(br);
 
-		final StringBProgram bprog = new StringBProgram(code);
+		final StringBProgram bprog = new StringBProgram(s);
 
 		/*br = new BufferedReader(new FileReader("packman\\bt-server.js"));
 		String code2 = IOUtils.toString(br);

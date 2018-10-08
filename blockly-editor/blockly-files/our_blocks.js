@@ -53,8 +53,11 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_bsync",
-  "message0": "Wait %1 Request %2 Block %3",
+  "message0": "bsync with:%1 Wait %2 Request %3 Block %4",
   "args0": [
+      {
+          "type": "input_dummy"
+      },
     {
       "type": "input_value",
       "name": "WAIT",
@@ -210,8 +213,39 @@ Blockly.defineBlocksWithJsonArray([
   "colour": 230,
   "tooltip": "Turn a string to an integer",
   "helpUrl": ""
-}
-  ])
+},
+
+{
+        "type": "mathFloor",
+        "message0": "Math.Floor %1",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "floor",
+                "check": "Number"
+            }
+        ],
+        "output": "Number",
+        "colour": 65,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+{
+    "type": "is_number",
+    "message0": "IsNumber %1",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "TEXT",
+            "check": "String"
+        }
+    ],
+    "output": "Boolean",
+    "colour": 230,
+    "tooltip": "Is the given string a number (includes negative and decimals)",
+    "helpUrl": ""
+    }
+  ]);
   
   
 Blockly.JavaScript['bp_event'] = function(block) {
@@ -261,52 +295,37 @@ Blockly.JavaScript['bp_bsync'] = function(block) {
   var value_request = Blockly.JavaScript.valueToCode(block, 'REQUEST', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
   var value_block = Blockly.JavaScript.valueToCode(block, 'BLOCK', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
 	
-  code = '';
-  
-  //make the code prettier by not showing null values
-  if (value_wait == 'null' && value_request != 'null' && value_block != 'null')
-	  code = 'bsync({request: '+value_request+',\nblock: '+value_block+'})';
-  
-  if (value_wait != 'null' && value_request == 'null' && value_block != 'null')
-	  code = 'bsync({waitFor: '+value_wait+',\nblock: '+value_block+'})';
+    var set=[];
 
-  if (value_wait != 'null' && value_request != 'null' && value_block == 'null')
-	  code = 'bsync({waitFor: '+value_wait+',\nrequest: '+value_request+'})';
-  
-  if (value_wait == 'null' && value_request == 'null' && value_block != 'null')
-	  code = 'bsync({block: '+value_block+'})';
-  
-  if (value_wait == 'null' && value_request != 'null' && value_block == 'null')
-	  code = 'bsync({request: '+value_request+'})';
-  
-  if (value_wait != 'null' && value_request == 'null' && value_block == 'null')
-	  code = 'bsync({waitFor: '+value_wait+'})';
-  
-  if (value_wait == 'null' && value_request == 'null' && value_block == 'null')
-	  code = 'bsync({})';
-  
-  if (value_wait != 'null' && value_request != 'null' && value_block != 'null')
-      code = 'bsync({waitFor: '+value_wait+',\nrequest: '+value_request+',\nblock: '+value_block+'})';
-  
-  if(value_wait == 'null' || value_wait.includes('bp.EventSet'))
-	  return code+';\n';
+    if (value_wait !== 'null') {
+        //check for EventSet and array of events
+        set.push('waitFor: '+value_wait);
+    }
+    if (value_request !== 'null') {
+        //check for EventSet and array of events
+        set.push('request: '+value_request);
+    }
+    if (value_block !== 'null') {
+        //check for EventSet and array of events
+        set.push('block: '+value_block);
+    }
+    var code = 'bsync({'+set.join(",\n")+'})';
+  //if(value_wait == 'null' || value_wait.includes('bp.EventSet'))
+	//  return code+';\n';
   
   
-  generated_line_format = '//Auto-generated code for dynamic event detection:\nbp.log.info(\"EVENT_DETECTED: \"+'
-  
- 
-  
-  
+  //generated_line_format = '//Auto-generated code for dynamic event detection:\nbp.log.info(\"EVENT_DETECTED: \"+'
+    generated_line_format ="";
   //if waitFor is a list of events, generate a bp.log.info line for each of them, for the downstream application
-  if (value_wait.startsWith('[')){
-	value_wait = value_wait.substring(1,value_wait.length-1);//remove brackets
-	split = value_wait.split(',');
-	split.forEach(function(entry){
-		code=generated_line_format+getEventName(entry.trim())+');\n'+code;
-	});
-  }
-  else
-	code=generated_line_format+getEventName(value_wait.trim())+');\n'+code;
+  // if (value_wait.startsWith('[')){
+	// value_wait = value_wait.substring(1,value_wait.length-1);//remove brackets
+	// split = value_wait.split(',');
+	// split.forEach(function(entry){
+	// 	code=generated_line_format+getEventName(entry.trim())+');\n'+code;
+	// });
+  // }
+  // else
+	// code=generated_line_format+getEventName(value_wait.trim())+');\n'+code;
   
   return code+';\n';
 };
@@ -404,6 +423,24 @@ Blockly.JavaScript['text_parseint'] = function(block) {
   var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
   var code = 'parseInt('+text+')';
   return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['text_parse'] = function(block) {
+    var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = 'parseInt('+text+')';
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['mathFloor'] = function(block) {
+    var value_floor = Blockly.JavaScript.valueToCode(block, 'floor', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = 'Math.floor('+ value_floor + ')';
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['is_number'] = function(block) {
+    var s = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = 'IsNumber('+ s + ')';
+    return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 
