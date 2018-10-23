@@ -8,13 +8,30 @@ Blockly.defineBlocksWithJsonArray([
         "type": "input_value",
         "name": "NAME",
         "check": "String"
-      }
+      },
     ],
-	"inputsInline": true,
     "output" : "BP_EVENT",
 	"colour": 0,
     "tooltip": "A BP Event"
   },
+{
+        "type": "bp_event_with_data",
+        "message0": "BP Event %1 With data: %2",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "NAME",
+                "check": "String"
+            },
+            {
+                "type": "input_value",
+                "name": "DATA"
+            }
+        ],
+        "output" : "BP_EVENT",
+        "colour": 0,
+        "tooltip": "A BP Event"
+    },
 {
   "type": "bp_event_of_list",
   "message0": "BP Event %1",
@@ -82,9 +99,12 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_bsync_with_output",
-  "message0": "Wait %1 Request %2 Block %3",
+  "message0": "bsync with:%1 Wait %2 Request %3 Block %4",
   "args0": [
-    {
+      {
+          "type": "input_dummy"
+      },
+      {
       "type": "input_value",
       "name": "WAIT",
       "check": ["BP_EVENT","BP_EVENT_LIST","Array","BP_EVENT_SET"]
@@ -134,11 +154,16 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_eventset",
-  "message0": "All events so that: %1 %2",
+  "message0": "BP EventSet %1 name: %2 with function: %3",
   "args0": [
     {
       "type": "input_dummy"
     },
+      {
+          "type": "input_value",
+          "name": "NAME",
+          "check": "String"
+      },
     {
       "type": "input_value",
       "name": "COND",
@@ -151,6 +176,30 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "Define a predicate over the events' name",
   "helpUrl": ""
 },
+{
+        "type": "bp_eventset_var",
+        "message0": "BP EventSet %1 name: %2 with variable: %3",
+        "args0": [
+            {
+                "type": "input_dummy"
+            },
+            {
+                "type": "input_value",
+                "name": "NAME",
+                "check": "String"
+            },
+            {
+                "type": "input_value",
+                "name": "VAR",
+                "check": "variable_get"
+            }
+        ],
+        "inputsInline": false,
+        "output": "BP_EVENT_SET",
+        "colour": 355,
+        "tooltip": "Define a predicate over the events' name",
+        "helpUrl": ""
+    },
 {
   "type": "text_startswith",
   "message0": "%1 Starts with %2 %3",
@@ -171,7 +220,7 @@ Blockly.defineBlocksWithJsonArray([
   ],
   "inputsInline": true,
   "output": "Boolean",
-  "colour": 180,
+  "colour": 160,
   "tooltip": "Check whether or not a string begins with another string",
   "helpUrl": ""
 },
@@ -200,20 +249,56 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "text_parseint",
-  "message0": "Integer %1",
+  "type": "toString",
+  "message0": "toString() %1",
   "args0": [
     {
       "type": "input_value",
       "name": "TEXT",
-      "check": "String"
+      "check": "Number"
     }
   ],
-  "output": "Number",
-  "colour": 230,
-  "tooltip": "Turn a string to an integer",
+  "output": "String",
+  "colour": 160,
+  "tooltip": "Turn a integer to an string",
   "helpUrl": ""
 },
+{
+        "type": "includes",
+        "message0": "%1 includes %2",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "VAR",
+                "check": "String"
+            },
+            {
+                "type": "input_value",
+                "name": "TEXT",
+                "check": "String"
+            }
+        ],
+        "inputsInline": true,
+        "output": "Boolean",
+        "colour": 160,
+        "tooltip": "Check if one string may be found within another string, returning true or false",
+        "helpUrl": ""
+    },
+{
+        "type": "text_parseint",
+        "message0": "parse to number %1",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "TEXT",
+                "check": "String"
+            }
+        ],
+        "output": "Number",
+        "colour": 160,
+        "tooltip": "Turn a string to an integer",
+        "helpUrl": ""
+    },
 
 {
         "type": "mathFloor",
@@ -231,8 +316,8 @@ Blockly.defineBlocksWithJsonArray([
         "helpUrl": ""
     },
 {
-    "type": "is_number",
-    "message0": "IsNumber %1",
+    "type": "is_nan",
+    "message0": "Is not a number %1",
     "args0": [
         {
             "type": "input_value",
@@ -245,15 +330,28 @@ Blockly.defineBlocksWithJsonArray([
     "tooltip": "Is the given string a number (includes negative and decimals)",
     "helpUrl": ""
     }
+
+
   ]);
   
   
 Blockly.JavaScript['bp_event'] = function(block) {
   var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
   if(event_name == '\'\'')
-	  event_name = '\'Anonymous event\''
+	  event_name = '\'Anonymous event\'';
+
   var code = 'bp.Event('+event_name+')';
+
   return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+
+Blockly.JavaScript['bp_event_with_data'] = function(block) {
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name == '\'\'')
+        event_name = '\'Anonymous event\'';
+    var event_data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
+
+        var code = 'bp.Event('+event_name+','+')';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
   
 Blockly.JavaScript['bp_event_of_list'] =  Blockly.JavaScript['bp_event']
 
@@ -315,7 +413,6 @@ Blockly.JavaScript['bp_bsync'] = function(block) {
   
   
   //generated_line_format = '//Auto-generated code for dynamic event detection:\nbp.log.info(\"EVENT_DETECTED: \"+'
-    generated_line_format ="";
   //if waitFor is a list of events, generate a bp.log.info line for each of them, for the downstream application
   // if (value_wait.startsWith('[')){
 	// value_wait = value_wait.substring(1,value_wait.length-1);//remove brackets
@@ -334,48 +431,22 @@ Blockly.JavaScript['bp_bsync_with_output'] = function(block) {
   var value_wait = Blockly.JavaScript.valueToCode(block, 'WAIT', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
   var value_request = Blockly.JavaScript.valueToCode(block, 'REQUEST', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
   var value_block = Blockly.JavaScript.valueToCode(block, 'BLOCK', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
-  
-  code = '';
-  
-  //make the code prettier by not showing null values
-  if (value_wait == 'null' && value_request != 'null' && value_block != 'null')
-	  code = 'bsync({request: '+value_request+',\nblock: '+value_block+'})';
-  
-  if (value_wait != 'null' && value_request == 'null' && value_block != 'null')
-	  code = 'bsync({waitFor: '+value_wait+',\nblock: '+value_block+'})';
 
-  if (value_wait != 'null' && value_request != 'null' && value_block == 'null')
-	  code = 'bsync({waitFor: '+value_wait+',\nrequest: '+value_request+'})';
-  
-  if (value_wait == 'null' && value_request == 'null' && value_block != 'null')
-	  code = 'bsync({block: '+value_block+'})';
-  
-  if (value_wait == 'null' && value_request != 'null' && value_block == 'null')
-	  code = 'bsync({request: '+value_request+'})';
-  
-  if (value_wait != 'null' && value_request == 'null' && value_block == 'null')
-	  code = 'bsync({waitFor: '+value_wait+'})';
-  
-  if (value_wait == 'null' && value_request == 'null' && value_block == 'null')
-	  code = 'bsync({})';
-  
-  if (value_wait != 'null' && value_request != 'null' && value_block != 'null')
-      code = 'bsync({waitFor: '+value_wait+',\nrequest: '+value_request+',\nblock: '+value_block+'})';
-  
-  if(value_wait == 'null' || value_wait.includes('bp.EventSet'))
-	  return [code, Blockly.JavaScript.ORDER_ATOMIC];
-  
-  generated_line_format = '//Auto-generated code for dynamic event detection:\nbp.log.info(\"EVENT_DETECTED: \"+'
-  //if waitFor is a list of events, generate a bp.log.info line for each of them, for the downstream application
-  if (value_wait.startsWith('[')){
-	value_wait = value_wait.substring(1,value_wait.length-1);
-	split = value_wait.split(',');
-	split.forEach(function(entry){
-		code=generated_line_format+getEventName(entry.trim())+');\n'+code;
-	});
-  }
-  else
-	code=generated_line_format+getEventName(value_wait.trim())+');\n'+code;
+    var set=[];
+
+    if (value_wait !== 'null') {
+        //check for EventSet and array of events
+        set.push('waitFor: '+value_wait);
+    }
+    if (value_request !== 'null') {
+        //check for EventSet and array of events
+        set.push('request: '+value_request);
+    }
+    if (value_block !== 'null') {
+        //check for EventSet and array of events
+        set.push('block: '+value_block);
+    }
+    var code = 'bsync({'+set.join(",\n")+'})';
  
  //return code;
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
@@ -404,12 +475,31 @@ Blockly.JavaScript['text_startswith'] = function(block) {
 var eventset_counter = 0;
 
 Blockly.JavaScript['bp_eventset'] = function(block) {
-  var cond = Blockly.JavaScript.valueToCode(block, 'COND', Blockly.JavaScript.ORDER_ATOMIC);
-  eventset_counter++;
-  
-  var code = 'bp.EventSet(\"es'+eventset_counter+'\", function(e) {\n  return '+cond+';\n})';
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name == '\'\''){
+        event_name = 'es'+ eventset_counter;
+        eventset_counter++;
+    }
 
-  return [code, Blockly.JavaScript.ORDER_NONE];
+  var cond = Blockly.JavaScript.valueToCode(block, 'COND', Blockly.JavaScript.ORDER_ATOMIC);
+
+  var code = 'bp.EventSet('+event_name+', function(e) {\n  return '+cond+';\n})';
+
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.JavaScript['bp_eventset_var'] = function(block) {
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name == '\'\''){
+        event_name = 'es'+ eventset_counter;
+        eventset_counter++;
+    }
+
+    var variable = Blockly.JavaScript.valueToCode(block, 'VAR', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = 'bp.EventSet('+event_name+','+variable+')';
+
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['text_concatenate'] = function(block) {
@@ -422,25 +512,39 @@ Blockly.JavaScript['text_concatenate'] = function(block) {
 Blockly.JavaScript['text_parseint'] = function(block) {
   var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
   var code = 'parseInt('+text+')';
-  return [code, Blockly.JavaScript.ORDER_NONE];
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.JavaScript['toString'] = function(block) {
+    var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = text+'.toString()';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.JavaScript['includes'] = function(block) {
+    var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+    var _var = Blockly.JavaScript.valueToCode(block, 'VAR', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = _var+'.includes('+text+')';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['text_parse'] = function(block) {
     var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
     var code = 'parseInt('+text+')';
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['mathFloor'] = function(block) {
     var value_floor = Blockly.JavaScript.valueToCode(block, 'floor', Blockly.JavaScript.ORDER_ATOMIC);
     var code = 'Math.floor('+ value_floor + ')';
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['is_number'] = function(block) {
+Blockly.JavaScript['is_nan'] = function(block) {
     var s = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
-    var code = 'IsNumber('+ s + ')';
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    var code = 'isNaN('+ s + ')';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
+
 
 

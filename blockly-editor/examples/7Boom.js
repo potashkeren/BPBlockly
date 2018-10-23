@@ -1,24 +1,40 @@
-var beforeSeven = bp.EventSet( "got7", function(evt) {
-    var nxt = ""+ (parseInt(evt.name) + 1);
-    return (parseInt(nxt) % 7 === 0 || nxt.include("7"))
-});
+var beforeSevenFunction = function (evt) {
+    var nxt = (parseInt(evt.name) + 1);
+    return (nxt % 7 === 0 || nxt.toString().includes("7"))
+};
 
-var number = bp.EventSet( "num", function(evt) {
-    return isNumber(evt.name)
+var beforeSeven = bp.EventSet("got7", beforeSevenFunction);
+
+var number = bp.EventSet("num", function (evt) {
+    //return /^\d+$/.test(evt.name)
+    return !isNaN(evt.name)
 });
 
 var boom = bp.Event("booom");
 
-
-bp.registerBThread("7boom", function(){
-    for(i=1; i<=100; i++) {
-        bp.sync({request:bp.Event(i), waitFor: boom})
+bp.registerBThread("7boom", function () {
+    for (i = 1; i <= 100; i++) {
+        bsync({request: bp.Event(i), waitFor: boom})
     }
 });
 
-bp.registerBThread("counter", function(){
-    while(true){
-        bp.sync({waitFor: beforeSeven});
-        bp.sync({request: boom , block: number});
+bp.registerBThread("badCounter", function () {
+        return;/// problem in 28...
+        while (true) {
+            bsync({waitFor: beforeSeven});
+            bsync({request: boom, block: number});
+        }
     }
-});
+);
+
+bp.registerBThread("counter", function () {
+        while (true) {
+            var num = bsync({waitFor: beforeSeven});
+            while (true) {
+                bsync({request: boom, block: number});
+                num = {name: (Number(num.name) + 1).toString()};
+                if (!beforeSevenFunction(num)){break; }
+            }
+        }
+    }
+);
