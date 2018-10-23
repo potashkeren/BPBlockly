@@ -178,7 +178,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
         "type": "bp_eventset_var",
-        "message0": "BP EventSet %1 name: %2 with variable: %3",
+        "message0": "BP EventSet %1 name: %2 with function name: %3",
         "args0": [
             {
                 "type": "input_dummy"
@@ -191,7 +191,7 @@ Blockly.defineBlocksWithJsonArray([
             {
                 "type": "input_value",
                 "name": "VAR",
-                "check": "variable_get"
+                "check": "String"
             }
         ],
         "inputsInline": false,
@@ -290,8 +290,7 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
             {
                 "type": "input_value",
-                "name": "TEXT",
-                "check": "String"
+                "name": "TEXT"
             }
         ],
         "output": "Number",
@@ -329,6 +328,65 @@ Blockly.defineBlocksWithJsonArray([
     "colour": 230,
     "tooltip": "Is the given string a number (includes negative and decimals)",
     "helpUrl": ""
+    },
+{
+    "type": "object",
+    "message0": "create an object %1 %2",
+    "args0": [
+        {
+            "type": "input_dummy"
+        },
+        {
+            "type": "input_statement",
+            "name": "LIST"
+        }
+    ],
+    "output": null,
+    "colour": 240,
+    "tooltip": "",
+    "helpUrl": ""
+},
+
+{
+    "type": "property_value",
+    "message0": "property: %1 value: %2",
+    "args0": [
+    {
+        "type": "input_value",
+        "name": "PROPERTY",
+        "check": "String"
+    },
+    {
+        "type": "input_value",
+        "name": "VALUE"
+    }
+],
+    "inputsInline": true,
+    "previousStatement": null,
+    "nextStatement": "property_value",
+    "colour": 220,
+    "tooltip": "",
+    "helpUrl": ""
+},
+{
+        "type": "get_object_value",
+        "message0": "from object %1 get %2",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "OBJECT"
+            },
+            {
+                "type": "input_value",
+                "name": "PROPERTY",
+                "check": "String"
+            }
+        ],
+        "inputsInline": true,
+        "output": null,
+        "colour": 230,
+        "tooltip": "",
+        "helpUrl": ""
     }
 
 
@@ -353,10 +411,10 @@ Blockly.JavaScript['bp_event_with_data'] = function(block) {
         var code = 'bp.Event('+event_name+','+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC]};
   
-Blockly.JavaScript['bp_event_of_list'] =  Blockly.JavaScript['bp_event']
+Blockly.JavaScript['bp_event_of_list'] =  Blockly.JavaScript['bp_event'];
 
 Blockly.JavaScript['bp_event_list'] = function(block) {
-  var events_string = Blockly.JavaScript.valueToCode(block, 'LIST');
+  var events_string = Blockly.JavaScript.statementToCode(block, 'LIST');
   events = breakEventsString(events_string);
   var code = '';
   events.forEach(function(entry){
@@ -460,7 +518,7 @@ Blockly.JavaScript['bp_register_bthread'] = function(block) {
 };
 
 Blockly.JavaScript['bp_event_name'] = function(block) {
-  var code = 'e.getName()';
+  var code = 'e.name';
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -497,7 +555,7 @@ Blockly.JavaScript['bp_eventset_var'] = function(block) {
 
     var variable = Blockly.JavaScript.valueToCode(block, 'VAR', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = 'bp.EventSet('+event_name+','+variable+')';
+    var code = 'bp.EventSet('+event_name+','+eval(variable)+')';
 
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
@@ -546,5 +604,72 @@ Blockly.JavaScript['is_nan'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+Blockly.JavaScript['object'] = function(block) {
+    var property_value = Blockly.JavaScript.statementToCode(block, 'LIST');
+    var code = '{'+property_value.slice(0, -1) +'}';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+
+Blockly.JavaScript['property_value'] = function(block) {
+    var value_property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
+    var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = ' '+ eval(value_property)+ ':' + value_value + ',';
+    return code;
+};
+
+Blockly.JavaScript['get_object_value'] = function(block) {
+    var object = Blockly.JavaScript.valueToCode(block, 'OBJECT', Blockly.JavaScript.ORDER_ATOMIC);
+    var property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = object+ '.' + eval(property);
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['procedures_defreturn2'] = {
+    init: function() {
+        var nameField = new Blockly.FieldTextInput('',
+            Blockly.Procedures.rename);
+        nameField.setSpellcheck(false);
+        this.appendDummyInput()
+            .appendField(Blockly.Msg['PROCEDURES_DEFRETURN_TITLE'])
+            .appendField(nameField, 'NAME')
+            .appendField('', 'PARAMS');
+        this.appendValueInput('RETURN')
+            .setAlign(Blockly.ALIGN_RIGHT)
+            .appendField(Blockly.Msg['PROCEDURES_DEFRETURN_RETURN']);
+        this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
+        if ((this.workspace.options.comments ||
+                (this.workspace.options.parentWorkspace &&
+                    this.workspace.options.parentWorkspace.options.comments)) &&
+            Blockly.Msg['PROCEDURES_DEFRETURN_COMMENT']) {
+            this.setCommentText(Blockly.Msg['PROCEDURES_DEFRETURN_COMMENT']);
+        }
+        this.setColour(Blockly.Msg['PROCEDURES_HUE']);
+        this.setOutput(true, null);
+        this.setTooltip(Blockly.Msg['PROCEDURES_DEFRETURN_TOOLTIP']);
+        this.setHelpUrl(Blockly.Msg['PROCEDURES_DEFRETURN_HELPURL']);
+        this.arguments_ = [];
+        this.argumentVarModels_ = [];
+        this.setStatements_(true);
+        this.statementConnection_ = null;
+    },
+    setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
+    updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
+    mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
+    domToMutation: Blockly.Blocks['procedures_defnoreturn'].domToMutation,
+    decompose: Blockly.Blocks['procedures_defnoreturn'].decompose,
+    compose: Blockly.Blocks['procedures_defnoreturn'].compose,
+    getProcedureDef: function() {
+        return [this.getFieldValue('NAME'), this.arguments_, true];
+    },
+    getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
+    getVarModels: Blockly.Blocks['procedures_defnoreturn'].getVarModels,
+    renameVarById: Blockly.Blocks['procedures_defnoreturn'].renameVarById,
+    updateVarName: Blockly.Blocks['procedures_defnoreturn'].updateVarName,
+    displayRenamedVar_: Blockly.Blocks['procedures_defnoreturn'].displayRenamedVar_,
+    customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
+    callType_: 'procedures_callreturn'
+};
 
 
+Blockly.Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('procedures_defreturn2');

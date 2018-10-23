@@ -53,49 +53,10 @@ public class RunServlet extends HttpServlet {
 		BufferedReader br = request.getReader();
 
 		//String s = null;
-		String s = "var beforeSevenFunction = function (evt) {\n" +
-				"    var nxt = (parseInt(evt.name) + 1);\n" +
-				"    return (nxt % 7 === 0 || nxt.toString().includes(\"7\"))\n" +
-				"};\n" +
-				"\n" +
-				"var beforeSeven = bp.EventSet(\"got7\", beforeSevenFunction);\n" +
-				"\n" +
-				"var number = bp.EventSet(\"num\", function (evt) {\n" +
-				"    //return /^\\d+$/.test(evt.name)\n" +
-				"    return !isNaN(evt.name)\n" +
-				"});\n" +
-				"\n" +
-				"var boom = bp.Event(\"booom\");\n" +
-				"\n" +
-				"bp.registerBThread(\"7boom\", function () {\n" +
-				"    for (i = 1; i <= 100; i++) {\n" +
-				"        bsync({request: bp.Event(i), waitFor: boom})\n" +
-				"    }\n" +
-				"});\n" +
-				"\n" +
-				"bp.registerBThread(\"badCounter\", function () {\n" +
-				"        return;/// problem in 28...\n" +
-				"        while (true) {\n" +
-				"            bsync({waitFor: beforeSeven});\n" +
-				"            bsync({request: boom, block: number});\n" +
-				"        }\n" +
-				"    }\n" +
-				");\n" +
-				"\n" +
-				"bp.registerBThread(\"counter\", function () {\n" +
-				"        while (true) {\n" +
-				"            var num = bsync({waitFor: beforeSeven});\n" +
-				"            while (true) {\n" +
-				"                bsync({request: boom, block: number});\n" +
-				"                num = {name: (Number(num.name) + 1).toString()};\n" +
-				"                if (!beforeSevenFunction(num)){break; }\n" +
-				"            }\n" +
-				"        }\n" +
-				"    }\n" +
-				");";
+		String s = "";
 		String code = IOUtils.toString(br);
 
-		final StringBProgram bprog = new StringBProgram(s);
+		final StringBProgram bprog = new StringBProgram(code);
 
 		/*br = new BufferedReader(new FileReader("packman\\bt-server.js"));
 		String code2 = IOUtils.toString(br);

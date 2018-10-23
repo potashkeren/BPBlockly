@@ -1,4 +1,4 @@
-var beforeSevenFunction = function (evt) {
+function beforeSevenFunction (evt) {
     var nxt = (parseInt(evt.name) + 1);
     return (nxt % 7 === 0 || nxt.toString().includes("7"))
 };
@@ -18,15 +18,6 @@ bp.registerBThread("7boom", function () {
     }
 });
 
-bp.registerBThread("badCounter", function () {
-        return;/// problem in 28...
-        while (true) {
-            bsync({waitFor: beforeSeven});
-            bsync({request: boom, block: number});
-        }
-    }
-);
-
 bp.registerBThread("counter", function () {
         while (true) {
             var num = bsync({waitFor: beforeSeven});
@@ -38,3 +29,4 @@ bp.registerBThread("counter", function () {
         }
     }
 );
+
