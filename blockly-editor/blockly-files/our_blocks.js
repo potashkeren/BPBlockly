@@ -33,6 +33,40 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "A BP Event"
     },
 {
+    "type": "bp_event_no_output",
+    "message0": "BP Event %1",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "NAME",
+            "check": "String"
+        },
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "A BP Event"
+},
+{
+    "type": "bp_event_with_data_no_output",
+    "message0": "BP Event %1 With data: %2",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "NAME",
+            "check": "String"
+        },
+        {
+            "type": "input_value",
+            "name": "DATA"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "A BP Event"
+},
+{
   "type": "bp_event_of_list",
   "message0": "BP Event %1",
   "args0": [
@@ -140,6 +174,7 @@ Blockly.defineBlocksWithJsonArray([
   ],
   "inputsInline": true,
   "previousStatement": null,
+  "nextStatement": null,
   "colour": 55,
   "tooltip": "A single BThread",
   "helpUrl": ""
@@ -408,7 +443,25 @@ Blockly.JavaScript['bp_event_with_data'] = function(block) {
         event_name = '\'Anonymous event\'';
     var event_data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
-        var code = 'bp.Event('+event_name+','+')';
+        var code = 'bp.Event('+event_name+','+event_data+')';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+
+Blockly.JavaScript['bp_event_no_output'] = function(block) {
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name == '\'\'')
+        event_name = '\'Anonymous event\'';
+
+    var code = 'bp.Event('+event_name+')';
+
+    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+
+Blockly.JavaScript['bp_event_with_data_no_output'] = function(block) {
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name == '\'\'')
+        event_name = '\'Anonymous event\'';
+    var event_data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = 'bp.Event('+event_name+','+event_data+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC]};
   
 Blockly.JavaScript['bp_event_of_list'] =  Blockly.JavaScript['bp_event'];
@@ -465,7 +518,7 @@ Blockly.JavaScript['bp_bsync'] = function(block) {
         //check for EventSet and array of events
         set.push('block: '+value_block);
     }
-    var code = 'bsync({'+set.join(",\n")+'})';
+    var code = 'bp.sync({'+set.join(",\n")+'})';
   //if(value_wait == 'null' || value_wait.includes('bp.EventSet'))
 	//  return code+';\n';
   
@@ -504,7 +557,7 @@ Blockly.JavaScript['bp_bsync_with_output'] = function(block) {
         //check for EventSet and array of events
         set.push('block: '+value_block);
     }
-    var code = 'bsync({'+set.join(",\n")+'})';
+    var code = 'bp.sync({'+set.join(",\n")+'})';
  
  //return code;
   return [code, Blockly.JavaScript.ORDER_ATOMIC];

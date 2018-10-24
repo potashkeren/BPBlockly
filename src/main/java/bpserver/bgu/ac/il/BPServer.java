@@ -61,6 +61,10 @@ public class BPServer {
         // Add debug endpoint to server container
         ServerEndpointConfig echoConfig = ServerEndpointConfig.Builder.create(DebugEndPoint.class,"/debug").build();
         container.addEndpoint(echoConfig);
+
+		// Add endpoint to server container
+		ServerEndpointConfig cfg = ServerEndpointConfig.Builder.create(EventQueue.class,"/eventqueue").build();
+		container.addEndpoint(cfg);
 		
 		HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[] { fileHandler, context});
