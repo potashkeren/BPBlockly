@@ -1,19 +1,12 @@
 package bpserver.bgu.ac.il;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
-
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.Logger;
-
-
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import org.eclipse.jetty.util.log.Log;
+import org.eclipse.jetty.util.log.Logger;
+import org.json.*;
+import javax.websocket.*;
 
 public class EventQueue extends Endpoint implements MessageHandler.Whole<String> {
     private static final Logger LOG = Log.getLogger(EventQueue.class);
@@ -52,9 +45,17 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
     public void onMessage(String message) {
         LOG.info("Enquing external event {}", message);
 
-        if (RunServlet.bprog != null) {
-            RunServlet.bprog.enqueueExternalEvent(new BEvent(message));
+        try {
+            final JSONObject obj = new JSONObject(message);
 
+            String name = obj.getString("name");
+            Object data = obj.getJSONObject("data");
+
+            if (RunServlet.bprog != null) {
+                RunServlet.bprog.enqueueExternalEvent(new BEvent(name,data));
+            }
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -34,7 +34,7 @@
 	</div>
 </body>
 <script>
-	webSocket = new WebSocket("ws://localhost:8090/eventqueue");
+	webSocket = new WebSocket("ws://localhost:8080/eventqueue");
 
 	webSocket.onmessage = function(msg) {
 		try {
@@ -42,7 +42,7 @@
 			console.log(event);
 
 			if (event.name == "X" || event.name == "O") {
-				$("#cell_" + event.row + "_" + event.col).html(event.name);
+				$("#cell_" + event.data._row + "_" + event.data._col).html(event.name);
 			}
 		} catch (e) {
 			console.log(msg.data);
@@ -51,10 +51,11 @@
 
 	function clickCell(r, c) {
 		var e = JSON.stringify({
-			name : 'Click',
-			row : r,
-			col : c
-		});
+            name: 'Click',
+            data: {
+            _row: r,
+            _col: c
+        }	});
 
 		webSocket.send(e);
 	}

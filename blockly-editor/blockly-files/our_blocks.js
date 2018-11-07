@@ -8,7 +8,7 @@ Blockly.defineBlocksWithJsonArray([
         "type": "input_value",
         "name": "NAME",
         "check": "String"
-      },
+      }
     ],
     "output" : "BP_EVENT",
 	"colour": 0,
@@ -40,7 +40,7 @@ Blockly.defineBlocksWithJsonArray([
             "type": "input_value",
             "name": "NAME",
             "check": "String"
-        },
+        }
     ],
     "previousStatement": null,
     "nextStatement": null,
@@ -104,7 +104,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_bsync",
-  "message0": "bsync with:%1 Wait %2 Request %3 Block %4",
+  "message0": "bsync with:%1 Wait %2 Request %3 Block %4 Priority %5",
   "args0": [
       {
           "type": "input_dummy"
@@ -117,13 +117,18 @@ Blockly.defineBlocksWithJsonArray([
     {
       "type": "input_value",
       "name": "REQUEST",
-      "check": "BP_EVENT"
+      "check": ["BP_EVENT","BP_EVENT_LIST","Array","BP_EVENT_SET"]
     },
     {
       "type": "input_value",
       "name": "BLOCK",
       "check": ["BP_EVENT","BP_EVENT_LIST","Array","BP_EVENT_SET"]
-    }
+    },
+      {
+          "type": "input_value",
+          "name": "PRIORITY",
+          "check": "Number"
+      }
   ],
   "previousStatement": null,
   "nextStatement": null,
@@ -364,45 +369,7 @@ Blockly.defineBlocksWithJsonArray([
     "tooltip": "Is the given string a number (includes negative and decimals)",
     "helpUrl": ""
     },
-{
-    "type": "object",
-    "message0": "create an object %1 %2",
-    "args0": [
-        {
-            "type": "input_dummy"
-        },
-        {
-            "type": "input_statement",
-            "name": "LIST"
-        }
-    ],
-    "output": null,
-    "colour": 240,
-    "tooltip": "",
-    "helpUrl": ""
-},
 
-{
-    "type": "property_value",
-    "message0": "property: %1 value: %2",
-    "args0": [
-    {
-        "type": "input_value",
-        "name": "PROPERTY",
-        "check": "String"
-    },
-    {
-        "type": "input_value",
-        "name": "VALUE"
-    }
-],
-    "inputsInline": true,
-    "previousStatement": null,
-    "nextStatement": "property_value",
-    "colour": 220,
-    "tooltip": "",
-    "helpUrl": ""
-},
 {
         "type": "get_object_value",
         "message0": "from object %1 get %2",
@@ -430,7 +397,7 @@ Blockly.defineBlocksWithJsonArray([
   
 Blockly.JavaScript['bp_event'] = function(block) {
   var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-  if(event_name == '\'\'')
+  if(event_name === '\'\'')
 	  event_name = '\'Anonymous event\'';
 
   var code = 'bp.Event('+event_name+')';
@@ -439,7 +406,7 @@ Blockly.JavaScript['bp_event'] = function(block) {
 
 Blockly.JavaScript['bp_event_with_data'] = function(block) {
     var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-    if(event_name == '\'\'')
+    if(event_name === '\'\'')
         event_name = '\'Anonymous event\'';
     var event_data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
@@ -448,21 +415,23 @@ Blockly.JavaScript['bp_event_with_data'] = function(block) {
 
 Blockly.JavaScript['bp_event_no_output'] = function(block) {
     var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-    if(event_name == '\'\'')
+    if(event_name === '\'\'')
         event_name = '\'Anonymous event\'';
 
     var code = 'bp.Event('+event_name+')';
 
-    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+    return code
+};
 
 Blockly.JavaScript['bp_event_with_data_no_output'] = function(block) {
     var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-    if(event_name == '\'\'')
+    if(event_name === '\'\'')
         event_name = '\'Anonymous event\'';
     var event_data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
     var code = 'bp.Event('+event_name+','+event_data+')';
-    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+    return code
+};
   
 Blockly.JavaScript['bp_event_of_list'] =  Blockly.JavaScript['bp_event'];
 
@@ -503,6 +472,7 @@ Blockly.JavaScript['bp_bsync'] = function(block) {
   var value_wait = Blockly.JavaScript.valueToCode(block, 'WAIT', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
   var value_request = Blockly.JavaScript.valueToCode(block, 'REQUEST', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
   var value_block = Blockly.JavaScript.valueToCode(block, 'BLOCK', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+    var value_priority = Blockly.JavaScript.valueToCode(block, 'PRIORITY', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
 	
     var set=[];
 
@@ -518,7 +488,14 @@ Blockly.JavaScript['bp_bsync'] = function(block) {
         //check for EventSet and array of events
         set.push('block: '+value_block);
     }
-    var code = 'bp.sync({'+set.join(",\n")+'})';
+    var priority = '';
+    if (value_priority !== 'null') {
+        priority = ','+value_priority ;
+    }
+
+    var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +')';
+
+
   //if(value_wait == 'null' || value_wait.includes('bp.EventSet'))
 	//  return code+';\n';
   
@@ -657,19 +634,6 @@ Blockly.JavaScript['is_nan'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['object'] = function(block) {
-    var property_value = Blockly.JavaScript.statementToCode(block, 'LIST');
-    var code = '{'+property_value.slice(0, -1) +'}';
-    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
-
-Blockly.JavaScript['property_value'] = function(block) {
-    var value_property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
-    var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
-
-    var code = ' '+ eval(value_property)+ ':' + value_value + ',';
-    return code;
-};
-
 Blockly.JavaScript['get_object_value'] = function(block) {
     var object = Blockly.JavaScript.valueToCode(block, 'OBJECT', Blockly.JavaScript.ORDER_ATOMIC);
     var property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
@@ -678,51 +642,210 @@ Blockly.JavaScript['get_object_value'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['procedures_defreturn2'] = {
-    init: function() {
-        var nameField = new Blockly.FieldTextInput('',
-            Blockly.Procedures.rename);
-        nameField.setSpellcheck(false);
-        this.appendDummyInput()
-            .appendField(Blockly.Msg['PROCEDURES_DEFRETURN_TITLE'])
-            .appendField(nameField, 'NAME')
-            .appendField('', 'PARAMS');
-        this.appendValueInput('RETURN')
-            .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField(Blockly.Msg['PROCEDURES_DEFRETURN_RETURN']);
-        this.setMutator(new Blockly.Mutator(['procedures_mutatorarg']));
-        if ((this.workspace.options.comments ||
-                (this.workspace.options.parentWorkspace &&
-                    this.workspace.options.parentWorkspace.options.comments)) &&
-            Blockly.Msg['PROCEDURES_DEFRETURN_COMMENT']) {
-            this.setCommentText(Blockly.Msg['PROCEDURES_DEFRETURN_COMMENT']);
-        }
-        this.setColour(Blockly.Msg['PROCEDURES_HUE']);
-        this.setOutput(true, null);
-        this.setTooltip(Blockly.Msg['PROCEDURES_DEFRETURN_TOOLTIP']);
-        this.setHelpUrl(Blockly.Msg['PROCEDURES_DEFRETURN_HELPURL']);
-        this.arguments_ = [];
-        this.argumentVarModels_ = [];
-        this.setStatements_(true);
-        this.statementConnection_ = null;
-    },
-    setStatements_: Blockly.Blocks['procedures_defnoreturn'].setStatements_,
-    updateParams_: Blockly.Blocks['procedures_defnoreturn'].updateParams_,
-    mutationToDom: Blockly.Blocks['procedures_defnoreturn'].mutationToDom,
-    domToMutation: Blockly.Blocks['procedures_defnoreturn'].domToMutation,
-    decompose: Blockly.Blocks['procedures_defnoreturn'].decompose,
-    compose: Blockly.Blocks['procedures_defnoreturn'].compose,
-    getProcedureDef: function() {
-        return [this.getFieldValue('NAME'), this.arguments_, true];
-    },
-    getVars: Blockly.Blocks['procedures_defnoreturn'].getVars,
-    getVarModels: Blockly.Blocks['procedures_defnoreturn'].getVarModels,
-    renameVarById: Blockly.Blocks['procedures_defnoreturn'].renameVarById,
-    updateVarName: Blockly.Blocks['procedures_defnoreturn'].updateVarName,
-    displayRenamedVar_: Blockly.Blocks['procedures_defnoreturn'].displayRenamedVar_,
-    customContextMenu: Blockly.Blocks['procedures_defnoreturn'].customContextMenu,
-    callType_: 'procedures_callreturn'
+Blockly.JavaScript['object_create'] = function(block) {
+    if (!block.numFields) {
+        return ['{}', Blockly.JavaScript.ORDER_NONE];
+    }
+    var fieldInitCode = '';
+    for (var i = 1; i <= block.numFields; i++) {
+        const fieldName = block.getFieldValue('field' + i);
+        const fieldValue = Blockly.JavaScript.valueToCode(block, 'field_input' + i, Blockly.JavaScript.ORDER_ATOMIC);
+        fieldInitCode += fieldName+ ":" +fieldValue+","
+    }
+    const code = "{" +fieldInitCode+ "}";
+    return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 
-Blockly.Blocks['procedures_ifreturn'].FUNCTION_TYPES.push('procedures_defreturn2');
+
+const CUSTOM_OBJECT_CREATE_BLOCK_NAME = 'object_create';
+const CUSTOM_OBJECT_MUTATOR_FIELD_BLOCK_NAME = 'object_field';
+const CUSTOM_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME = 'object_create_mutator_top';
+
+const objectCreateBlockDef = {
+    "type": "object_create",
+    "message0": "create object",
+    "output": "Object",
+    "mutator": "controls_create_mutator",
+    "colour": 250,
+    "tooltip": "",
+    "helpUrl": ""
+};
+
+Blockly.Blocks[CUSTOM_OBJECT_CREATE_BLOCK_NAME] = {
+    init: function () {
+        this.jsonInit(objectCreateBlockDef);
+    }
+};
+
+const objectFieldBlockDef = {
+    "type": "object_field",
+    "message0": "%1 %2",
+    "args0": [
+        {
+            "type": "field_input",
+            "name": "field_name",
+            "text": "property name"
+        },
+        {
+            "type": "input_value",
+            "name": "field_value"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": ""
+};
+
+Blockly.Blocks[CUSTOM_OBJECT_MUTATOR_FIELD_BLOCK_NAME] = {
+    init: function () {
+        this.jsonInit(objectFieldBlockDef);
+    }
+};
+
+const objectCreateMutatorBlockDef = {
+    "type": "object_create_mutator",
+    "message0": "create object",
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": ""
+};
+
+Blockly.Blocks[CUSTOM_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME] = {
+    init: function () {
+        this.jsonInit(objectCreateMutatorBlockDef);
+    }
+};
+
+const objectCreateMutator = {
+    numFields: 0,
+    fields: [],
+
+    /**
+     * Standard function for Mutator mixin. It's called to update the block based on contents of the mutator's XML
+     * DOM element.
+     */
+    domToMutation: function(xmlElement) {
+        this.fields = [];
+        for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
+            if (childNode.nodeName.toLowerCase() == 'field') {
+                this.fields.push(childNode.getAttribute('name'));
+            }
+        }
+        this.numFields = this.fields.length;
+        this.updateShape();
+    },
+
+    /**
+     * Standard function for Mutator mixin. It's called to generate the mutator's XML DOM element based on the content
+     * of the block.
+     */
+    mutationToDom: function() {
+        if (!this.numFields) {
+            return null;
+        }
+        const container = document.createElement('mutation');
+        container.setAttribute('num_fields', '' + this.numFields);
+        for (var i = 0; i < this.fields.length; i++) {
+            const field = document.createElement('field');
+            field.setAttribute('name', this.fields[i]);
+            container.appendChild(field);
+        }
+        return container;
+    },
+
+    /**
+     * Standard function for Mutator mixin when the mutator uses the standard mutator UI. It's called to update the
+     * block based on changes to the mutator's UI.
+     */
+    compose: function(topBlock) {
+        var fieldBlock = topBlock.nextConnection && topBlock.nextConnection.targetBlock();
+        this.numFields = 0;
+        this.fields = [];
+        var connectionsToRestore = [null];
+        while (fieldBlock) {
+            this.fields.push(fieldBlock.getFieldValue('field_name'));
+            this.numFields++;
+            connectionsToRestore.push(fieldBlock.savedConnection);
+            fieldBlock = fieldBlock.nextConnection && fieldBlock.nextConnection.targetBlock();
+        }
+        this.updateShape();
+        // Reconnect any child blocks.
+        for (var i = 1; i <= this.numFields; i++) {
+            Blockly.Mutator.reconnect(connectionsToRestore[i], this, 'field_input' + i);
+        }
+    },
+
+    /**
+     * Standard function for Mutator mixin when the mutator uses the standard mutator UI.  It's called to populate the
+     * mutator UI.
+     */
+    decompose: function(workspace) {
+        const topBlock = workspace.newBlock(CUSTOM_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME);
+        topBlock.initSvg();
+        var connection = topBlock.nextConnection;
+        for (var i = 0; i < this.fields.length; i++) {
+            const fieldBlock = workspace.newBlock(CUSTOM_OBJECT_MUTATOR_FIELD_BLOCK_NAME);
+            fieldBlock.initSvg();
+            fieldBlock.setFieldValue(this.fields[i], 'field_name');
+            connection.connect(fieldBlock.previousConnection);
+            connection = fieldBlock.nextConnection;
+        }
+        return topBlock;
+    },
+
+    /**
+     * Standard function for Mutator mixin when the mutator uses the standard mutator UI.  It's called on any changes to
+     * the block and is generally used to keep track of input connections (by saving them with their corresponding mutator
+     * blocks), so that if the mutator later causes changes to the block it can restore those input connections.
+     *
+     * We're also using this function to update the mutator block field name values if the user changes the name in the
+     * block.
+     */
+    saveConnections: function(topBlock) {
+        var fieldBlock = topBlock.nextConnection && topBlock.nextConnection.targetBlock();
+        var i = 1;
+        while (fieldBlock) {
+            const input = this.getInput('field_input' + i);
+            fieldBlock.savedConnection = input && input.connection.targetConnection;
+            // Set mutator block field name from the corresponding 'real' Object.create block
+            fieldBlock.setFieldValue(this.getFieldValue('field' + i), 'field_name');
+            i++;
+            fieldBlock = fieldBlock.nextConnection &&
+                fieldBlock.nextConnection.targetBlock();
+        }
+    },
+
+    updateShape: function() {
+        // Delete everything.
+        if (this.getInput('with')) {
+            this.removeInput('with');
+        }
+        var i = 1;
+        while (this.getInput('field_input' + i)) {
+            this.removeInput('field_input' + i);
+            i++;
+        }
+        // Rebuild block.
+        if (this.numFields > 0) {
+            this.appendDummyInput('with')
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField("with fields");
+        }
+        for (var i = 1; i <= this.numFields; i++) {
+            const fieldName = this.fields[i - 1];
+            this.appendValueInput("field_input" + i)
+                .setCheck(null)
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField(new Blockly.FieldTextInput(fieldName), "field" + i);
+        }
+    },
+
+};
+
+Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutator, null, ['object_field']);
+
+
