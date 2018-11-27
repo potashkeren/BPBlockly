@@ -19,15 +19,19 @@
 <div class="app-container">
 
     <!--868px-->
-    <div id="blocklyDiv" style="height: 90%;" class="main blockly-panel"></div>
+    <div id="blocklyDiv" style="height: 90%;   border-radius: 8px; " class="main blockly-panel"></div>
     <div id="buttons">
         <button id="save_project_btn" type="button" class="btn btn-warning"
-                style="position: absolute; left: 9px; bottom: 9px;"
+                style="position: absolute; left: 9px; bottom: 9px; background-color: #18493d; border-color: #c0bdc1;"
+                onMouseOver="this.style.color='#ffffff'; this.style.backgroundColor='#68a0a0'"
+                onMouseOut="this.style.color='#ffffff'; this.style.backgroundColor='#2F4F4F'"
                 onclick="save_project()" title="Save your project">Save Project As..
         </button>
 
         <button id="load_project_btn" type="button" class="btn btn-warning"
-                style="position: absolute; left: 151px; bottom: 9px;"
+                style="position: absolute; left: 151px; bottom: 9px; background-color: #18493d; border-color: #c0bdc1;"
+                onMouseOver="this.style.color='#ffffff'; this.style.backgroundColor='#68a0a0'"
+                onMouseOut="this.style.color='#ffffff'; this.style.backgroundColor='#2F4F4F'"
                 onclick="input_click()" title="Load existing project">Load Project
         </button>
         <input type="file" id="project_file" accept='.xml'
@@ -35,7 +39,9 @@
 
 
         <button id="export_code_btn" type="button" class="btn btn-success"
-                style="position: absolute; right: 367px; bottom: 9px;"
+                style="position: absolute; right: 367px; bottom: 9px; background-color: #267163; border-color: darkslategray;"
+                onMouseOver="this.style.color='#ffffff'; this.style.backgroundColor='#68a0a0'"
+                onMouseOut="this.style.color='#ffffff'; this.style.backgroundColor='#2F4F4F'"
                 onclick="export_code()" title="Export your code">Deploy code
         </button>
 
@@ -47,7 +53,7 @@
 
     </div>
 </div>
-<xml id="toolbox" style="display: none">
+<xml id="toolbox" style="display: none ">
     <category id="catLogic" colour="210" name="Logic">
         <block type="controls_if"></block>
         <block type="logic_compare"></block>
@@ -179,6 +185,8 @@
             </value>
         </block>
         <block type="math_random_float"></block>
+        <block type="is_nan"></block>
+        <block type="mathFloor"></block>
     </category>
     <category id="catText" colour="160" name="Text">
         <block type="text"></block>
@@ -274,7 +282,7 @@
                 <field name="TEXT">a</field>
             </shadow>
         </block>
-        <block type="toString">
+        <block type="text_toString">
             <shadow type="text">
                 <field name="TEXT">a</field>
             </shadow>
@@ -473,9 +481,25 @@
         </block>
     </category>
 
-    <category id="catMY_BP" name="My BP" colour="130">
-        <block type="is_nan"></block>
-        <block type="mathFloor"></block>
+    <category id="catBP_CONTEXT" name="BP Context" colour="130">
+        <block type="object">
+            <value name="LIST">
+                <block type="property_value">
+                    <value name="PROPERTY">
+                        <shadow type="text">
+                            <field name="TEXT"></field>
+                        </shadow>
+                    </value>
+                </block>
+            </value>
+        </block>
+        <block type="property_value">
+            <value name="PROPERTY">
+                <shadow type="text">
+                    <field name="TEXT"></field>
+                </shadow>
+            </value>
+        </block>
         <block type="object_create"></block>
        <block type="get_object_value">
             <value name="PROPERTY">
@@ -484,6 +508,19 @@
                 </shadow>
             </value>
         </block>
+
+        <block type="context_created">
+            <value name="FIELDS">
+                <block type="variables_set">
+                    <value name="VALUE">
+                        <block type="get_context_property"></block>
+                    </value>
+                </block>
+            </value>
+        </block>
+        <block type="get_context_property"></block>
+        <block type="context_get_property"></block>
+
 
 
    </category>
@@ -654,7 +691,7 @@
 
 <style>
    .explanatoryBPLabelStyle > .blocklyFlyoutLabelText {
-       fill: purple;
+       fill: #000238;
        font-family: "verdana";
        font-weight: bold;
        font-size: 16px;

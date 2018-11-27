@@ -289,7 +289,7 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
-  "type": "toString",
+  "type": "text_toString",
   "message0": "toString() %1",
   "args0": [
     {
@@ -350,7 +350,7 @@ Blockly.defineBlocksWithJsonArray([
             }
         ],
         "output": "Number",
-        "colour": 65,
+        "colour": 240,
         "tooltip": "",
         "helpUrl": ""
     },
@@ -369,7 +369,44 @@ Blockly.defineBlocksWithJsonArray([
     "tooltip": "Is the given string a number (includes negative and decimals)",
     "helpUrl": ""
     },
-
+    {
+        "type": "object",
+        "message0": "create an object %1 %2",
+        "args0": [
+            {
+                "type": "input_dummy"
+            },
+            {
+                "type": "input_statement",
+                "name": "LIST"
+            }
+        ],
+        "output": null,
+        "colour": 240,
+        "tooltip": "",
+        "helpUrl": ""
+    },
+    {
+        "type": "property_value",
+        "message0": "property: %1 value: %2",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "PROPERTY",
+                "check": "String"
+            },
+            {
+                "type": "input_value",
+                "name": "VALUE"
+            }
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": "property_value",
+        "colour": 220,
+        "tooltip": "",
+        "helpUrl": ""
+    },
 {
         "type": "get_object_value",
         "message0": "from object %1 get %2",
@@ -393,8 +430,9 @@ Blockly.defineBlocksWithJsonArray([
 
 
   ]);
-  
-  
+
+//#region BP Basic + Advance Blocks
+
 Blockly.JavaScript['bp_event'] = function(block) {
   var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
   if(event_name === '\'\'')
@@ -495,23 +533,6 @@ Blockly.JavaScript['bp_bsync'] = function(block) {
 
     var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +')';
 
-
-  //if(value_wait == 'null' || value_wait.includes('bp.EventSet'))
-	//  return code+';\n';
-  
-  
-  //generated_line_format = '//Auto-generated code for dynamic event detection:\nbp.log.info(\"EVENT_DETECTED: \"+'
-  //if waitFor is a list of events, generate a bp.log.info line for each of them, for the downstream application
-  // if (value_wait.startsWith('[')){
-	// value_wait = value_wait.substring(1,value_wait.length-1);//remove brackets
-	// split = value_wait.split(',');
-	// split.forEach(function(entry){
-	// 	code=generated_line_format+getEventName(entry.trim())+');\n'+code;
-	// });
-  // }
-  // else
-	// code=generated_line_format+getEventName(value_wait.trim())+');\n'+code;
-  
   return code+';\n';
 };
 
@@ -552,13 +573,6 @@ Blockly.JavaScript['bp_event_name'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
-Blockly.JavaScript['text_startswith'] = function(block) {
-  var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '\'\'';
-  var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '\'\'';
-  var code = a+'.startsWith('+b+')';
-  return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
 //just to make the EventSet names unique
 var eventset_counter = 0;
 
@@ -589,6 +603,15 @@ Blockly.JavaScript['bp_eventset_var'] = function(block) {
 
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
+//#endregion  BP Basic + Advance Blocks
+
+//#region Text Blocks
+Blockly.JavaScript['text_startswith'] = function(block) {
+    var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC) || '\'\'';
+    var b = Blockly.JavaScript.valueToCode(block, 'B', Blockly.JavaScript.ORDER_ATOMIC) || '\'\'';
+    var code = a+'.startsWith('+b+')';
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
 
 Blockly.JavaScript['text_concatenate'] = function(block) {
   var a = Blockly.JavaScript.valueToCode(block, 'A', Blockly.JavaScript.ORDER_ATOMIC);
@@ -603,7 +626,7 @@ Blockly.JavaScript['text_parseint'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['toString'] = function(block) {
+Blockly.JavaScript['text_toString'] = function(block) {
     var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
     var code = text+'.toString()';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
@@ -622,6 +645,9 @@ Blockly.JavaScript['text_parse'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+//#endregion Text Blocks
+
+//#region Math Blocks
 Blockly.JavaScript['mathFloor'] = function(block) {
     var value_floor = Blockly.JavaScript.valueToCode(block, 'floor', Blockly.JavaScript.ORDER_ATOMIC);
     var code = 'Math.floor('+ value_floor + ')';
@@ -632,6 +658,20 @@ Blockly.JavaScript['is_nan'] = function(block) {
     var s = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
     var code = 'isNaN('+ s + ')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+//#endregion Math Blocks
+
+//#region Object Blocks
+Blockly.JavaScript['object'] = function(block) {
+    var property_value = Blockly.JavaScript.statementToCode(block, 'LIST');
+    var code = '{'+property_value.slice(0, -1) +'}';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC]};
+
+Blockly.JavaScript['property_value'] = function(block) {
+    var value_property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
+    var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = ' '+ eval(value_property)+ ':' + value_value + ',';
+    return code;
 };
 
 Blockly.JavaScript['get_object_value'] = function(block) {
@@ -655,8 +695,6 @@ Blockly.JavaScript['object_create'] = function(block) {
     const code = "{" +fieldInitCode+ "}";
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
-
-
 
 const CUSTOM_OBJECT_CREATE_BLOCK_NAME = 'object_create';
 const CUSTOM_OBJECT_MUTATOR_FIELD_BLOCK_NAME = 'object_field';
@@ -847,5 +885,140 @@ const objectCreateMutator = {
 };
 
 Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutator, null, ['object_field']);
+
+//endregion Object Blocks
+
+//#region Context
+var context= {
+    office: ['Motion Detector','Air Condition','Smoke Detector'],
+    restroom:['Smart Light'],
+    emergency: ['true', 'false'],
+    kitchen : ['Motion Detector','Smart Light','Air Condition']
+};
+var CONTEXT_OPTIONS = function(context){
+    result = [];
+    var keys = Object.keys(context);
+    keys.forEach(function(element) {
+        new_entry=[element, element.toUpperCase()]
+        result.push(new_entry);
+    });
+    return result
+};
+var PROPRTY_OPTIONS = function(selected_context){
+    result = [];
+    var properties = context[selected_context];
+    properties.forEach(function(element) {
+        new_entry=[element, element.toUpperCase()]
+        result.push(new_entry);
+    });
+    return result
+};
+
+var OPTIONS = CONTEXT_OPTIONS(context);
+var PROPERTIES = PROPRTY_OPTIONS("office");
+
+Blockly.Blocks['context_created'] = {
+    // Value input.
+    init: function() {
+        this.setColour(210);
+        this.appendDummyInput()
+            .appendField('context created')
+            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
+        this.appendStatementInput('FIELDS');
+        this.setPreviousStatement(true, 'Input');
+        this.setNextStatement(true, 'Input');
+        this.setOutput();
+        this.setTooltip('context created');
+    }
+};
+
+Blockly.Blocks['get_context_property'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput()
+            .appendField('get property')
+            .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
+        this.setOutput(true, null);
+        this.setTooltip('get the context property');
+    }
+};
+
+Blockly.Blocks['context_get_property'] = {
+    init: function() {
+        this.setColour(210);
+        this.appendDummyInput()
+            .appendField('from context:')
+            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
+        this.appendDummyInput('dropDownField')
+            .appendField('get property:')
+            .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
+        this.setPreviousStatement(true, 'Input');
+        this.setNextStatement(true, 'Input');
+        this.setOutput();
+        this.setTooltip('context created');
+    }
+    ,
+    onchange: function() {
+        update_context(this);
+    }
+
+};
+
+Blockly.JavaScript['get_context_property'] = function (block) {
+    var property = block.getFieldValue('PROPERTY').toLowerCase();
+    var code = property;
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['context_created'] = function (block) {
+    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
+    var property = Blockly.JavaScript.statementToCode(block, 'FIELDS');
+    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
+};
+
+Blockly.JavaScript['context_get_property'] = function (block) {
+    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
+    var property = block.getFieldValue('PROPERTY').toLowerCase();
+    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
+};
+
+function equalContext (a,b){
+    if (!a || !b)
+        return false;
+    if (a.length !== b.length)
+        return false;
+
+    for (var i = 0; i < a.length ; i++){
+        if (a[i][0] !== b[i][0])
+            return false;
+    }
+
+    return true;
+}
+function update_context(referenceBlock) {
+    if (referenceBlock.getInput('dropDownField') ){
+        // calculate new options
+        var ctx = referenceBlock.getFieldValue('CONTEXT').toLowerCase();
+        var newOptions=PROPRTY_OPTIONS(ctx);
+
+        // load current options from the drop down
+        var dropdown = referenceBlock.getInput('dropDownField').fieldRow[1];
+        var oldOptions = dropdown.menuGenerator_;
+        if (newOptions != null) {
+            if (oldOptions == null || !equalContext(oldOptions, newOptions)) {
+                try {
+                    referenceBlock.removeInput('dropDownField');
+                    referenceBlock.appendDummyInput('dropDownField')
+                        .appendField('get property:')
+                        .appendField(new Blockly.FieldDropdown(newOptions), 'PROPERTY');
+                }
+                catch(e){}
+            }
+        }
+    }
+};
+
+//#endregion Context
 
 

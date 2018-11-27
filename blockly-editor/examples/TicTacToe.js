@@ -8,7 +8,7 @@ function addSquareBThreads(row, col) {
     // Detects mouse click
     bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('Click',{ _row:row, _col:col}) ] });
+            bp.sync({ waitFor:[ bp.Event('Click',{ _row:row, _col:col}.toString()) ] });
             bp.sync({ request:[ bp.Event('X',{_row:row, _col:col}) ] });
         }
     });

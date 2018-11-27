@@ -354,9 +354,9 @@ public class RunServlet extends HttpServlet {
 		bprog = new StringBProgram(s);
 
         bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
-        //bprog.setWaitForExternalEvents(true);
+        bprog.setWaitForExternalEvents(true);
 
-		bprog.setDaemonMode(true);
+		//bprog.setDaemonMode(true);
 
 		rnr = new BProgramRunner(bprog);
 		rnr.addListener(new PrintBProgramRunnerListener());
