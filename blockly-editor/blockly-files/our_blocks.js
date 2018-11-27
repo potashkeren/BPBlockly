@@ -184,6 +184,34 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "A single BThread",
   "helpUrl": ""
 },
+    {
+        "type": "bp_register_contextual_bthread",
+        "message0": "BThread %1 %2 %3 %4",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "NAME"
+            },
+            {
+                "type": "input_value",
+                "name": "CTX_NAME"
+            },
+            {
+                "type": "input_value",
+                "name": "CTX_VAR_NAME"
+            },
+            {
+                "type": "input_statement",
+                "name": "CONTENT"
+            }
+        ],
+        "inputsInline": true,
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 55,
+        "tooltip": "A single BThread",
+        "helpUrl": ""
+    },
 {
   "type": "bp_event_name",
   "message0": "The event's name",
@@ -566,6 +594,18 @@ Blockly.JavaScript['bp_register_bthread'] = function(block) {
   var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
   var code = 'bp.registerBThread('+name+', function(){\n'+statements+'\n});\n';
   return code;
+};
+
+
+
+Blockly.JavaScript['bp_register_contextual_bthread'] = function(block) {
+    var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    var ctx_name = Blockly.JavaScript.valueToCode(block, 'CTX_NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    var ctx_var_name = Blockly.JavaScript.valueToCode(block, 'CTX_VAR_NAME', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
+    var code = 'bp.registerBThread('+name+','+ ctx_name +','+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
+    return code;
 };
 
 Blockly.JavaScript['bp_event_name'] = function(block) {
