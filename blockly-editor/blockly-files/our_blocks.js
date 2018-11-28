@@ -186,7 +186,7 @@ Blockly.defineBlocksWithJsonArray([
 },
     {
         "type": "bp_register_contextual_bthread",
-        "message0": "BThread %1 %2 %3 %4",
+        "message0": "BThread %1 with Context %2 function: %3 %4",
         "args0": [
             {
                 "type": "input_value",
@@ -205,7 +205,6 @@ Blockly.defineBlocksWithJsonArray([
                 "name": "CONTENT"
             }
         ],
-        "inputsInline": true,
         "previousStatement": null,
         "nextStatement": null,
         "colour": 55,
@@ -969,6 +968,39 @@ Blockly.Blocks['context_created'] = {
         this.setNextStatement(true, 'Input');
         this.setOutput();
         this.setTooltip('context created');
+    },
+    onchange: function() {
+        update_context_created(this);
+    }
+};
+
+function update_context_created(referenceBlock) {
+    var statement = referenceBlock.getInput('FIELDS');
+    if (statement.connection.targetConnection) {
+        var get_var = statement.connection.targetConnection.sourceBlock_;
+            var get_context_property = get_var.childBlocks_[0];
+
+            if (get_context_property.getInput('dropDownField')) {
+                // calculate new options
+                var ctx = referenceBlock.getFieldValue('CONTEXT').toLowerCase();
+                var newOptions = PROPRTY_OPTIONS(ctx);
+
+                // load current options from the drop down
+                var dropdown = get_context_property.getInput('dropDownField').fieldRow[1];
+                var oldOptions = dropdown.menuGenerator_;
+                if (newOptions != null) {
+                    if (oldOptions == null || !equalContext(oldOptions, newOptions)) {
+                        try {
+                            get_context_property.removeInput('dropDownField');
+                            get_context_property.appendDummyInput('dropDownField')
+                                .appendField('get property:')
+                                .appendField(new Blockly.FieldDropdown(newOptions), 'PROPERTY');
+                        }
+                        catch (e) {
+                        }
+                    }
+                }
+            }
     }
 };
 
@@ -976,7 +1008,7 @@ Blockly.Blocks['get_context_property'] = {
     // Value input.
     init: function () {
         this.setColour(240);
-        this.appendDummyInput()
+        this.appendDummyInput('dropDownField')
             .appendField('get property')
             .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
         this.setOutput(true, null);

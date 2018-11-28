@@ -52,7 +52,7 @@ public class RunServlet extends HttpServlet {
 				"    // Detects mouse click\n" +
 				"    bp.registerBThread(\"ClickHandler(\" + row + \",\" + col + \")\", function() {\n" +
 				"        while (true) {\n" +
-				"        bp.sync({ request:[ bp.Event('X',\"{\\\"_row\\\":1,\\\"_col\\\":1}\") ] });\n"+
+				"        bp.sync({ request:[ bp.Event('Click',\"{\\\"_row\\\":1,\\\"_col\\\":1}\") ] });\n"+
 				"            bp.sync({ waitFor:[ bp.Event('Click',\"{\\\"_row\\\":row,\\\"_col\\\":col}\") ] });\n" +
 				"            bp.sync({ request:[ bp.Event('X',\"{\\\"_row\\\":row,\\\"_col\\\":col}\") ] });\n" +
 				"        }\n" +
