@@ -33,8 +33,8 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
             RunServlet.rnr.addListener(new BProgramRunnerListenerAdapter() {
                 public void eventSelected(BProgram bp, BEvent event) {
                     if (remote != null) {
-                        LOG.info("Sending:" + event.name);
-                        remote.sendText(event.name);
+                        LOG.info("Sending:" + event.toString());
+                        remote.sendText(event.toString());
                     }
                 }
 
@@ -49,7 +49,7 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
         JsonObject message = jsonReader.readObject();
         jsonReader.close();
         String name = message.getString("name");
-        JsonObject data = message.getJsonObject("data");
+        String data = message.getJsonObject("data").toString().replaceAll("\"","");
 
         if (RunServlet.bprog != null) {
             RunServlet.bprog.enqueueExternalEvent(new BEvent(name, data));
