@@ -1,9 +1,9 @@
 bp.log.info('Tic-Tac-Toe - Let the game begin!');
 
-bp.registerBThread("test", function() {
-    bp.sync({ waitFor:[ bp.Event('test') ] });
-    bp.sync({ request:[ bp.Event("Click","{_row:0,_col:0}") ] });
-});
+function createEvent(name, row, col) {
+    return bp.Event(name,"{_row:"+row+",_col:"+col+"}")
+}
+
 // GameRules:
 
 // This BThreads are on each square of the grid
@@ -12,16 +12,16 @@ function addSquareBThreads(row, col) {
     // Detects mouse click
     bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event("Click","{_row:"+row+",_col:"+col+"}") ] });
-            bp.sync({ request:[ bp.Event("X","{_row:"+row+",_col:"+col+"}") ] });
+            bp.sync({ waitFor:[ createEvent('Click', row, col) ] });
+            bp.sync({ request:[ createEvent('X', row, col) ] });
         }
     });
 
     // Blocks further marking of a square already marked by X or O.
     bp.registerBThread("SquareTaken(" + row + "," + col + ")", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:row, _col:col}), bp.Event('O',{_row:row, _col:col})] });
-            bp.sync({ block:[ bp.Event('X',{_row:row, _col:col}), bp.Event('O',{_row:row, _col:col}) ] });
+            bp.sync({ waitFor:[ createEvent('X', row, col), createEvent('O', row, col)] });
+            bp.sync({ block:[ createEvent('X', row, col), createEvent('O', row, col) ] });
         }
     });
 }
@@ -36,23 +36,23 @@ for (var r = 0; r < 3; r++) {
 bp.registerBThread("EnforceTurns", function() {
     while (true) {
         bp.sync({waitFor:[
-            bp.Event('X',{_row:0, _col:0}), bp.Event('X',{_row:0, _col:1}), bp.Event('X',{_row:0, _col:2}),
-            bp.Event('X',{_row:1, _col:0}), bp.Event('X',{_row:1, _col:1}), bp.Event('X',{_row:1, _col:2}),
-            bp.Event('X',{_row:2, _col:0}), bp.Event('X',{_row:2, _col:1}), bp.Event('X',{_row:2, _col:2}) ],
+            createEvent('X', 0, 0), createEvent('X', 0, 1), createEvent('X', 0, 2),
+            createEvent('X', 1, 0), createEvent('X', 1, 1), createEvent('X', 1, 2),
+            createEvent('X', 2, 0), createEvent('X', 2, 1), createEvent('X', 2, 2) ],
         block:[
-            bp.Event('O',{_row:0, _col:0}), bp.Event('O',{_row:0, _col:1}), bp.Event('O',{_row:0, _col:2}),
-            bp.Event('O',{_row:1, _col:0}), bp.Event('O',{_row:1, _col:1}), bp.Event('O',{_row:1, _col:2}),
-            bp.Event('O',{_row:2, _col:0}), bp.Event('O',{_row:2, _col:1}), bp.Event('O',{_row:2, _col:2}) ] });
+            createEvent('O', 0, 0), createEvent('O', 0, 1), createEvent('O', 0, 2),
+            createEvent('O', 1, 0), createEvent('O', 1, 1), createEvent('O', 1, 2),
+            createEvent('O', 2, 0), createEvent('O', 2, 1), createEvent('O', 2, 2) ] });
 
         bp.sync({
             waitFor:[
-                bp.Event('O',{_row:0, _col:0}), bp.Event('O',{_row:0, _col:1}), bp.Event('O',{_row:0, _col:2}),
-                bp.Event('O',{_row:1, _col:0}), bp.Event('O',{_row:1, _col:1}), bp.Event('O',{_row:1, _col:2}),
-                bp.Event('O',{_row:2, _col:0}), bp.Event('O',{_row:2, _col:1}), bp.Event('O',{_row:2, _col:2}) ],
+                createEvent('O', 0, 0), createEvent('O', 0, 1), createEvent('O', 0, 2),
+                createEvent('O', 1, 0), createEvent('O', 1, 1), createEvent('O', 1, 2),
+                createEvent('O', 2, 0), createEvent('O', 2, 1), createEvent('O', 2, 2) ],
             block:[
-                bp.Event('X',{_row:0, _col:0}), bp.Event('X',{_row:0, _col:1}), bp.Event('X',{_row:0, _col:2}),
-                bp.Event('X',{_row:1, _col:0}), bp.Event('X',{_row:1, _col:1}), bp.Event('X',{_row:1, _col:2}),
-                bp.Event('X',{_row:2, _col:0}), bp.Event('X',{_row:2, _col:1}), bp.Event('X',{_row:2, _col:2})] });
+                createEvent('X', 0, 0), createEvent('X', 0, 1), createEvent('X', 0, 2),
+                createEvent('X', 1, 0), createEvent('X', 1, 1), createEvent('X', 1, 2),
+                createEvent('X', 2, 0), createEvent('X', 2, 1), createEvent('X', 2, 2)] });
     }
 });
 
@@ -61,12 +61,12 @@ bp.registerBThread("EndOfGame", function() {
     bp.sync({ waitFor:[ bp.Event('OWin'), bp.Event('XWin'), bp.Event('Draw') ] });
 
     bp.sync({ block:[
-            bp.Event('X',{_row:0, _col:0}), bp.Event('X',{_row:0, _col:1}), bp.Event('X',{_row:0, _col:2}),
-            bp.Event('X',{_row:1, _col:0}), bp.Event('X',{_row:1, _col:1}), bp.Event('X',{_row:1, _col:2}),
-            bp.Event('X',{_row:2, _col:0}), bp.Event('X',{_row:2, _col:1}), bp.Event('X',{_row:2, _col:2}),
-            bp.Event('O',{_row:0, _col:0}), bp.Event('O',{_row:0, _col:1}), bp.Event('O',{_row:0, _col:2}),
-            bp.Event('O',{_row:1, _col:0}), bp.Event('O',{_row:1, _col:1}), bp.Event('O',{_row:1, _col:2}),
-            bp.Event('O',{_row:2, _col:0}), bp.Event('O',{_row:2, _col:1}), bp.Event('O',{_row:2, _col:2})
+            createEvent('X', 0, 0), createEvent('X', 0, 1), createEvent('X', 0, 2),
+            createEvent('X', 1, 0), createEvent('X', 1, 1), createEvent('X', 1, 2),
+            createEvent('X', 2, 0), createEvent('X', 2, 1), createEvent('X', 2, 2),
+            createEvent('O', 0, 0), createEvent('O', 0, 1), createEvent('O', 0, 2),
+            createEvent('O', 1, 0), createEvent('O', 1, 1), createEvent('O', 1, 2),
+            createEvent('O', 2, 0), createEvent('O', 2, 1), createEvent('O', 2, 2)
         ] });
 });
 
@@ -100,11 +100,11 @@ function addLinePermutationBthreads(l, p) {
     // Represents when X wins
     bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', l[p[0]].x, l[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', l[p[1]].x, l[p[1]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[2]].x, _col:l[p[2]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', l[p[2]].x, l[p[2]].y) ] });
 
             bp.sync({ request:[ bp.Event('XWin') ] }, 100);
 
@@ -114,11 +114,11 @@ function addLinePermutationBthreads(l, p) {
     // Represents when O wins
     bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('O', l[p[0]].x, l[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('O', l[p[1]].x, l[p[1]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[2]].x, _col:l[p[2]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('O', l[p[2]].x, l[p[2]].y) ] });
 
             bp.sync({ request:[ bp.Event('OWin') ] }, 100);
 
@@ -128,22 +128,22 @@ function addLinePermutationBthreads(l, p) {
     // Player O strategy to add a the third O to win
     bp.registerBThread("AddThirdO(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('O', l[p[0]].x, l[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('O', l[p[1]].x, l[p[1]].y) ] });
 
-            bp.sync({ request:[ bp.Event('O',{_row:l[p[2]].x, _col:l[p[2]].y}) ] }, 50);
+            bp.sync({ request:[ createEvent('O', l[p[2]].x, l[p[2]].y) ] }, 50);
         }
     });
 
     // Player O strategy to prevent the third X of player X
     bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', l[p[0]].x, l[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', l[p[1]].x, l[p[1]].y) ] });
 
-            bp.sync({ request:[ bp.Event('O',{_row:l[p[2]].x, _col:l[p[2]].y}) ] }, 40);
+            bp.sync({ request:[ createEvent('O', l[p[2]].x, l[p[2]].y) ] }, 40);
         }
     });
 }
@@ -172,12 +172,12 @@ function addFork22PermutationBthreads(f, p) {
     // Player O strategy to prevent the Fork22 of player X
     bp.registerBThread("PreventFork22X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[0]].x, f[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[1]].x, f[p[1]].y) ] });
 
-            bp.sync({ request:[ bp.Event('O',{_row:2, _col:2}),bp.Event('O',{_row:0, _col:2}),
-                    bp.Event('O',{_row:2, _col:0})] }, 30);
+            bp.sync({ request:[ createEvent('O', 2, 2),createEvent('O', 0, 2),
+                    createEvent('O', 2, 0)] }, 30);
 //			bp.sync({ block:[ O(0,0), O(0,1), O(1,0) ] },30); // Problematic - stays all the time
         }
     });
@@ -187,12 +187,12 @@ function addFork02PermutationBthreads(f, p) {
     // Player O strategy to prevent the Fork02 of player X
     bp.registerBThread("PreventFork02X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[0]].x, f[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[1]].x, f[p[1]].y) ] });
 
-            bp.sync({ request:[ bp.Event('O',{_row:0, _col:2}),bp.Event('O',{_row:0, _col:0}),
-                    bp.Event('O',{_row:2, _col:2})] }, 30);
+            bp.sync({ request:[ createEvent('O', 0, 2),createEvent('O', 0, 0),
+                    createEvent('O', 2, 2)] }, 30);
         }
     });
 }
@@ -201,12 +201,12 @@ function addFork20PermutationBthreads(f, p) {
     // Player O strategy to prevent the Fork20 of player X
     bp.registerBThread("PreventFork20X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[0]].x, f[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[1]].x, f[p[1]].y) ] });
 
-            bp.sync({ request:[ bp.Event('O',{_row:2, _col:0}),bp.Event('O',{_row:0, _col:0}),
-                    bp.Event('O',{_row:2, _col:2})] }, 30);
+            bp.sync({ request:[ createEvent('O', 2, 0),createEvent('O', 0, 0),
+                    createEvent('O', 2, 2)] }, 30);
         }
     });
 }
@@ -215,12 +215,12 @@ function addFork00PermutationBthreads(f, p) {
     // Player O strategy to prevent the Fork00 of player X
     bp.registerBThread("PreventFork00X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[0]].x, f[p[0]].y) ] });
 
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[1]].x, f[p[1]].y) ] });
 
-            bp.sync({ request:[ bp.Event('O',{_row:0, _col:0}),bp.Event('O',{_row:0, _col:2}),
-                    bp.Event('O',{_row:2, _col:0})] }, 30);
+            bp.sync({ request:[ createEvent('O', 0, 0),createEvent('O', 0, 2),
+                    createEvent('O', 2, 0)] }, 30);
         }
     });
 }
@@ -229,10 +229,10 @@ function addForkdiagPermutationBthreads(f, p) {
     // Player O strategy to prevent the Forkdiagonal of player X
     bp.registerBThread("PreventForkdiagX(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
-            bp.sync({ waitFor:[bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y})] });
-            bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
-            bp.sync({ request:[ bp.Event('O',{_row:0, _col:1}),bp.Event('O',{_row:1, _col:0}),
-                    bp.Event('O',{_row:2, _col:1}), bp.Event('O',{_row:1, _col:2}) ] }, 30);
+            bp.sync({ waitFor:[createEvent('X', f[p[0]].x, f[p[0]].y)] });
+            bp.sync({ waitFor:[ createEvent('X', f[p[1]].x, f[p[1]].y) ] });
+            bp.sync({ request:[ createEvent('O', 0, 1),createEvent('O', 1, 0),
+                    createEvent('O', 2, 1), createEvent('O', 1, 2) ] }, 30);
         }
     });
 }
@@ -282,15 +282,15 @@ forksdiag.forEach(function(f) {
 
 bp.registerBThread("Center", function() {
     while (true) {
-        bp.sync({ request:[ bp.Event('O',{_row:1, _col:1}) ] }, 35);
+        bp.sync({ request:[ createEvent('O', 1, 1) ] }, 35);
     }
 });
 
 // Preference to put O on the corners
 bp.registerBThread("Corners", function() {
     while (true) {
-        bp.sync({ request:[ bp.Event('O',{_row:0, _col:0}),bp.Event('O',{_row:0, _col:2}),
-                bp.Event('O',{_row:2, _col:0}), bp.Event('O',{_row:2, _col:2}) ] }, 20);
+        bp.sync({ request:[ createEvent('O', 0, 0),createEvent('O', 0, 2),
+                createEvent('O', 2, 0), createEvent('O', 2, 2) ] }, 20);
 
     }
 });
@@ -298,7 +298,7 @@ bp.registerBThread("Corners", function() {
 // Preference to put O on the sides
 bp.registerBThread("Sides", function() {
     while (true) {
-        bp.sync({ request:[ bp.Event('O',{_row:0, _col:1}),bp.Event('O',{_row:1, _col:0}),
-                bp.Event('O',{_row:2, _col:1}), bp.Event('O',{_row:1, _col:2}) ] }, 10);
+        bp.sync({ request:[ createEvent('O', 0, 1),createEvent('O', 1, 0),
+                createEvent('O', 2, 1), createEvent('O', 1, 2) ] }, 10);
     }
 });

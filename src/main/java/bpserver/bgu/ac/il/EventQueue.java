@@ -29,30 +29,34 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
         session.addMessageHandler(this);
 
         // Start reporting BP events
-        if (RunServlet.rnr != null) {
-            RunServlet.rnr.addListener(new BProgramRunnerListenerAdapter() {
-                public void eventSelected(BProgram bp, BEvent event) {
-                    if (remote != null) {
-                        LOG.info("Sending:" + event.toString());
-                        remote.sendText(event.toString());
-                    }
+        RunServlet.addListener(new BProgramRunnerListenerAdapter() {
+            public void eventSelected(BProgram bp, BEvent event) {
+                if (remote != null) {
+                    String send =
+                            String.format("{\"name\": \"%s\", \"data\": %s}",event.name, event.maybeData)
+                                    .replaceAll("_col","\"_col\"")
+                                    .replaceAll("_row","\"_row\"");;
+                    LOG.info("Sending:" + send);
+                    remote.sendText(send);
                 }
+            }
 
-            });
-        }
+        });
     }
 
 
     public void onMessage(String m) {
         LOG.info("Recieved external event {}", m);
+        if(m.equals("RESET")){
+            RunServlet.reset();
+            return;
+        }
         JsonReader jsonReader = Json.createReader(new StringReader(m));
         JsonObject message = jsonReader.readObject();
         jsonReader.close();
         String name = message.getString("name");
         String data = message.getJsonObject("data").toString().replaceAll("\"","");
 
-        if (RunServlet.bprog != null) {
-            RunServlet.bprog.enqueueExternalEvent(new BEvent(name, data));
-        }
+        RunServlet.pushToExternal(new BEvent(name, data));
     }
 }

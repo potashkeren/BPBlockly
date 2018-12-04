@@ -30,7 +30,10 @@
 	</div>
 	<br />
 	<div>
-		<input type=button onClick="window.location.reload()" value="Reset">
+		<input type=button onClick="JavaScript: reset();" value="Reset">
+	</div>
+	<br />
+	<div id="winner" style="font-size: xx-large; font-weight: bold">
 	</div>
 </body>
 <script>
@@ -38,18 +41,23 @@
 
 	webSocket.onmessage = function(msg) {
 		try {
-			var event = JSON.parse(msg.data[0]);
-			console.log("event"+event);
-            var data = JSON.parse(event.data);
-            console.log("data"+data);
+			var event = JSON.parse(msg.data);
+            var data =event.data;
 
 			if (event.name == "X" || event.name == "O") {
 				$("#cell_" + data._row + "_" + data._col).html(event.name);
+			} else if(event.name == "XWin" || event.name == "OWin" || event.name == "Draw") {
+                $("#winner").html(event.name);
 			}
 		} catch (e) {
 			console.log(msg.data);
 		}
 	}
+
+	function reset() {
+        webSocket.send("RESET");
+        window.location.reload();
+    }
 
 	function clickCell(r, c) {
 		var e = JSON.stringify({
