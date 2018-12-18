@@ -929,7 +929,7 @@ Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutato
 
 //#region Context
 var context= {
-    office: ['Motion Detector','Air Condition','Smoke Detector'],
+    cell: ['i','j','value'],
     restroom:['Smart Light'],
     emergency: ['true', 'false'],
     kitchen : ['Motion Detector','Smart Light','Air Condition']
