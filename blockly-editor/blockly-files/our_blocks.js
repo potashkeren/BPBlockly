@@ -184,33 +184,6 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "A single BThread",
   "helpUrl": ""
 },
-    {
-        "type": "bp_register_contextual_bthread",
-        "message0": "BThread %1 with Context %2 function: %3 %4",
-        "args0": [
-            {
-                "type": "input_value",
-                "name": "NAME"
-            },
-            {
-                "type": "input_value",
-                "name": "CTX_NAME"
-            },
-            {
-                "type": "input_value",
-                "name": "CTX_VAR_NAME"
-            },
-            {
-                "type": "input_statement",
-                "name": "CONTENT"
-            }
-        ],
-        "previousStatement": null,
-        "nextStatement": null,
-        "colour": 55,
-        "tooltip": "A single BThread",
-        "helpUrl": ""
-    },
 {
   "type": "bp_event_name",
   "message0": "The event's name",
@@ -396,44 +369,44 @@ Blockly.defineBlocksWithJsonArray([
     "tooltip": "Is the given string a number (includes negative and decimals)",
     "helpUrl": ""
     },
-    {
-        "type": "object",
-        "message0": "create an object %1 %2",
-        "args0": [
-            {
-                "type": "input_dummy"
-            },
-            {
-                "type": "input_statement",
-                "name": "LIST"
-            }
-        ],
-        "output": null,
-        "colour": 240,
-        "tooltip": "",
-        "helpUrl": ""
-    },
-    {
-        "type": "property_value",
-        "message0": "property: %1 value: %2",
-        "args0": [
-            {
-                "type": "input_value",
-                "name": "PROPERTY",
-                "check": "String"
-            },
-            {
-                "type": "input_value",
-                "name": "VALUE"
-            }
-        ],
-        "inputsInline": true,
-        "previousStatement": null,
-        "nextStatement": "property_value",
-        "colour": 220,
-        "tooltip": "",
-        "helpUrl": ""
-    },
+{
+    "type": "object",
+    "message0": "create an object %1 %2",
+    "args0": [
+        {
+            "type": "input_dummy"
+        },
+        {
+            "type": "input_statement",
+            "name": "LIST"
+        }
+    ],
+    "output": null,
+    "colour": 240,
+    "tooltip": "",
+    "helpUrl": ""
+},
+{
+    "type": "property_value",
+    "message0": "property: %1 value: %2",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "PROPERTY",
+            "check": "String"
+        },
+        {
+            "type": "input_value",
+            "name": "VALUE"
+        }
+    ],
+    "inputsInline": true,
+    "previousStatement": null,
+    "nextStatement": "property_value",
+    "colour": 220,
+    "tooltip": "",
+    "helpUrl": ""
+},
 {
         "type": "get_object_value",
         "message0": "from object %1 get %2",
@@ -454,8 +427,6 @@ Blockly.defineBlocksWithJsonArray([
         "tooltip": "",
         "helpUrl": ""
     }
-
-
   ]);
 
 //#region BP Basic + Advance Blocks
@@ -593,18 +564,6 @@ Blockly.JavaScript['bp_register_bthread'] = function(block) {
   var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
   var code = 'bp.registerBThread('+name+', function(){\n'+statements+'\n});\n';
   return code;
-};
-
-
-
-Blockly.JavaScript['bp_register_contextual_bthread'] = function(block) {
-    var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-    var ctx_name = Blockly.JavaScript.valueToCode(block, 'CTX_NAME', Blockly.JavaScript.ORDER_ATOMIC);
-    var ctx_var_name = Blockly.JavaScript.valueToCode(block, 'CTX_VAR_NAME', Blockly.JavaScript.ORDER_ATOMIC);
-
-    var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
-    var code = 'bp.registerBThread('+name+','+ ctx_name +','+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
-    return code;
 };
 
 Blockly.JavaScript['bp_event_name'] = function(block) {
@@ -928,8 +887,10 @@ Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutato
 //endregion Object Blocks
 
 //#region Context
+var context_name = ["Empty Cells","NonEmpty Cells","Cells","Playing","End of Game","Triple"];
+var commands =["Mark Cell as non empty","Finish the game"];
 var context= {
-    cell: ['i','j','value'],
+    office: ['Motion Detector','Air Condition','Smoke Detector'],
     restroom:['Smart Light'],
     emergency: ['true', 'false'],
     kitchen : ['Motion Detector','Smart Light','Air Condition']
@@ -952,27 +913,19 @@ var PROPRTY_OPTIONS = function(selected_context){
     });
     return result
 };
+var CREATE_OPTIONS = function(contexts){
+    result = [];
+    contexts.forEach(function(element) {
+        new_entry=[element, element];
+        result.push(new_entry);
+    });
+    return result
+};
 
 var OPTIONS = CONTEXT_OPTIONS(context);
 var PROPERTIES = PROPRTY_OPTIONS("office");
-
-Blockly.Blocks['context_created'] = {
-    // Value input.
-    init: function() {
-        this.setColour(210);
-        this.appendDummyInput()
-            .appendField('context created')
-            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
-        this.appendStatementInput('FIELDS');
-        this.setPreviousStatement(true, 'Input');
-        this.setNextStatement(true, 'Input');
-        this.setOutput();
-        this.setTooltip('context created');
-    },
-    onchange: function() {
-        update_context_created(this);
-    }
-};
+var CONTEXT_NAME =CREATE_OPTIONS(context_name);
+var COMMAND = CREATE_OPTIONS(commands);
 
 function update_context_created(referenceBlock) {
     var statement = referenceBlock.getInput('FIELDS');
@@ -1003,58 +956,6 @@ function update_context_created(referenceBlock) {
             }
     }
 };
-
-Blockly.Blocks['get_context_property'] = {
-    // Value input.
-    init: function () {
-        this.setColour(240);
-        this.appendDummyInput('dropDownField')
-            .appendField('get property')
-            .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
-        this.setOutput(true, null);
-        this.setTooltip('get the context property');
-    }
-};
-
-Blockly.Blocks['context_get_property'] = {
-    init: function() {
-        this.setColour(210);
-        this.appendDummyInput()
-            .appendField('from context:')
-            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
-        this.appendDummyInput('dropDownField')
-            .appendField('get property:')
-            .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
-        this.setPreviousStatement(true, 'Input');
-        this.setNextStatement(true, 'Input');
-        this.setOutput();
-        this.setTooltip('context created');
-    }
-    ,
-    onchange: function() {
-        update_context(this);
-    }
-
-};
-
-Blockly.JavaScript['get_context_property'] = function (block) {
-    var property = block.getFieldValue('PROPERTY').toLowerCase();
-    var code = property;
-    return [code, Blockly.JavaScript.ORDER_NONE];
-};
-
-Blockly.JavaScript['context_created'] = function (block) {
-    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
-    var property = Blockly.JavaScript.statementToCode(block, 'FIELDS');
-    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
-};
-
-Blockly.JavaScript['context_get_property'] = function (block) {
-    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
-    var property = block.getFieldValue('PROPERTY').toLowerCase();
-    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
-};
-
 function equalContext (a,b){
     if (!a || !b)
         return false;
@@ -1089,6 +990,188 @@ function update_context(referenceBlock) {
             }
         }
     }
+};
+
+Blockly.Blocks['context_created'] = {
+    // Value input.
+    init: function() {
+        this.setColour(210);
+        this.appendDummyInput()
+            .appendField('context created')
+            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
+        this.appendStatementInput('FIELDS');
+        this.setPreviousStatement(true, 'Input');
+        this.setNextStatement(true, 'Input');
+        this.setOutput();
+        this.setTooltip('context created');
+    },
+    onchange: function() {
+        update_context_created(this);
+    }
+};
+
+Blockly.JavaScript['context_created'] = function (block) {
+    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
+    var property = Blockly.JavaScript.statementToCode(block, 'FIELDS');
+    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
+};
+
+Blockly.Blocks['context_get_property'] = {
+    init: function() {
+        this.setColour(210);
+        this.appendDummyInput()
+            .appendField('from context:')
+            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
+        this.appendDummyInput('dropDownField')
+            .appendField('get property:')
+            .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
+        this.setPreviousStatement(true, 'Input');
+        this.setNextStatement(true, 'Input');
+        this.setOutput();
+        this.setTooltip('context_get_property');
+    }
+    ,
+    onchange: function() {
+        update_context(this);
+    }
+
+};
+
+Blockly.JavaScript['context_get_property'] = function (block) {
+    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
+    var property = block.getFieldValue('PROPERTY').toLowerCase();
+    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
+};
+
+Blockly.Blocks['ctx_get_instances'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('ctx.getInstances')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'PROPERTY');
+        this.setOutput(true, null);
+        this.setTooltip('get the context name');
+    }
+};
+
+Blockly.JavaScript['ctx_get_instances'] = function (block) {
+    var property = block.getFieldValue('PROPERTY');
+    var code = "ctx.getInstances(\""+property+"\")";
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.Blocks['ctx_update_db'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('ctx.updateDBEvent')
+            .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
+        this.setOutput(true, null);
+        this.setTooltip('get the context name');
+    }
+};
+
+Blockly.JavaScript['ctx_update_db'] = function(block) {
+    var command = block.getFieldValue('COMMAND');
+
+    var code = "ctx.updateDBEvent(\""+command+"\")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_context_ended'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('ctx.contextEndedEvent')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
+        this.setOutput(true, null);
+        this.setTooltip('get the context name');
+    }
+};
+
+Blockly.JavaScript['ctx_context_ended'] = function(block) {
+    var name = block.getFieldValue('CONTEXT_NAME');
+
+    var code = "ctx.contextEndedEvent(\""+name+"\")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_update_db_data'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('ctx.updateDBEvent')
+            .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
+        this.appendValueInput("DATA")
+            .appendField("with data");
+        this.setOutput(true, null);
+        this.setInputsInline(true);
+        this.setTooltip('get the context name');
+    }
+};
+
+Blockly.JavaScript['ctx_update_db_data'] = function(block) {
+    var command = block.getFieldValue('COMMAND');
+    var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = "ctx.updateDBEvent(\""+command+"\","+data+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_context_ended_data'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('ctx.contextEndedEvent')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
+        this.appendValueInput("DATA")
+            .appendField("with data");
+        this.setOutput(true, null);
+        this.setInputsInline(true);
+        this.setTooltip('get the context name');
+    }
+};
+
+Blockly.JavaScript['ctx_context_ended_data'] = function(block) {
+    var name = block.getFieldValue('CONTEXT_NAME');
+    var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = "ctx.contextEndedEvent(\""+name+"\","+data+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_subscribe'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendValueInput("NAME")
+            .appendField("ctx.subscribe");
+        this.appendDummyInput('dropDownField')
+            .appendField('with context')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CTX_NAME');
+        this.appendValueInput("CTX_VAR_NAME")
+            .appendField("function:");
+        this.appendStatementInput("CONTENT");
+        this.setInputsInline(true);
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setTooltip('subscribe the context');
+    }
+};
+
+Blockly.JavaScript['ctx_subscribe'] = function(block) {
+    var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    var ctx_name = block.getFieldValue('CTX_NAME');
+    var ctx_var_name = Blockly.JavaScript.valueToCode(block, 'CTX_VAR_NAME', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
+    var code = 'ctx.subscribe('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
+    return code;
 };
 
 //#endregion Context

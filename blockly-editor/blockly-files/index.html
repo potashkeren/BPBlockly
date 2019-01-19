@@ -387,7 +387,7 @@
     <category id="catVariables" colour="330" custom="VARIABLE" name="Variables"></category>
     <category id="catFunctions" colour="290" custom="PROCEDURE" name="Functions"></category>
     <sep></sep>
-    <category id="catBP_BASIC" name="BP Basic" colour="0">
+    <category id="catBP_BASIC" name="BP Basic" colour="#ffcc00">
         <label text="Plug the following blocks:" web-class="explanatoryBPLabelStyle"></label>
         <block type="bp_event">
             <value name="NAME">
@@ -445,22 +445,10 @@
                 </shadow>
             </value>
         </block>
-        <block type="bp_register_contextual_bthread">
-            <value name="NAME">
-                <shadow type="text">
-                    <field name="TEXT">BThread Name</field>
-                </shadow>
-            </value>
-            <value name="CTX_NAME">
-                <shadow type="text">
-                    <field name="TEXT">Context Name</field>
-                </shadow>
-            </value>
-        </block>
 
     </category>
 
-    <category id="catBP_ADVANCED" name="BP Advanced" colour="0">
+    <category id="catBP_ADVANCED" name="BP Advanced" colour="#ff9900">
         <block type="bp_eventset">
             <value name="NAME">
                 <shadow type="text">
@@ -493,7 +481,39 @@
         </block>
     </category>
 
-    <category id="catBP_CONTEXT" name="BP Context" colour="130">
+    <category id="catBP_CONTEXT" name="BP Context" colour="#cc0000">
+        <block type="ctx_subscribe">
+            <value name="NAME">
+                <shadow type="text">
+                    <field name="TEXT">Name</field>
+                </shadow>
+            </value>
+            <value name="CTX_VAR_NAME">
+                <block type="variables_get">
+                    <field name="VAR">c</field>
+                </block>
+            </value>
+        </block>
+        <block type="ctx_get_instances"></block>
+        <block type="ctx_update_db"></block>
+        <block type="ctx_update_db_data">
+            <value name="DATA">
+                <block type="variables_get">
+                    <field name="VAR">c</field>
+                </block>
+            </value>
+        </block>
+        <block type="ctx_context_ended"></block>
+        <block type="ctx_context_ended_data">
+            <value name="DATA">
+                <block type="variables_get">
+                    <field name="VAR">c</field>
+                </block>
+            </value>
+        </block>
+
+   </category>
+    <category id="catBP_OTHERS" name="BP Others" colour="#990000">
         <block type="object">
             <value name="LIST">
                 <block type="property_value">
@@ -513,7 +533,7 @@
             </value>
         </block>
         <block type="object_create"></block>
-       <block type="get_object_value">
+        <block type="get_object_value">
             <value name="PROPERTY">
                 <shadow type="text">
                     <field name="TEXT"></field>
@@ -525,17 +545,13 @@
             <value name="FIELDS">
                 <block type="variables_set">
                     <value name="VALUE">
-                        <block type="get_context_property"></block>
+                        <block type="ctx_get_instances"></block>
                     </value>
                 </block>
             </value>
         </block>
-        <block type="get_context_property"></block>
         <block type="context_get_property"></block>
-
-
-
-   </category>
+    </category>
 
 
 

@@ -4,6 +4,16 @@ function createEvent(name, row, col) {
     return bp.Event(name,"{_row:"+row+",_col:"+col+"}")
 }
 
+var turnX = bp.EventSet("turnX", function(e) {
+    return e.name == 'X';
+});
+var turnY = bp.EventSet("turnY", function(e) {
+    return e.name == 'O' ;
+});
+var EndGame = bp.EventSet("EndGame", function(e) {
+    return e.name == 'OWin' || e.name == 'XWin' || e.name == 'Draw';
+});
+
 // GameRules:
 
 // This BThreads are on each square of the grid
@@ -11,8 +21,8 @@ function addSquareBThreads(row, col) {
     // Detects mouse click
     bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
         while (true) {
-            bp.sync({ waitFor:[ createEvent('Click', row, col) ] });
-            bp.sync({ request:[ createEvent('X', row, col) ] });
+            bp.sync({ waitFor:[ createEvent('Click', row, col) ],interrupt:EndGame });
+            bp.sync({ request:[ createEvent('X', row, col) ],interrupt:EndGame });
         }
     });
 
@@ -35,38 +45,18 @@ for (var r = 0; r < 3; r++) {
 bp.registerBThread("EnforceTurns", function() {
     while (true) {
         bp.sync({
-            waitFor:[
-                createEvent('X', 0, 0), createEvent('X', 0, 1), createEvent('X', 0, 2),
-                createEvent('X', 1, 0), createEvent('X', 1, 1), createEvent('X', 1, 2),
-                createEvent('X', 2, 0), createEvent('X', 2, 1), createEvent('X', 2, 2) ],
-            block:[
-                createEvent('O', 0, 0), createEvent('O', 0, 1), createEvent('O', 0, 2),
-                createEvent('O', 1, 0), createEvent('O', 1, 1), createEvent('O', 1, 2),
-                createEvent('O', 2, 0), createEvent('O', 2, 1), createEvent('O', 2, 2) ] });
-
+            waitFor: [turnX],
+            block:[turnY ]});
         bp.sync({
-            waitFor:[
-                createEvent('O', 0, 0), createEvent('O', 0, 1), createEvent('O', 0, 2),
-                createEvent('O', 1, 0), createEvent('O', 1, 1), createEvent('O', 1, 2),
-                createEvent('O', 2, 0), createEvent('O', 2, 1), createEvent('O', 2, 2) ],
-            block:[
-                createEvent('X', 0, 0), createEvent('X', 0, 1), createEvent('X', 0, 2),
-                createEvent('X', 1, 0), createEvent('X', 1, 1), createEvent('X', 1, 2),
-                createEvent('X', 2, 0), createEvent('X', 2, 1), createEvent('X', 2, 2)] });
+            waitFor:[ turnY],
+            block:[turnX] });
     }
 });
 
 // Represents when the game ends
 bp.registerBThread("EndOfGame", function() {
     bp.sync({ waitFor:[ bp.Event('OWin'), bp.Event('XWin'), bp.Event('Draw') ] });
-    bp.sync({ block:[
-            createEvent('X', 0, 0), createEvent('X', 0, 1), createEvent('X', 0, 2),
-            createEvent('X', 1, 0), createEvent('X', 1, 1), createEvent('X', 1, 2),
-            createEvent('X', 2, 0), createEvent('X', 2, 1), createEvent('X', 2, 2),
-            createEvent('O', 0, 0), createEvent('O', 0, 1), createEvent('O', 0, 2),
-            createEvent('O', 1, 0), createEvent('O', 1, 1), createEvent('O', 1, 2),
-            createEvent('O', 2, 0), createEvent('O', 2, 1), createEvent('O', 2, 2)
-        ] });
+    bp.sync({ block:[ turnX,turnY] });
 });
 
 var move = bp.EventSet("Move events", function(e) {
