@@ -73,13 +73,13 @@ ctx.subscribe("ClickHandler","Cells", function(c) {
 });
 
 //detect black cell , white cell - query name
-ctx.subscribe("detect black cell","white cell",function(c) { //select * from cell where value == null
-    var e= bp.sync({ waitFor:[ createEvent('X', c), createEvent('O',c)] });
-    ctx.excuteCommand("mark cell as non empty",{cell:c });
+ctx.subscribe("detect black cell","Empty Cells",function(c) { //select * from cell where value == null
+    bp.sync({ waitFor:[ createEvent('X', c), createEvent('O',c)] });
+    ctx.updateDBEvent("mark cell as non empty",{cell:c });
 });
 
 //block X,O on black cell
-ctx.subscribe("block X,O on black cell","black cell",function(c) { //select * from cell where value != null
+ctx.subscribe("block X,O on black cell","NonEmpty Cells",function(c) { //select * from cell where value != null
     bp.sync({ block:[ createEvent('X', c), createEvent('O',c) ] });
 });
 
@@ -91,14 +91,12 @@ ctx.subscribe("block X,O on black cell","black cell",function(c) { //select * fr
 var move = bp.EventSet("Move events", function(e) {
     return e.name === 'O' || e.name === 'X';
 });
-
 var turnX = bp.EventSet("turnX", function(e) {
     return e.name == 'X';
 });
-var turnY = bp.EventSet("turnY", function(e) {
+var turnO = bp.EventSet("turnO", function(e) {
     return e.name == 'O' ;
 });
-
 var EndGame = bp.EventSet("EndGame", function(e) {
     return e.name == 'OWin' || e.name == 'XWin' || e.name == 'Draw';
 });
@@ -107,11 +105,11 @@ ctx.subscribe("EnforceTurns", function() {
     while (true) {
             bp.sync({
                 waitFor: turnX,
-                block: turnY
+                block: turnO
             });
             bp.sync({
-                waitFor: [turnY],
-                block: [turnX]
+                waitFor: turnO,
+                block: turnX
             });
         }
 });
@@ -123,27 +121,27 @@ ctx.subscribe("EnforceTurns", function() {
 // Represents when the game ends
 ctx.subscribe("block all cells","",function() { //select * from playing where value == false
     bp.sync({ waitFor:EndGame });
-    bp.sync({ block:[ turnX, turnY] });
+    bp.sync({ block:[ turnX, turnO] });
 });
 
 // Represents when it is a draw
 ctx.subscribe("DetectDraw", function() {
     // For debug
-    bp.sync({ waitFor:[ move ] });
-    bp.sync({ waitFor:[ move ] });
-    bp.sync({ waitFor:[ move ] });
+    bp.sync({ waitFor: move });
+    bp.sync({ waitFor: move });
+    bp.sync({ waitFor: move });
 
-    bp.sync({ waitFor:[ move ] });
-    bp.sync({ waitFor:[ move ] });
-    bp.sync({ waitFor:[ move ] });
+    bp.sync({ waitFor: move });
+    bp.sync({ waitFor: move });
+    bp.sync({ waitFor: move });
 
-    bp.sync({ waitFor:[ move ] });
-    bp.sync({ waitFor:[ move ] });
-    bp.sync({ waitFor:[ move ] });
+    bp.sync({ waitFor: move });
+    bp.sync({ waitFor: move });
+    bp.sync({ waitFor: move });
     /*
      * for (var i=0; i< 9; i++) { bp.sync({ waitFor:[ move ] }); }
      */
-    bp.sync({ request:[ bp.Event('Draw') ] }, 90);
+    bp.sync({ request: bp.Event('Draw') }, 90);
 });
 
 //#endregion GAME RULES
@@ -218,39 +216,39 @@ function addFork00PermutationBthreads(c1,c2){ //
     ctx.subscribe("PreventFork20X", function() {
         bp.sync({ waitFor:[ createEvent('X',c1) ] });
         bp.sync({ waitFor:[ createEvent('X',c2) ] });
-        bp.sync({ request:[ createEvent('O', 2, 0),createEvent('O', 0, 0), createEvent('O', 2, 2)] }, 30);
+        bp.sync({ request:[ createEvent('O',{x:0,y:0}),createEvent('O', {x:0,y:2}), createEvent('O',{x:2,y:0})] }, 30);
     });
 }
 
 // Player O strategy to prevent the Forkdiagonal of player X
 function addForkdiagPermutationBthreads(c1,c2){ //
-    ctx.subscribe("PreventFork20X", function() {
+    ctx.subscribe("PreventForkdiagX", function() {
         bp.sync({ waitFor:[ createEvent('X',c1) ] });
         bp.sync({ waitFor:[ createEvent('X',c2) ] });
-        bp.sync({ request:[ createEvent('O', 0, 1),createEvent('O', 1, 0), reateEvent('O', 2, 1), createEvent('O', 1, 2) ] }, 30);
+        bp.sync({ request:[ createEvent('O', {x:0,y:1}),createEvent('O',{x:1,y:0}), reateEvent('O', {x:2,y:1}), createEvent('O', {x:1,y:2}) ] }, 30);
     });
 }
 
 // Preference to put O on the center
 bp.registerBThread("Center", function() {
     while (true) {
-        bp.sync({ request:[ createEvent('O', 1, 1) ] }, 35);
+        bp.sync({ request:[ createEvent('O', {x:1,y:1}) ] }, 35);
     }
 });
 
 // Preference to put O on the corners
 bp.registerBThread("Corners", function() {
     while (true) {
-        bp.sync({ request:[ createEvent('O', 0, 0),createEvent('O', 0, 2),
-                createEvent('O', 2, 0), createEvent('O', 2, 2) ] }, 20);
+        bp.sync({ request:[ createEvent('O',{x:0,y:0}),createEvent('O',{x:0,y:2}),
+                createEvent('O', {x:2,y:0}), createEvent('O', {x:2,y:2}) ] }, 20);
     }
 });
 
 // Preference to put O on the sides
 bp.registerBThread("Sides", function() {
     while (true) {
-        bp.sync({ request:[ createEvent('O', {x:0,y:1}),createEvent('O', 1, 0),
-                createEvent('O', 2, 1), createEvent('O', 1, 2) ] }, 10);
+        bp.sync({ request:[ createEvent('O', {x:0,y:1}),createEvent('O', {x:1,y:0}),
+                createEvent('O',{x:2,y:1}), createEvent('O',{x:1,y:2}) ] }, 10);
     }
 });
 
@@ -265,9 +263,7 @@ var permsforks = [ [ 0, 1 ], [ 1, 0 ] ];
 
 forks22.forEach(function(f) {
     permsforks.forEach(function(p) {
-        var c1 = ctx.get("get cell",f[p[0]]);
-        var c2 = ctx.get("get cell",f[p[1]]);
-        addFork22PermutationBthreads(c1, c2);
+        addFork22PermutationBthreads(f[p[0]],f[p[1]]);
     });
 });
 

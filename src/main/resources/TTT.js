@@ -45,11 +45,11 @@ for (var r = 0; r < 3; r++) {
 bp.registerBThread("EnforceTurns", function() {
     while (true) {
         bp.sync({
-            waitFor: [turnX],
-            block:[turnY ]});
+            waitFor: turnX,
+            block:turnY });
         bp.sync({
-            waitFor:[ turnY],
-            block:[turnX] });
+            waitFor: turnY,
+            block:turnX });
     }
 });
 
@@ -78,7 +78,7 @@ bp.registerBThread("DetectDraw", function() {
     /*
      * for (var i=0; i< 9; i++) { bp.sync({ waitFor:[ move ] }); }
      */
-    bp.sync({ request:[ bp.Event('Draw') ] }, 90);
+    bp.sync({ request: bp.Event('Draw') }, 90);
 });
 
 function addLinePermutationBthreads(l, p) {
