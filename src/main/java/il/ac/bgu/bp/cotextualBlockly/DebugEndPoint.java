@@ -1,4 +1,4 @@
-package bpserver.bgu.ac.il;
+package il.ac.bgu.bp.cotextualBlockly;
 
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;

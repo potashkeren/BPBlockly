@@ -37,7 +37,7 @@ function load_project(event){
 
 function export_code() {
     var code = Blockly.JavaScript.workspaceToCode(workspace);
-    //saveTextAs(code, "program.js");
+    //saveTextAs(code, "Contextual_TTT.js");
 
     alert('running');
 //	$.post('/run', function() {

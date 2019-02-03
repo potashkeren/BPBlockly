@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2011-2012, JGraph Ltd
  */
-package bpserver.bgu.ac.il;
+package il.ac.bgu.bp.cotextualBlockly;
 
 import java.io.BufferedReader;
 import java.io.IOException;

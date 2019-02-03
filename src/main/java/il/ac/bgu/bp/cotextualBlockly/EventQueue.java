@@ -1,4 +1,4 @@
-package bpserver.bgu.ac.il;
+package il.ac.bgu.bp.cotextualBlockly;
 
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;

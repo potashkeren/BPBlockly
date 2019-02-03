@@ -1,4 +1,4 @@
-package bpserver.bgu.ac.il;
+package il.ac.bgu.bp.cotextualBlockly;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,19 +8,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import il.ac.bgu.cs.bp.bpjs.context.ContextService;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import org.apache.commons.io.IOUtils;
-import org.mozilla.javascript.NativeObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 
 public class RunServlet extends HttpServlet {
@@ -34,8 +30,7 @@ public class RunServlet extends HttpServlet {
 
 	// A hack that only works if one program is running at a time!
 	private static BProgram bprog;
-	private static BProgramRunner rnr;
-	private static Thread thread;
+	private static ContextService contextService;
 
 	public static boolean pushToExternal(BEvent event){
 		if(bprog != null) {
@@ -46,8 +41,8 @@ public class RunServlet extends HttpServlet {
 	}
 
 	public static boolean addListener(BProgramRunnerListener listener){
-		if (rnr != null) {
-			rnr.addListener(listener);
+		if (contextService != null) {
+			contextService.addListener(listener);
 			return true;
 		}
 		return false;
@@ -55,34 +50,19 @@ public class RunServlet extends HttpServlet {
 
 	public static void reset(){
 		// Stop the current deployment
-		if (thread != null)
-			thread.interrupt();
+		if (contextService != null) {
+			contextService.close();
+		}
+		contextService = ContextService.getInstance();
+		contextService.init("ContextDB");
 
 		// Start a new deployment
-		bprog = new StringBProgram(code);
-		bprog = new SingleResourceBProgram("TTT.js");
+		bprog = contextService.run("Contextual_TTT_population.js", "Contextual_TTT.js");
+//		bprog = new StringBProgram(code);
 
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
 		bprog.setWaitForExternalEvents(true);
 
-		//bprog.isDaemon(true);
-
-		rnr = new BProgramRunner(bprog);
-		rnr.addListener(new PrintBProgramRunnerListener());
-
-		thread = new Thread() {
-			public void run() {
-				// go!
-				try {
-					rnr.run();
-					throw new InterruptedException();
-				} catch (InterruptedException e) {
-					LOG.info("BProgram runner interrupted");
-				}
-			}
-		};
-
-		thread.start();
 
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
 //        bprog.enqueueExternalEvent(new BEvent("test"));
