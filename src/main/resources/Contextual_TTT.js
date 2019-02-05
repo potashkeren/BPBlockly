@@ -4,7 +4,7 @@ importPackage(Packages.il.ac.bgu.bp.cotextualBlockly.context.schema);
 
 //#region HELP FUNCTIONS
 function createEvent(name, c) {
-    return bp.Event(name,"{_row:"+c.i+",_col:"+c.j+"}")
+    return bp.Event(name, c);
 }
 //#endregion HELP FUNCTIONS
 
@@ -52,6 +52,12 @@ CTX.subscribe("assert twice", "Cell", function(c){
     bp.sync({waitFor:createEvent("O",c)});
     bp.ASSERT(false,"O twice");
 });
+
+CTX.subscribe("assert X..O", "Cell", function(c){
+    bp.sync({waitFor:createEvent("X",c)});
+    bp.sync({waitFor:createEvent("O",c)});
+    bp.ASSERT(false,"O after X");
+});
 //endregion CEll BEHAVIORS
 
 //#region GAME RULES
@@ -62,15 +68,17 @@ bp.registerBThread("EnforceTurns", function() {
             block: OEvents
         });
         bp.sync({
-            waitFor: CellUpdateEvents,
-            block: move
-        });
-        bp.sync({
             waitFor: OEvents,
             block: XEvents
         });
+    }
+});
+
+bp.registerBThread("EnforceTurns", function() {
+    while (true) {
+        var e = bp.sync({ waitFor: move });
         bp.sync({
-            waitFor: CellUpdateEvents,
+            waitFor: CTX.NewContextEvent("NonEmptyCell", e.data),
             block: move
         });
     }

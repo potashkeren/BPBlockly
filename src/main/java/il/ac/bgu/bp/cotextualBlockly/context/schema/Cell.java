@@ -20,7 +20,7 @@ public class Cell extends BasicEntity {
     @Column
     public final int j;
     @Column
-    public String value="";
+    public final String value="";
 
     protected Cell() {
         super();
@@ -32,5 +32,10 @@ public class Cell extends BasicEntity {
         super("cell1("+i+","+j+")");
         this.i = i;
         this.j = j;
+    }
+
+    @Override
+    public String toString() {
+        return  "{_row:"+i+",_col:"+j+"}";
     }
 }

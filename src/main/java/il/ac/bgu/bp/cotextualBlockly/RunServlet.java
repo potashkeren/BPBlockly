@@ -54,10 +54,10 @@ public class RunServlet extends HttpServlet {
 			contextService.close();
 		}
 		contextService = ContextService.getInstance();
-		contextService.init("ContextDB");
+		contextService.init("ContextDB", "Contextual_TTT_Population.js", "Contextual_TTT.js");
 
 		// Start a new deployment
-		bprog = contextService.run("Contextual_TTT_Population.js", "Contextual_TTT.js");
+		bprog = contextService.run();
 //		bprog = new StringBProgram(code);
 
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());

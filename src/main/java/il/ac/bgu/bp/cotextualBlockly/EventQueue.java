@@ -1,5 +1,6 @@
 package il.ac.bgu.bp.cotextualBlockly;
 
+import il.ac.bgu.bp.cotextualBlockly.context.schema.Cell;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -32,10 +33,14 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
         RunServlet.addListener(new BProgramRunnerListenerAdapter() {
             public void eventSelected(BProgram bp, BEvent event) {
                 if (remote != null) {
-                    String send =
-                            String.format("{\"name\": \"%s\", \"data\": %s}",event.name, event.maybeData)
-                                    .replaceAll("_col","\"_col\"")
-                                    .replaceAll("_row","\"_row\"");;
+                    Object data = event.maybeData;
+                    if(event.maybeData instanceof Cell) {
+                        Cell c = (Cell) event.maybeData;
+                        data = c.toString()
+                                .replaceAll("_col","\"_col\"")
+                                .replaceAll("_row","\"_row\"");
+                    }
+                    String send = String.format("{\"name\": \"%s\", \"data\": %s}",event.name, data);
                     LOG.info("Sending:" + send);
                     remote.sendText(send);
                 }
@@ -55,8 +60,8 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
         JsonObject message = jsonReader.readObject();
         jsonReader.close();
         String name = message.getString("name");
-        String data = message.getJsonObject("data").toString().replaceAll("\"","");
+        JsonObject data = message.getJsonObject("data");
 
-        RunServlet.pushToExternal(new BEvent(name, data));
+        RunServlet.pushToExternal(new BEvent(name, new Cell(data.getInt("_row"), data.getInt("_col"))));
     }
 }
