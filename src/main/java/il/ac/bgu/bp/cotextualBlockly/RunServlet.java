@@ -60,15 +60,11 @@ public class RunServlet extends HttpServlet {
 		bprog = contextService.run();
 //		bprog = new StringBProgram(code);
 
-		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
+		//bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
 		bprog.setWaitForExternalEvents(true);
 
 
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
-//        bprog.enqueueExternalEvent(new BEvent("test"));
-//        bprog.enqueueExternalEvent(new BEvent("Click","{_row:1,_col:1}"));
-
-		//bprog.enqueueExternalEvent(new BEvent("Click",new json {_row:1,_col:0}));
 	}
 
 	/**
