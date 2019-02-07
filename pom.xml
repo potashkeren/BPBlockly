@@ -15,10 +15,6 @@
 	</properties>
 
 	<repositories>
-		<!--<repository>
-			<id>alfresco-public</id>
-			<url>https://artifacts.alfresco.com/nexus/content/groups/public</url>
-		</repository>-->
 		<repository>
 			<id>jitpack.io</id>
 			<url>https://jitpack.io</url>
@@ -62,9 +58,9 @@
 
 		<!--//region context-->
 		<dependency>
-			<groupId>com.github.bThink-BGU</groupId>
-			<artifactId>BPjs-Context</artifactId>
-			<version>a521200</version>
+			<groupId>com.github.bThink-BGU.BPjs-Context</groupId>
+			<artifactId>BPjs-Context-Core</artifactId>
+			<version>52022c1</version>
 		</dependency>
 
 		<dependency>
