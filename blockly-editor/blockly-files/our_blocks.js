@@ -502,7 +502,28 @@ Blockly.defineBlocksWithJsonArray([
         "colour": 230,
         "tooltip": "",
         "helpUrl": ""
-    }
+    },
+{
+    "type": "equals",
+    "message0": " %1 equals to: %2",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "VALUE1",
+            "check": "String"
+        },
+        {
+            "type": "input_value",
+            "name": "VALUE2",
+            "check": "String"
+        }
+    ],
+    "inputsInline": true,
+    "output": "Boolean",
+    "colour": 220,
+    "tooltip": "",
+    "helpUrl": ""
+}
   ]);
 
 //#region BP Basic + Advance Blocks
@@ -837,6 +858,13 @@ Blockly.JavaScript['object_create'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+Blockly.JavaScript['equals'] = function(block) {
+    var value1 = Blockly.JavaScript.valueToCode(block, 'VALUE1', Blockly.JavaScript.ORDER_ATOMIC);
+    var value2 = Blockly.JavaScript.valueToCode(block, 'VALUE2', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = value1 + '.equals(' + value2 + ')';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC]
+};
+
 const CUSTOM_OBJECT_CREATE_BLOCK_NAME = 'object_create';
 const CUSTOM_OBJECT_MUTATOR_FIELD_BLOCK_NAME = 'object_field';
 const CUSTOM_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME = 'object_create_mutator_top';
@@ -1030,8 +1058,8 @@ Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutato
 //endregion Object Blocks
 
 //#region Context
-var context_name = ["Empty Cells","NonEmpty Cells","Cells","Playing","End of Game","Triple"];
-var commands =["Mark Cell as non empty","Finish the game"];
+var context_name = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
+var commands =["UpdateCell","Finish the game"];
 var context= {
     office: ['Motion Detector','Air Condition','Smoke Detector'],
     restroom:['Smart Light'],
@@ -1209,7 +1237,7 @@ Blockly.Blocks['ctx_update_db'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.updateDBEvent')
+            .appendField('CTX.UpdateEvent')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1219,26 +1247,26 @@ Blockly.Blocks['ctx_update_db'] = {
 Blockly.JavaScript['ctx_update_db'] = function(block) {
     var command = block.getFieldValue('COMMAND');
 
-    var code = "ctx.updateDBEvent(\""+command+"\")";
+    var code = "CTX.UpdateEvent(\""+command+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['ctx_context_ended'] = {
+Blockly.Blocks['ctx_new_context'] = {
     // Value input.
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.contextEndedEvent')
+            .appendField('ctx.NewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
     }
 };
 
-Blockly.JavaScript['ctx_context_ended'] = function(block) {
+Blockly.JavaScript['ctx_new_context'] = function(block) {
     var name = block.getFieldValue('CONTEXT_NAME');
 
-    var code = "ctx.contextEndedEvent(\""+name+"\")";
+    var code = "ctx.NewContextEvent(\""+name+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1247,7 +1275,7 @@ Blockly.Blocks['ctx_update_db_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.updateDBEvent')
+            .appendField('CTX.UpdateEvent')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.appendValueInput("DATA")
             .appendField("with data");
@@ -1261,16 +1289,16 @@ Blockly.JavaScript['ctx_update_db_data'] = function(block) {
     var command = block.getFieldValue('COMMAND');
     var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = "ctx.updateDBEvent(\""+command+"\","+data+")";
+    var code = "CTX.UpdateEvent(\""+command+"\","+data+")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['ctx_context_ended_data'] = {
+Blockly.Blocks['ctx_new_context_data'] = {
     // Value input.
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.contextEndedEvent')
+            .appendField('ctx.NewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.appendValueInput("DATA")
             .appendField("with data");
@@ -1280,11 +1308,11 @@ Blockly.Blocks['ctx_context_ended_data'] = {
     }
 };
 
-Blockly.JavaScript['ctx_context_ended_data'] = function(block) {
+Blockly.JavaScript['ctx_new_context_data'] = function(block) {
     var name = block.getFieldValue('CONTEXT_NAME');
     var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = "ctx.contextEndedEvent(\""+name+"\","+data+")";
+    var code = "NewContextEvent(\""+name+"\","+data+")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1315,6 +1343,24 @@ Blockly.JavaScript['ctx_subscribe'] = function(block) {
     var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
     var code = 'ctx.subscribe('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
     return code;
+};
+
+Blockly.Blocks['ctx_get_context'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendValueInput("NAME")
+            .appendField("CTX.getContextsOfType");
+        this.setOutput(true, null);
+        this.setTooltip('get context');
+    }
+};
+
+Blockly.JavaScript['ctx_get_context'] = function(block) {
+    var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = "CTX.getContextsOfType("+name+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 //#endregion Context

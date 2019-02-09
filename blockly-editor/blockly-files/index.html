@@ -292,6 +292,13 @@
                 <field name="TEXT">a</field>
             </shadow>
         </block>
+        <block type="equals">
+            <value name="VALUE2">
+                <shadow type="text">
+                    <field name="TEXT">b</field>
+                </shadow>
+            </value>
+        </block>
 
     </category>
     <category id="catLists" colour="260" name="Lists">
@@ -479,7 +486,16 @@
                 </block>
             </value>
         </block>
-        <block type="bp_event_name">
+        <block type="bp_event_name"></block>
+        <block type="equals">
+            <value name="VALUE1">
+                <block type="bp_event_name"></block>
+            </value>
+            <value name="VALUE2">
+                <shadow type="text">
+                    <field name="TEXT">b</field>
+                </shadow>
+            </value>
         </block>
     </category>
 
@@ -505,14 +521,17 @@
                 </block>
             </value>
         </block>
-        <block type="ctx_context_ended"></block>
-        <block type="ctx_context_ended_data">
+        <block type="ctx_new_context"></block>
+        <block type="ctx_new_context_data">
             <value name="DATA">
                 <block type="variables_get">
                     <field name="VAR">c</field>
                 </block>
             </value>
         </block>
+        <block type="ctx_get_context"></block>
+
+
 
    </category>
     <category id="catBP_OTHERS" name="BP Others" colour="#990000">
