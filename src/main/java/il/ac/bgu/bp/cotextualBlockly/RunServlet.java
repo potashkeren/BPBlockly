@@ -54,16 +54,16 @@ public class RunServlet extends HttpServlet {
 			contextService.close();
 		}
 		contextService = ContextService.getInstance();
-		contextService.init("ContextDB", "Contextual_TTT_Population.js", "Contextual_TTT.js");
+
+//		Use contextService.initFromString to init from the blockly code
+		contextService.initFromResources("ContextDB", "Contextual_TTT_Population.js", "Contextual_TTT.js");
+//		contextService.initFromString("ContextDB", code);
+
 		bprog = contextService.getBProgram();
 		bprog.setWaitForExternalEvents(true);
 
 		// Start a new deployment
 		contextService.run();
-//		bprog = new StringBProgram(code);
-
-		//bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
-
 
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
 	}
