@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>com.github.bthink-bgu</groupId>
 			<artifactId>BPjs</artifactId>
-			<version>0.9.5</version>
+			<version>0.9.8</version>
 		</dependency>
 
 		<dependency>
@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.github.bThink-BGU.BPjs-Context</groupId>
 			<artifactId>BPjs-Context-Core</artifactId>
-			<version>52022c1</version>
+			<version>43458e5</version>
 		</dependency>
 
 		<dependency>

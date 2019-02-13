@@ -55,13 +55,14 @@ public class RunServlet extends HttpServlet {
 		}
 		contextService = ContextService.getInstance();
 		contextService.init("ContextDB", "Contextual_TTT_Population.js", "Contextual_TTT.js");
+		bprog = contextService.getBProgram();
+		bprog.setWaitForExternalEvents(true);
 
 		// Start a new deployment
-		bprog = contextService.run();
+		contextService.run();
 //		bprog = new StringBProgram(code);
 
 		//bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
-		bprog.setWaitForExternalEvents(true);
 
 
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }

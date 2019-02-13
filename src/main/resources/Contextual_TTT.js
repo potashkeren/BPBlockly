@@ -50,7 +50,8 @@ CTX.subscribe("block X,O on nonempty cell","NonEmptyCell",function(c) {
 //endregion CEll BEHAVIORS
 
 //#region GAME RULES
-bp.registerBThread("EnforceTurns", function() {
+
+bp.registerBThread("EnforceTurnsXO", function() {
     while (true) {
         bp.sync({
             waitFor: XEvents,
@@ -63,10 +64,9 @@ bp.registerBThread("EnforceTurns", function() {
     }
 });
 
-bp.registerBThread("EnforceTurns", function() {
+bp.registerBThread("EnforceMoveAfterNonEmptyCell", function() {
     while (true) {
         var e = bp.sync({ waitFor: move });
-        // bp.log.info("HERE " + e);
         bp.sync({
             waitFor: CTX.NewContextEvent("NonEmptyCell", e.data),
             block: move
@@ -82,21 +82,9 @@ bp.registerBThread("block X or O on endgame", function() {
 
 // Represents when it is a draw
 bp.registerBThread("DetectDraw", function() {
-    // For debug
-    bp.sync({ waitFor: move });
-    bp.sync({ waitFor: move });
-    bp.sync({ waitFor: move });
-
-    bp.sync({ waitFor: move });
-    bp.sync({ waitFor: move });
-    bp.sync({ waitFor: move });
-
-    bp.sync({ waitFor: move });
-    bp.sync({ waitFor: move });
-    bp.sync({ waitFor: move });
-    /*
-     * for (var i=0; i< 9; i++) { bp.sync({ waitFor:[ move ] }); }
-     */
+    for (var i = 0; i < 9; i++) {
+        bp.sync({ waitFor: move });
+    }
     bp.sync({ request: bp.Event('Draw') }, 90);
 });
 
@@ -178,7 +166,7 @@ function addForkdiagPermutationBthreads(c1,c2){ //
     bp.registerBThread("PreventForkdiagX", function() {
         bp.sync({ waitFor:[ createEvent("X",c1) ] });
         bp.sync({ waitFor:[ createEvent("X",c2) ] });
-        bp.sync({ request:[ createEvent("O", getCell(0,1)),createEvent("O",getCell(1,0)), reateEvent("O", getCell(2,1)), createEvent("O", getCell(1,2)) ] }, 30);
+        bp.sync({ request:[ createEvent("O", getCell(0,1)),createEvent("O",getCell(1,0)), createEvent("O", getCell(2,1)), createEvent("O", getCell(1,2)) ] }, 30);
     });
 }
 //#endregion fork functions
@@ -186,8 +174,9 @@ function addForkdiagPermutationBthreads(c1,c2){ //
 // Preference to put O on the center
 bp.registerBThread("Center", function() {
     bp.sync({waitFor: bp.Event("Context Population Ended")});
-
+    bp.log.info("Point 1.start");
     bp.sync({request: [createEvent("O", getCell(1,1))]}, 35);
+    bp.log.info("Point 1.end");
 });
 
 // Preference to put O on the corners
@@ -197,7 +186,7 @@ CTX.subscribe("Corner", "CornerCell", function(c) {
 
 bp.registerBThread("PLAYER O STRATEGIES", function() {
     bp.sync({waitFor: bp.Event("Context Population Ended")});
-
+    bp.log.info("Point 2.start");
     // Preference to put O on the sides
     bp.registerBThread("Sides", function () {
         while (true) {
@@ -207,7 +196,7 @@ bp.registerBThread("PLAYER O STRATEGIES", function() {
             }, 10);
         }
     });
-
+    bp.log.info("Point 2.end");
     var forks22 = [[getCell(1, 2), getCell(2, 0)], [getCell(2, 1), getCell(0, 2)], [getCell(1, 2), getCell(2, 1)]];
     var forks02 = [[getCell(1, 2), getCell(0, 0)], [getCell(0, 1), getCell(2, 2)], [getCell(1, 2), getCell(0, 1)]];
     var forks20 = [[getCell(1, 0), getCell(2, 2)], [getCell(2, 1), getCell(0, 0)], [getCell(2, 1), getCell(1, 0)]];
