@@ -268,6 +268,14 @@ Blockly.defineBlocksWithJsonArray([
   "tooltip": "The name of the event considered for selection",
   "helpUrl": ""
 },
+    {
+        "type": "bp_event_data",
+        "message0": "The event's data",
+        "output": "String",
+        "colour": 0,
+        "tooltip": "The data of the event considered for selection",
+        "helpUrl": ""
+    },
 {
   "type": "bp_eventset",
   "message0": "BP EventSet %1 name: %2 with function: %3",
@@ -523,7 +531,27 @@ Blockly.defineBlocksWithJsonArray([
     "colour": 220,
     "tooltip": "",
     "helpUrl": ""
-}
+},
+    {
+        "type": "get_array_list",
+        "message0": "CTX %1 get %2",
+        "args0": [
+            {
+                "type": "input_value",
+                "name": "OBJECT"
+            },
+            {
+                "type": "input_value",
+                "name": "PROPERTY",
+                "check": "Number"
+            }
+        ],
+        "inputsInline": true,
+        "output": null,
+        "colour": 230,
+        "tooltip": "",
+        "helpUrl": ""
+    }
   ]);
 
 //#region BP Basic + Advance Blocks
@@ -735,6 +763,11 @@ Blockly.JavaScript['bp_event_name'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
+Blockly.JavaScript['bp_event_data'] = function(block) {
+    var code = 'e.data';
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
 //just to make the EventSet names unique
 var eventset_counter = 0;
 
@@ -843,6 +876,15 @@ Blockly.JavaScript['get_object_value'] = function(block) {
     var code = object+ '.' + eval(property);
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
+
+Blockly.JavaScript['get_array_list'] = function(block) {
+    var object = Blockly.JavaScript.valueToCode(block, 'OBJECT', Blockly.JavaScript.ORDER_ATOMIC);
+    var property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = object+ '.get(' + property+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
 
 Blockly.JavaScript['object_create'] = function(block) {
     if (!block.numFields) {
@@ -1049,7 +1091,7 @@ const objectCreateMutator = {
                 .setAlign(Blockly.ALIGN_RIGHT)
                 .appendField(new Blockly.FieldTextInput(fieldName), "field" + i);
         }
-    },
+    }
 
 };
 
@@ -1256,7 +1298,7 @@ Blockly.Blocks['ctx_new_context'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.NewContextEvent')
+            .appendField('CTX.NewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1266,7 +1308,7 @@ Blockly.Blocks['ctx_new_context'] = {
 Blockly.JavaScript['ctx_new_context'] = function(block) {
     var name = block.getFieldValue('CONTEXT_NAME');
 
-    var code = "ctx.NewContextEvent(\""+name+"\")";
+    var code = "CTX.NewContextEvent(\""+name+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1298,7 +1340,7 @@ Blockly.Blocks['ctx_new_context_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.NewContextEvent')
+            .appendField('CTX.NewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.appendValueInput("DATA")
             .appendField("with data");
@@ -1312,7 +1354,7 @@ Blockly.JavaScript['ctx_new_context_data'] = function(block) {
     var name = block.getFieldValue('CONTEXT_NAME');
     var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = "NewContextEvent(\""+name+"\","+data+")";
+    var code = "CTX.NewContextEvent(\""+name+"\","+data+".data)";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1321,7 +1363,7 @@ Blockly.Blocks['ctx_subscribe'] = {
     init: function () {
         this.setColour(240);
         this.appendValueInput("NAME")
-            .appendField("ctx.subscribe");
+            .appendField("CTX.subscribe");
         this.appendDummyInput('dropDownField')
             .appendField('with context')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CTX_NAME');
@@ -1341,7 +1383,7 @@ Blockly.JavaScript['ctx_subscribe'] = function(block) {
     var ctx_var_name = Blockly.JavaScript.valueToCode(block, 'CTX_VAR_NAME', Blockly.JavaScript.ORDER_ATOMIC);
 
     var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
-    var code = 'ctx.subscribe('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
+    var code = 'CTX.subscribe('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
     return code;
 };
 
@@ -1364,5 +1406,7 @@ Blockly.JavaScript['ctx_get_context'] = function(block) {
 };
 
 //#endregion Context
+
+
 
 
