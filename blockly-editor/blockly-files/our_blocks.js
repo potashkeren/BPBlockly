@@ -16,7 +16,7 @@ Blockly.defineBlocksWithJsonArray([
   },
 {
         "type": "bp_event_with_data",
-        "message0": "BP Event %1 With data: %2",
+        "message0": "BP Event %1 data: %2",
         "args0": [
             {
                 "type": "input_value",
@@ -49,7 +49,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_event_with_data_no_output",
-    "message0": "BP Event %1 With data: %2",
+    "message0": "BP Event %1 data: %2",
     "args0": [
         {
             "type": "input_value",
@@ -104,7 +104,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_bsync",
-    "message0": "bsync with:%1 Wait %2 Request %3 Block %4 Priority %5",
+    "message0": "bsync %1 Wait %2 Request %3 Block %4 Data %5",
     "args0": [
         {
             "type": "input_dummy"
@@ -138,7 +138,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_bsync_with_output",
-    "message0": "bsync with:%1 Wait %2 Request %3 Block %4 Priority %5",
+    "message0": "bsync %1 Wait %2 Request %3 Block %4 Data %5",
     "args0": [
         {
             "type": "input_dummy"
@@ -171,7 +171,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_bsync_line",
-  "message0": "bsync with:%1 Wait %2 Request %3 Block %4 Priority %5",
+  "message0": "bsync %1 Wait %2 Request %3 Block %4 Data %5",
   "args0": [
       {
           "type": "input_dummy"
@@ -206,7 +206,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_bsync_with_output_line",
-  "message0": "bsync with:%1 Wait %2 Request %3 Block %4 Priority %5",
+  "message0": "bsync %1 Wait %2 Request %3 Block %4 Data %5",
   "args0": [
       {
           "type": "input_dummy"
@@ -278,7 +278,7 @@ Blockly.defineBlocksWithJsonArray([
     },
 {
   "type": "bp_eventset",
-  "message0": "BP EventSet %1 name: %2 with function: %3",
+  "message0": "BP EventSet %1 name: %2 function: %3",
   "args0": [
     {
       "type": "input_dummy"
@@ -302,7 +302,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
         "type": "bp_eventset_var",
-        "message0": "BP EventSet %1 name: %2 with function name: %3",
+        "message0": "BP EventSet %1 name: %2 function name: %3",
         "args0": [
             {
                 "type": "input_dummy"
@@ -493,7 +493,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
         "type": "get_object_value",
-        "message0": "from object %1 get %2",
+        "message0": "object %1 get %2",
         "args0": [
             {
                 "type": "input_value",
@@ -1320,7 +1320,7 @@ Blockly.Blocks['ctx_update_db_data'] = {
             .appendField('CTX.UpdateEvent')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.appendValueInput("DATA")
-            .appendField("with data");
+            .appendField("data");
         this.setOutput(true, null);
         this.setInputsInline(true);
         this.setTooltip('get the context name');
@@ -1343,7 +1343,7 @@ Blockly.Blocks['ctx_new_context_data'] = {
             .appendField('CTX.NewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.appendValueInput("DATA")
-            .appendField("with data");
+            .appendField("data");
         this.setOutput(true, null);
         this.setInputsInline(true);
         this.setTooltip('get the context name');
@@ -1365,7 +1365,7 @@ Blockly.Blocks['ctx_subscribe'] = {
         this.appendValueInput("NAME")
             .appendField("CTX.subscribe");
         this.appendDummyInput('dropDownField')
-            .appendField('with context')
+            .appendField('context')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CTX_NAME');
         this.appendValueInput("CTX_VAR_NAME")
             .appendField("function:");
