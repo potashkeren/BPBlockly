@@ -557,7 +557,22 @@ Blockly.defineBlocksWithJsonArray([
     "mutator": "bsync_mutator",
     "tooltip": "A basic bsync statement",
     "helpUrl": ""
-}
+},
+{
+    "type": "bp_basic_bsync_output",
+    "message0": "bsync %1",
+    "args0": [
+        {
+            "type": "input_dummy"
+        }
+    ],
+    "output":"BP_EVENT",
+    "nextStatement": null,
+    "colour": 27,
+    "mutator": "bsync_mutator_output",
+    "tooltip": "A basic bsync statement",
+    "helpUrl": ""
+    }
 
   ]);
 
@@ -782,6 +797,37 @@ Blockly.JavaScript['bp_basic_bsync'] = function(block) {
 
     return code+';\n';
 };
+
+Blockly.JavaScript['bp_basic_bsync_output'] = function(block) {
+    var value_wait = Blockly.JavaScript.valueToCode(block, 'Wait', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+    var value_request = Blockly.JavaScript.valueToCode(block, 'Request', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+    var value_block = Blockly.JavaScript.valueToCode(block, 'Block', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+    var value_priority = Blockly.JavaScript.valueToCode(block, 'Data', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+
+    var set=[];
+
+    if (value_wait !== 'null') {
+        //check for EventSet and array of events
+        set.push('waitFor: '+value_wait);
+    }
+    if (value_request !== 'null') {
+        //check for EventSet and array of events
+        set.push('request: '+value_request);
+    }
+    if (value_block !== 'null') {
+        //check for EventSet and array of events
+        set.push('block: '+value_block);
+    }
+    var priority = '';
+    if (value_priority !== 'null') {
+        priority = ','+value_priority ;
+    }
+
+    var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +')';
+
+    return code+';\n';
+};
+
 
 //#endregion  BP Basic + Advance Blocks
 
@@ -1633,5 +1679,241 @@ const objectCreateMutatorBsync = {
 Blockly.Extensions.registerMutator('bsync_mutator',
     objectCreateMutatorBsync, null, ['bp_wait','bp_request','bp_block', 'bp_data']);
 
+const objectCreateMutatorBsyncOutput = {
+    waitCount_: 0,
+    requestCount_: 0,
+    blockCount_: 0,
+    dataCount_: 0,
 
+    /**
+     * Create XML to represent the number of else-if and else inputs.
+     * @return {Element} XML storage element.
+     * @this Blockly.Block
+     */
+    mutationToDom: function() {
+        if (!this.waitCount_ && !this.requestCount_ && !this.blockCount_ && !this.dataCount_) {
+            return null;
+        }
+        var container = document.createElement('mutation');
+        if (this.waitCount_) {
+            container.setAttribute('wait', 1);
+        }
+        if (this.requestCount_) {
+            container.setAttribute('request', 1);
+        }
+        if (this.blockCount_) {
+            container.setAttribute('block', 1);
+        }
+        if (this.dataCount_) {
+            container.setAttribute('data', 1);
+        }
+        return container;
+    },
+    /**
+     * Parse XML to restore the else-if and else inputs.
+     * @param {!Element} xmlElement XML storage element.
+     * @this Blockly.Block
+     */
+    domToMutation: function(xmlElement) {
+        this.waitCount_ = parseInt(xmlElement.getAttribute('wait'), 10) || 0;
+        this.requestCount_ = parseInt(xmlElement.getAttribute('request'), 10) || 0;
+        this.blockCount_ = parseInt(xmlElement.getAttribute('block'), 10) || 0;
+        this.dataCount_ = parseInt(xmlElement.getAttribute('data'), 10) || 0;
+        this.rebuildShape_();
+    },
+    /**
+     * Populate the mutator's dialog with this block's components.
+     * @param {!Blockly.Workspace} workspace Mutator's workspace.
+     * @return {!Blockly.Block} Root block in mutator.
+     * @this Blockly.Block
+     */
+    decompose: function(workspace) {
+        var containerBlock = workspace.newBlock('bp_basic_bsync_output');
+        containerBlock.initSvg();
+        var connection = containerBlock.nextConnection;
+        if (this.waitCount_) {
+            var elseifBlock = workspace.newBlock('bp_wait');
+            elseifBlock.initSvg();
+            connection.connect(elseifBlock.previousConnection);
+            connection = elseifBlock.nextConnection;
+        }
+        if (this.requestCount_) {
+            var requestBlock = workspace.newBlock('bp_request');
+            requestBlock.initSvg();
+            connection.connect(requestBlock.previousConnection);
+            connection = requestBlock.nextConnection;
+        }
+        if (this.blockCount_) {
+            var blockBlock = workspace.newBlock('bp_block');
+            blockBlock.initSvg();
+            connection.connect(blockBlock.previousConnection);
+            connection = blockBlock.nextConnection;
+        }
+        if (this.dataCount_) {
+            var elseBlock = workspace.newBlock('bp_data');
+            elseBlock.initSvg();
+            connection.connect(elseBlock.previousConnection);
+        }
+        return containerBlock;
+    },
+    /**
+     * Reconfigure this block based on the mutator dialog's components.
+     * @param {!Blockly.Block} containerBlock Root block in mutator.
+     * @this Blockly.Block
+     */
+    compose: function(containerBlock) {
+        var clauseBlock = containerBlock.nextConnection.targetBlock();
+        // Count number of inputs.
+        this.waitCount_ = 0;
+        this.requestCount_ = 0;
+        this.blockCount_ = 0;
+        this.dataCount_ = 0;
+        var valueConnections = null;
+        var requestConnections = null;
+        var blockConnections = null;
+        var elseStatementConnection = null;
+        while (clauseBlock) {
+            switch (clauseBlock.type) {
+                case 'bp_wait':
+                    this.waitCount_++;
+                    valueConnections = clauseBlock.valueConnection_;
+                    break;
+                case 'bp_request':
+                    this.requestCount_++;
+                    requestConnections = clauseBlock.requestConnection_;
+                    break;
+                case 'bp_block':
+                    this.blockCount_++;
+                    blockConnections = clauseBlock.blockConnection_;
+                    break;
+                case 'bp_data':
+                    this.dataCount_++;
+                    elseStatementConnection = clauseBlock.statementConnection_;
+                    break;
+                default:
+                    throw TypeError('Unknown block type: ' + clauseBlock.type);
+            }
+            clauseBlock = clauseBlock.nextConnection &&
+                clauseBlock.nextConnection.targetBlock();
+        }
+        this.updateShape_();
+        // Reconnect any child blocks.
+        this.reconnectChildBlocks_(valueConnections, requestConnections, blockConnections, elseStatementConnection);
+    },
+    /**
+     * Store pointers to any connected child blocks.
+     * @param {!Blockly.Block} containerBlock Root block in mutator.
+     * @this Blockly.Block
+     */
+    saveConnections: function(containerBlock) {
+        var clauseBlock = containerBlock.nextConnection.targetBlock();
+        while (clauseBlock) {
+            switch (clauseBlock.type) {
+                case 'bp_wait':
+                    var inputIf = this.getInput('Wait');
+                    clauseBlock.valueConnection_ =
+                        inputIf && inputIf.connection.targetConnection;
+                    break;
+                case 'bp_request':
+                    var inputRequest = this.getInput('Request');
+                    clauseBlock.requestConnection_ =
+                        inputRequest && inputRequest.connection.targetConnection;
+                    break;
+                case 'bp_block':
+                    var inputBlock = this.getInput('Block');
+                    clauseBlock.blockConnection_ =
+                        inputBlock && inputBlock.connection.targetConnection;
+                    break;
+                case 'bp_data':
+                    var inputDo = this.getInput('Data');
+                    clauseBlock.statementConnection_ =
+                        inputDo && inputDo.connection.targetConnection;
+                    break;
+                default:
+                    throw TypeError('Unknown block type: ' + clauseBlock.type);
+            }
+            clauseBlock = clauseBlock.nextConnection &&
+                clauseBlock.nextConnection.targetBlock();
+        }
+    },
+    /**
+     * Reconstructs the block with all child blocks attached.
+     */
+    rebuildShape_: function() {
+        var valueConnections = null;
+        var requestConnections = null;
+        var blockConnections = null;
+        var elseStatementConnection = null;
+
+        if (this.getInput('Data')) {
+            elseStatementConnection = this.getInput('Data').connection.targetConnection;
+        }
+        if (this.getInput('Block')) {
+            blockConnections = this.getInput('Block').connection.targetConnection;
+        }
+        if (this.getInput('Request')) {
+            requestConnections = this.getInput('Request').connection.targetConnection;
+        }
+        if (this.getInput('Wait')) {
+            valueConnections= this.getInput('Wait').connection.targetConnection;
+        }
+        this.updateShape_();
+        this.reconnectChildBlocks_(valueConnections, requestConnections, blockConnections, elseStatementConnection);
+    },
+    /**
+     * Modify this block to have the correct number of inputs.
+     * @this Blockly.Block
+     * @private
+     */
+    updateShape_: function() {
+        // Delete everything.
+        if (this.getInput('Data')) {
+            this.removeInput('Data');
+        }
+        if (this.getInput('Block')) {
+            this.removeInput('Block');
+        }
+        if (this.getInput('Request')) {
+            this.removeInput('Request');
+        }
+        if (this.getInput('Wait')) {
+            this.removeInput('Wait');
+        }
+        // Rebuild block.
+        if( this.waitCount_) {
+            this.appendValueInput('Wait')
+                .appendField('Wait');
+        }
+        if( this.requestCount_) {
+            this.appendValueInput('Request')
+                .appendField('Request');
+        }
+        if( this.blockCount_) {
+            this.appendValueInput('Block')
+                .appendField('Block');
+        }
+        if (this.dataCount_) {
+            this.appendValueInput('Data')
+                .appendField('Data');
+        }
+    },
+    /**
+     * Reconnects child blocks.
+     * @param {!Array<?Blockly.RenderedConnection>} valueConnections List of value
+     * connectsions for if input.
+     * @param {!Array<?Blockly.RenderedConnection>} statementConnections List of
+     * statement connections for do input.
+     * @param {?Blockly.RenderedConnection} elseStatementConnection Statement
+     * connection for else input.
+     */
+    reconnectChildBlocks_: function(valueConnections, requestConnections, blockConnections, elseStatementConnection) {
+        Blockly.Mutator.reconnect(valueConnections, this, 'Wait');
+        Blockly.Mutator.reconnect(requestConnections, this, 'Request');
+        Blockly.Mutator.reconnect(blockConnections, this, 'Block');
+        Blockly.Mutator.reconnect(elseStatementConnection, this, 'Data');
+    }
+};
+
+Blockly.Extensions.registerMutator('bsync_mutator_output',
+    objectCreateMutatorBsyncOutput, null, ['bp_wait','bp_request','bp_block', 'bp_data']);
 
