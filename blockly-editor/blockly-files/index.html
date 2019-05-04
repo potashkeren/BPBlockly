@@ -287,7 +287,7 @@
                 <field name="TEXT">a</field>
             </shadow>
         </block>
-        <block type="includes">
+        <block type="text_includes">
             <shadow type="text">
                 <field name="TEXT">a</field>
             </shadow>
@@ -351,6 +351,7 @@
             </value>
         </block>
         <block type="lists_sort"></block>
+        <block type="list_includes"></block>
     </category>
     <category id="catColour" colour="20" name="Color">
         <block type="colour_picker"></block>
@@ -393,6 +394,21 @@
     <sep></sep>
     <category id="catVariables" colour="330" custom="VARIABLE" name="Variables"></category>
     <category id="catFunctions" colour="290" custom="PROCEDURE" name="Functions"></category>
+    <category id="catScheduling" name="Scheduling" colour="#61A7C0">
+        <label text="Date:" web-class="explanatoryBPLabelStyle"></label>
+        <block type="date"></block>
+        <block type="get_hour"></block>
+        <sep gap="20"></sep>
+        <label text="Timeout:" web-class="explanatoryBPLabelStyle"></label>
+        <block type="setTimeout"></block>
+        <block type="setTimeout_return"></block>
+        <block type="clearTimeout"></block>
+        <sep gap="20"></sep>
+        <label text="Interval:" web-class="explanatoryBPLabelStyle"></label>
+        <block type="setInterval"></block>
+        <block type="setInterval_return"></block>
+        <block type="clearInterval"></block>
+    </category>
     <sep></sep>
     <category id="catBP_BASIC" name="BP Basic" colour="#ffcc00">
         <label text="Plug the following blocks:" web-class="explanatoryBPLabelStyle"></label>
@@ -445,7 +461,6 @@
         </block>
 
     </category>
-
     <category id="catBP_ADVANCED" name="BP Advanced" colour="#ff9900">
         <block type="bp_eventset">
             <value name="NAME">
@@ -488,7 +503,6 @@
             </value>
         </block>
     </category>
-
     <category id="catBP_CONTEXT" name="BP Context" colour="#cc0000">
         <block type="ctx_subscribe">
             <value name="NAME">
@@ -521,12 +535,25 @@
         </block>
         <block type="ctx_get_context"></block>
         <block type="get_array_list"></block>
+        <block type="ctx_context_ended">
+            <value name="DATA">
+                <block type="variables_get">
+                    <field name="VAR">c</field>
+                </block>
+            </value>
+        </block>
+        <block type="ctx_tick"></block>
+        <block type="ctx_object_tick">
+            <value name="OBJECT">
+                <block type="variables_get">
+                    <field name="VAR">c</field>
+                </block>
+            </value>
+        </block>
+        <block type="ctx_transaction"></block>
 
 
-
-
-
-   </category>
+    </category>
     <category id="catBP_OTHERS" name="BP Others" colour="#990000">
         <block type="object">
             <value name="LIST">
