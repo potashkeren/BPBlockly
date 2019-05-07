@@ -1,6 +1,9 @@
 package il.ac.bgu.bp.cotextualBlockly.context.schema;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @NamedQueries(value = {
@@ -29,23 +32,21 @@ public class Lab extends BasicEntity {
     public final String name = "";
     @Column
     public final boolean isLocked = true;
-    @Column
-    public  final String practice = "noPractice";
-    @OneToOne(cascade = CascadeType.MERGE)
-    public final Sensor sensor;
+    @Enumerated(EnumType.STRING)
+    public  final Practice practice = Practice.noPractice;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lab", orphanRemoval = true)
+    private List<Schedule> scheduleList = new ArrayList<>();
 
     protected Lab() {
         super();
         capacity =0;
         occupancy=0;
-        sensor = new Sensor();
     }
 
     public Lab(String name ,int capacity, int occupancy) {
         super("lab_"+name);
         this.capacity = capacity;
         this.occupancy = occupancy;
-        this.sensor = new Sensor();
     }
 
     @Override

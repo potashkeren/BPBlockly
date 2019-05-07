@@ -327,6 +327,22 @@ Blockly.defineBlocksWithJsonArray([
   "helpUrl": ""
 },
 {
+    "type": "text_comment",
+    "message0": " %1",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "TEXT"
+        }
+    ],
+    "inputsInline": true,
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "comment block",
+    "helpUrl": ""
+},
+{
     "type": "text_includes",
     "message0": "%1 includes %2",
     "args0": [
@@ -1020,9 +1036,9 @@ Blockly.JavaScript['bp_basic_bsync'] = function(block) {
         priority = ','+value_priority ;
     }
 
-    var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +')';
+    var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +');';
 
-    return code+';\n';
+    return code;
 };
 
 Blockly.JavaScript['bp_basic_bsync_output'] = function(block) {
@@ -1057,7 +1073,7 @@ Blockly.JavaScript['bp_basic_bsync_output'] = function(block) {
 
     var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +')';
 
-    return code+';\n';
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 //#endregion  BP Basic + Advance Blocks
@@ -1101,6 +1117,13 @@ Blockly.JavaScript['text_parse'] = function(block) {
     var code = 'parseInt('+text+')';
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
+
+Blockly.JavaScript['text_comment'] = function(block) {
+    var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = '\\\\ '+ eval(text) +'\n';
+    return code;
+};
+
 
 //#endregion Text Blocks
 
