@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
 import il.ac.bgu.cs.bp.bpjs.context.ContextService;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -64,8 +65,8 @@ public class RunServlet extends HttpServlet {
 
 		// Start a new deployment
 		contextService.run();
-
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
+		new Thread(new TimeInjector()).run();
 	}
 
 	/**

@@ -3,24 +3,23 @@ package il.ac.bgu.bp.cotextualBlockly.context.schema;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NamedQueries(value = {
         @NamedQuery(name = "Lab", query = "SELECT l FROM Lab l"),
         @NamedQuery(name = "OpenLab", query = "SELECT l FROM Lab l WHERE l.isLocked = false "),
         @NamedQuery(name = "LockedLab", query = "SELECT l FROM Lab l WHERE l.isLocked = true "),
-        @NamedQuery(name = "NoPracticeLab", query = "SELECT l FROM Lab l WHERE l.practice = 'noPractice' "),
-        @NamedQuery(name = "PracticeLab", query = "SELECT l FROM Lab l WHERE l.practice = 'practice' "),
-        @NamedQuery(name = "BeforePracticeLab", query = "SELECT l FROM Lab l WHERE l.practice = 'beforePractice'"),
-        @NamedQuery(name = "AfterPracticeLab", query = "SELECT l FROM Lab l WHERE l.practice = 'afterPractice'"),
         @NamedQuery(name = "NonEmptyLab", query = "SELECT l FROM Lab l WHERE l.occupancy > 0"),
         @NamedQuery(name = "EmptyLab", query = "SELECT l FROM Lab l WHERE l.occupancy = 0"),
-        @NamedQuery(name = "OpenEmptyLab", query = "SELECT l FROM Lab l WHERE (l.occupancy = 0 AND l.isLocked = false)"),
-        @NamedQuery(name = "BeforePracticeOpenLab", query = "SELECT l FROM Lab l WHERE (l.practice = 'beforePractice' AND l.isLocked = false)"),
-        @NamedQuery(name = "BeforePracticeLockedLab", query = "SELECT l FROM Lab l WHERE (l.practice = 'beforePractice' AND l.isLocked = true)"),
-        @NamedQuery(name = "UpdateLab", query = "Update Lab L set L.isLocked=:val where L=:lab"),
-        @NamedQuery(name = "UpdatePractice", query = "Update Lab L set L.practice=:val where L=:lab")
+        @NamedQuery(name = "FreeLearningOpenLab", query = "SELECT l FROM Lab l WHERE l.freeLearning = true AND l.isLocked = false"),
+        @NamedQuery(name = "FreeLearningEmptyLab", query = "SELECT l FROM Lab l WHERE (l.occupancy = 0 AND l.freeLearning = true)"),
+        @NamedQuery(name = "LabNeedToBeEvacuated", query = "SELECT l FROM Lab l WHERE  l.isEvacuated = true "),
+        @NamedQuery(name = "IsOccupied", query = "SELECT l FROM Lab l WHERE (l.capacity - l.occupancy) < 5"),
+        @NamedQuery(name = "NotOccupied", query = "SELECT l FROM Lab l WHERE l.occupancy < l.capacity/2 "),
+        @NamedQuery(name = "OpenTheLab", query = "Update Lab L set L.isLocked=false where L=:lab"),
+        @NamedQuery(name = "CloseTheLab", query = "Update Lab L set L.isLocked=true where L=:lab"),
+        @NamedQuery(name = "IsEvacuated", query = "Update Lab L set L.isEvacuated=:val where L=:lab"),
+        @NamedQuery(name = "FreeLearning", query = "Update Lab L set L.freeLearning=:val where L=:lab")
 })
 
 public class Lab extends BasicEntity {
@@ -32,8 +31,10 @@ public class Lab extends BasicEntity {
     public final String name = "";
     @Column
     public final boolean isLocked = true;
-    @Enumerated(EnumType.STRING)
-    public  final Practice practice = Practice.noPractice;
+    @Column
+    public final boolean isEvacuated = false;
+    @Column
+    public final boolean freeLearning = false;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "lab", orphanRemoval = true)
     private List<Schedule> scheduleList = new ArrayList<>();
 
@@ -52,6 +53,10 @@ public class Lab extends BasicEntity {
     @Override
     public String toString() {
         return  "name:"+ name +", capacity:"+capacity+".";
+    }
+
+    public int getOccupancy() {
+        return occupancy;
     }
 }
 

@@ -468,13 +468,6 @@
 
     </category>
     <category id="catBP_ADVANCED" name="BP Advanced" colour="#ff9900">
-        <block type="bp_eventset">
-            <value name="NAME">
-                <shadow type="text">
-                    <field name="TEXT">Your event name here..</field>
-                </shadow>
-            </value>
-        </block>
         <block type="bp_eventset_var">
             <value name="NAME">
                 <shadow type="text">
@@ -522,12 +515,22 @@
                 </block>
             </value>
         </block>
-        <block type="ctx_get_instances"></block>
         <block type="ctx_update_db"></block>
         <block type="ctx_update_db_data">
             <value name="DATA">
                 <block type="variables_get">
                     <field name="VAR">c</field>
+                </block>
+            </value>
+        </block>
+        <block type="ctx_update_db_new">
+            <value name="CONTENT">
+                <block type="property_value">
+                    <value name="PROPERTY">
+                        <shadow type="text">
+                            <field name="TEXT"></field>
+                        </shadow>
+                    </value>
                 </block>
             </value>
         </block>
@@ -539,15 +542,18 @@
                 </block>
             </value>
         </block>
+        <block type="ctx_get_instances"></block>
         <block type="ctx_get_context"></block>
-        <block type="get_array_list"></block>
-        <block type="ctx_context_ended">
+        <block type="ctx_context_ended"></block>
+        <block type="ctx_context_ended_data">
             <value name="DATA">
                 <block type="variables_get">
                     <field name="VAR">c</field>
                 </block>
             </value>
         </block>
+        <block type="ctx_any_new_context"></block>
+        <block type="ctx_any_context_ended"></block>
         <block type="ctx_tick"></block>
         <block type="ctx_object_tick">
             <value name="OBJECT">
@@ -587,7 +593,7 @@
                 </shadow>
             </value>
         </block>
-
+        <block type="get_array_list"></block>
         <block type="context_created">
             <value name="FIELDS">
                 <block type="variables_set">

@@ -217,7 +217,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_eventset",
-  "message0": "BP EventSet %1 name: %2 function: %3",
+  "message0": "BP EventSet %1 name: %2 function(e): %3",
   "args0": [
     {
       "type": "input_dummy"
@@ -241,7 +241,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
         "type": "bp_eventset_var",
-        "message0": "BP EventSet %1 name: %2 function name: %3",
+        "message0": "BP EventSet %1 name: %2 function(e): %3 return: %4",
         "args0": [
             {
                 "type": "input_dummy"
@@ -252,9 +252,12 @@ Blockly.defineBlocksWithJsonArray([
                 "check": "String"
             },
             {
+                "type": "input_statement",
+                "name": "CONTENT"
+            },
+            {
                 "type": "input_value",
-                "name": "VAR",
-                "check": "String"
+                "name": "RETURN"
             }
         ],
         "inputsInline": false,
@@ -508,7 +511,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "get_array_list",
-    "message0": "CTX %1 get %2",
+    "message0": "Collection %1 get %2",
     "args0": [
         {
             "type": "input_value",
@@ -802,7 +805,6 @@ Blockly.defineBlocksWithJsonArray([
     "tooltip": "",
     "helpUrl": ""
 }
-
   ]);
 
 //#region BP Basic + Advance Blocks
@@ -998,10 +1000,12 @@ Blockly.JavaScript['bp_eventset_var'] = function(block) {
         event_name = 'es'+ eventset_counter;
         eventset_counter++;
     }
+    var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
+    var cond = Blockly.JavaScript.valueToCode(block, 'RETURN', Blockly.JavaScript.ORDER_NONE);
 
-    var variable = Blockly.JavaScript.valueToCode(block, 'VAR', Blockly.JavaScript.ORDER_ATOMIC);
-
-    var code = 'bp.EventSet('+event_name+','+eval(variable)+')';
+    var code = 'bp.EventSet('+event_name+', function(e) {\n '
+        + statements +
+        ' return '+ cond +';\n })';
 
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
@@ -1036,7 +1040,7 @@ Blockly.JavaScript['bp_basic_bsync'] = function(block) {
         priority = ','+value_priority ;
     }
 
-    var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +');';
+    var code = 'bp.sync({'+set.join(",\n")+'}'+ priority +');\n';
 
     return code;
 };
@@ -1123,7 +1127,6 @@ Blockly.JavaScript['text_comment'] = function(block) {
     var code = '\\\\ '+ eval(text) +'\n';
     return code;
 };
-
 
 //#endregion Text Blocks
 
@@ -1216,13 +1219,13 @@ Blockly.JavaScript['list_includes'] = function(block) {
 //#region Object Blocks
 Blockly.JavaScript['object'] = function(block) {
     var property_value = Blockly.JavaScript.statementToCode(block, 'LIST');
-    var code = '{'+property_value.slice(0, -1) +'}';
+    var code = '{'+property_value.slice(0, -2) +'}';
     return [code, Blockly.JavaScript.ORDER_ATOMIC]};
 
 Blockly.JavaScript['property_value'] = function(block) {
     var value_property = Blockly.JavaScript.valueToCode(block, 'PROPERTY', Blockly.JavaScript.ORDER_ATOMIC);
     var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
-    var code = ' '+ eval(value_property)+ ':' + value_value + ',';
+    var code = eval(value_property)+ ':' + value_value + ', ';
     return code;
 };
 
@@ -1463,9 +1466,10 @@ Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutato
 //endregion Object Blocks
 
 //#region Context
-var context_name = ["Lab", "OpenLab", "LockedLab", "NoPracticeLab", "PracticeLab", "BeforePracticeLab", "AfterPracticeLab", "NonEmptyLab",
-                    "EmptyLab", "OpenEmptyLab", "BeforePracticeOpenLab", "BeforePracticeLockedLab"];
-var commands =["UpdateLab", "UpdatePractice"];
+var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab","LabNeedToBeEvacuated",
+                   "IsOccupied","NotOccupied","Schedule", "LabInPractice", "BeforePractice", "AfterPractice",
+                     "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab"];
+var commands =["OpenTheLab","CloseTheLab", "IsEvacuated", "FreeLearning"];
 var context_name_TTT = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
 var commands_TTT =["UpdateCell","Finish the game"];
 var context= {
@@ -1627,7 +1631,7 @@ Blockly.Blocks['ctx_get_instances'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('ctx.getInstances')
+            .appendField('CTX.getContextOfType')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'PROPERTY');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1636,8 +1640,8 @@ Blockly.Blocks['ctx_get_instances'] = {
 
 Blockly.JavaScript['ctx_get_instances'] = function (block) {
     var property = block.getFieldValue('PROPERTY');
-    var code = "ctx.getInstances(\""+property+"\")";
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    var code = "CTX.getContextOfType(\""+property+"\")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.Blocks['ctx_update_db'] = {
@@ -1701,6 +1705,30 @@ Blockly.JavaScript['ctx_update_db_data'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+Blockly.Blocks['ctx_update_db_new'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('CTX.UpdateEvent')
+            .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
+        this.appendStatementInput("CONTENT")
+            .appendField("data");
+        this.setOutput(true, null);
+        this.setInputsInline(true);
+        this.setTooltip('get the context name');
+    }
+};
+
+Blockly.JavaScript['ctx_update_db_new'] = function(block) {
+    var command = block.getFieldValue('COMMAND');
+    var data = Blockly.JavaScript.statementToCode(block, 'CONTENT');
+    var slice_data = '{'+data.slice(0, -2) +'}';
+
+    var code = "CTX.UpdateEvent(\""+command+"\","+slice_data+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
 Blockly.Blocks['ctx_new_context_data'] = {
     // Value input.
     init: function () {
@@ -1758,7 +1786,7 @@ Blockly.Blocks['ctx_get_context'] = {
     init: function () {
         this.setColour(240);
         this.appendValueInput("NAME")
-            .appendField("CTX.getContextsOfType");
+            .appendField("CTX.getContextOfType");
         this.setOutput(true, null);
         this.setTooltip('get context');
     }
@@ -1767,11 +1795,31 @@ Blockly.Blocks['ctx_get_context'] = {
 Blockly.JavaScript['ctx_get_context'] = function(block) {
     var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = "CTX.getContextsOfType("+name+")";
+    var code = "CTX.getContextOfType("+name+")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.Blocks['ctx_context_ended'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('CTX.ContextEndedEvent')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
+        this.setOutput(true, null);
+        this.setInputsInline(true);
+        this.setTooltip('check when the context event was ended');
+    }
+};
+
+Blockly.JavaScript['ctx_context_ended'] = function(block) {
+    var command = block.getFieldValue('COMMAND');
+
+    var code = "CTX.ContextEndedEvent(\""+command+"\")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_context_ended_data'] = {
     // Value input.
     init: function () {
         this.setColour(240);
@@ -1786,11 +1834,51 @@ Blockly.Blocks['ctx_context_ended'] = {
     }
 };
 
-Blockly.JavaScript['ctx_context_ended'] = function(block) {
+Blockly.JavaScript['ctx_context_ended_data'] = function(block) {
     var command = block.getFieldValue('COMMAND');
     var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
     var code = "CTX.ContextEndedEvent(\""+command+"\","+data+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_any_new_context'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('CTX.AnyNewContextEventSet')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
+        this.setOutput(true, null);
+        this.setInputsInline(true);
+        this.setTooltip('check when the context event was ended');
+    }
+};
+
+Blockly.JavaScript['ctx_any_new_context'] = function(block) {
+    var command = block.getFieldValue('COMMAND');
+
+    var code = "CTX.AnyNewContextEventSet(\""+command+"\")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_any_context_ended'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendDummyInput('dropDownField')
+            .appendField('CTX.AnyContextEndedEventSet')
+            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
+        this.setOutput(true, null);
+        this.setInputsInline(true);
+        this.setTooltip('check when the context event was ended');
+    }
+};
+
+Blockly.JavaScript['ctx_any_context_ended'] = function(block) {
+    var command = block.getFieldValue('COMMAND');
+
+    var code = "CTX.AnyContextEndedEventSet(\""+command+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
