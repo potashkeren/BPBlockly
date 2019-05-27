@@ -3,6 +3,8 @@ package il.ac.bgu.bp.cotextualBlockly.context;
 import il.ac.bgu.bp.cotextualBlockly.RunServlet;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TimeInjector implements Runnable {
 //    public static EventSet get
@@ -10,12 +12,13 @@ public class TimeInjector implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Timestamp now = new Timestamp(System.currentTimeMillis());
-            //Returns the number of milliseconds since January 1, 1970, 00:00:00 GMT represented by this Timestamp object
-            long timeInMilliseconds = now.getTime();
-            long timeInMinutes = timeInMilliseconds/(60*1000);
+            long t = System.currentTimeMillis();
+            Timestamp now = new Timestamp(t-t%(60*1000));
 
-            RunServlet.pushToExternal(new BEvent("Time", timeInMinutes));
+            Map<String, Object> params = new HashMap<String, Object>() {{
+               put("timestamp", now);
+            }};
+            RunServlet.pushToExternal(new BEvent("Time", params));
             try {
                 Thread.sleep(1000*60);
             } catch (InterruptedException e) {
