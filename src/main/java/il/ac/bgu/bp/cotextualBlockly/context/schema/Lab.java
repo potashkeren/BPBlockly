@@ -28,15 +28,11 @@ public class Lab extends BasicEntity {
     @Column
     public final int occupancy;
     @Column
-    public final String name = "";
-    @Column
     public final boolean isLocked = true;
     @Column
     public final boolean isEvacuated = false;
     @Column
     public final boolean freeLearning = false;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "lab", orphanRemoval = true)
-    private List<Schedule> scheduleList = new ArrayList<>();
 
     protected Lab() {
         super();
@@ -48,11 +44,12 @@ public class Lab extends BasicEntity {
         super("lab_"+name);
         this.capacity = capacity;
         this.occupancy = occupancy;
+
     }
 
     @Override
     public String toString() {
-        return  "name:"+ name +", capacity:"+capacity+".";
+        return getId();
     }
 
     public int getOccupancy() {

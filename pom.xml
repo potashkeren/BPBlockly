@@ -60,13 +60,18 @@
 		<dependency>
 			<groupId>com.github.bThink-BGU.BPjs-Context</groupId>
 			<artifactId>BPjs-Context-Core</artifactId>
-			<version>7a56307</version>
+			<version>30f805a</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-core</artifactId>
 			<version>5.3.7.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<version>1.4.194</version>
 		</dependency>
 
 		<!--&lt;!&ndash; https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc &ndash;&gt;-->

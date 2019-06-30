@@ -7,22 +7,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TimeInjector implements Runnable {
-//    public static EventSet get
+    private boolean stop = false;
+
+    protected long getTime() {
+        return System.currentTimeMillis();
+    }
+
+    protected void sleep() throws InterruptedException {
+        Thread.sleep(1000 * 60);
+    }
+
+    public final void stop() {
+        stop = true;
+    }
 
     @Override
     public void run() {
-        while (true) {
-            long t = System.currentTimeMillis();
+        while (!stop) {
+            long t = getTime();
             Timestamp now = new Timestamp(t-t%(60*1000));
-
-            Map<String, Object> params = new HashMap<String, Object>() {{
-               put("timestamp", now);
-            }};
-            RunServlet.pushToExternal(new BEvent("Time", params));
+            RunServlet.pushToExternal(new BEvent("Time", now.toString()));
             try {
-                Thread.sleep(1000*60);
+                sleep();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                stop();
             }
         }
     }

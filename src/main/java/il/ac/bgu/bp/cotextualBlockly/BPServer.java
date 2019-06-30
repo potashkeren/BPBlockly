@@ -72,7 +72,7 @@ public class BPServer {
 		server.setHandler(handlers);
 
 		System.out.println(">> Go to http://localhost:" + PORT + "/blockly-editor/blockly-files/index.html");
-        System.out.println(">> Go to http://localhost:" + PORT + "/blockly-editor/TicTacToe/TTT.html");
+       // System.out.println(">> Go to http://localhost:" + PORT + "/blockly-editor/TicTacToe/TTT.html");
 
 		server.start();
 		server.join();

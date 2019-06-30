@@ -2,12 +2,14 @@ package il.ac.bgu.bp.cotextualBlockly;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.time.Instant;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import il.ac.bgu.bp.cotextualBlockly.context.SimulatedTimeInjector;
 import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
 import il.ac.bgu.cs.bp.bpjs.context.ContextService;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
@@ -16,9 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 
 public class RunServlet extends HttpServlet {
 	private static String code;
@@ -32,6 +32,8 @@ public class RunServlet extends HttpServlet {
 	// A hack that only works if one program is running at a time!
 	private static BProgram bprog;
 	private static ContextService contextService;
+	private static Thread timeInjectorThread;
+	private static TimeInjector timeInjector;
 
 	public static boolean pushToExternal(BEvent event){
 		if(bprog != null) {
@@ -53,11 +55,13 @@ public class RunServlet extends HttpServlet {
 		// Stop the current deployment
 		if (contextService != null) {
 			contextService.close();
+			timeInjector.stop();
+			timeInjectorThread = null;
 		}
 		contextService = ContextService.getInstance();
 
 //		Use contextService.initFromString to init from the blockly code
-		contextService.initFromResources("ContextDB", "Contextual_TTT_Population.js", "Contextual_TTT.js");
+		contextService.initFromResources("ContextDB",  "Tests.js","Labs_Experiment.js");
 //		contextService.initFromString("ContextDB", code);
 
 		bprog = contextService.getBProgram();
@@ -66,7 +70,11 @@ public class RunServlet extends HttpServlet {
 		// Start a new deployment
 		contextService.run();
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
-		new Thread(new TimeInjector()).run();
+       // "2012-02-22T02:06:58.147Z"
+        final Instant parsed = Instant.parse("2019-06-29T05:00:00Z");
+		timeInjector = new SimulatedTimeInjector(parsed.toEpochMilli() ,50);
+		timeInjectorThread = new Thread(timeInjector);
+		timeInjectorThread.run();
 	}
 
 	/**

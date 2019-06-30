@@ -1124,7 +1124,7 @@ Blockly.JavaScript['text_parse'] = function(block) {
 
 Blockly.JavaScript['text_comment'] = function(block) {
     var text = Blockly.JavaScript.valueToCode(block, 'TEXT', Blockly.JavaScript.ORDER_ATOMIC);
-    var code = '\\\\ '+ eval(text) +'\n';
+    var code = '//'+ eval(text) +'\n';
     return code;
 };
 
