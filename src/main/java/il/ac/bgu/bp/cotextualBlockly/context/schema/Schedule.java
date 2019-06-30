@@ -78,6 +78,7 @@ public class Schedule extends BasicEntity {
         this.start_date = new Timestamp(startDate-startDate%(60*1000));
         this.end_date = new Timestamp(Instant.parse(end_date).toEpochMilli());
         this.end_repeat =new Timestamp(Instant.parse(end_repeat).toEpochMilli());
+        //this.end_repeat = Timestamp.valueOf(end_repeat);
         this.lab = lab;
     }
 
