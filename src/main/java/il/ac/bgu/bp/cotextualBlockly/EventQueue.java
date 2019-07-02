@@ -1,6 +1,6 @@
 package il.ac.bgu.bp.cotextualBlockly;
 
-import il.ac.bgu.bp.cotextualBlockly.context.schema.Cell;
+import il.ac.bgu.bp.cotextualBlockly.context.schema.System;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -34,8 +34,8 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
             public void eventSelected(BProgram bp, BEvent event) {
                 if (remote != null) {
                     Object data = event.maybeData;
-                    if(event.maybeData instanceof Cell) {
-                        Cell c = (Cell) event.maybeData;
+                    if(event.maybeData instanceof System) {
+                        System c = (System) event.maybeData;
                         data = c.toString()
                                 .replaceAll("_col","\"_col\"")
                                 .replaceAll("_row","\"_row\"");
@@ -62,6 +62,6 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
         String name = message.getString("name");
         JsonObject data = message.getJsonObject("data");
 
-        RunServlet.pushToExternal(new BEvent(name, new Cell(data.getInt("_row"), data.getInt("_col"))));
+//        RunServlet.pushToExternal(new BEvent(name, new Cell(data.getInt("_row"), data.getInt("_col"))));
     }
 }

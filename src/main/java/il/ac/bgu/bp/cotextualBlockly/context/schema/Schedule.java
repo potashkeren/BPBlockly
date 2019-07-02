@@ -1,23 +1,21 @@
 package il.ac.bgu.bp.cotextualBlockly.context.schema;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @NamedQueries(value = {
-        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date) = current_date"),
+        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date,'unixepoch', 'localtime') = current_date"),
         @NamedQuery(name = "BeforePractice", query = "SELECT s FROM Schedule s where " +
-                "(cast((julianday(time(start_date))-julianday(time(current_timestamp)))*24*60 as integer) between 0 and 60) " +
-                "AND (" +
-                "  (date(current_timestamp) = date(start_date))" +
-                "  OR (" +
-                "    (end_repeat is not null ) AND " +
-                "    (julianday(current_timestamp)<julianday(end_repeat)) AND " +
-                "    (strftime('%w',current_timestamp)=strftime('%w',start_date))" +
-                "  )" +
-                ")"),
-        @NamedQuery(name = "AfterPractice", query = "SELECT s FROM Schedule s where " +
+                "(((julianday(time(start_date,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) BETWEEN 0 AND 60)\n" +
+                "  AND (\n" +
+                "    (date(current_timestamp) = date(start_date,'unixepoch', 'localtime'))\n" +
+                "    OR (\n" +
+                "      (end_repeat is not null ) AND\n" +
+                "      (julianday(current_timestamp)<julianday(end_repeat,'unixepoch', 'localtime')) AND (strftime('%w',current_timestamp)=strftime('%w',start_date,'unixepoch', 'localtime'))\n" +
+                "    )\n" +
+                "  )"),
+       /* @NamedQuery(name = "AfterPractice", query = "SELECT s FROM Schedule s where " +
                 "(cast((julianday(time(current_timestamp ))-julianday(time(end_date)))*24*60 as integer) between 0 and 60) " +
                 "AND (" +
                 "  (date(current_timestamp) = date(end_date))" +
@@ -47,7 +45,7 @@ import java.time.Instant;
                 "    (strftime('%w',current_timestamp)=strftime('%w',s.start_date))" +
                 "  )" +
                 ")"
-        )
+        )*/
 })
 
 @Table(name = "Schedule")
@@ -57,13 +55,14 @@ public class Schedule extends BasicEntity {
     public final String course;
 
     @Column(name = "start_date")
-    public final Timestamp start_date;
+    public final LocalDateTime start_date;
 
     @Column(name = "end_date" )
-    public final Timestamp end_date;
+    public final LocalDateTime end_date;
+
 
     @Column (name = "end_repeat")
-    public final Timestamp end_repeat;
+    public final LocalDateTime end_repeat;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "lab_id", nullable = false)
@@ -74,11 +73,9 @@ public class Schedule extends BasicEntity {
     public Schedule(String id, String course, String start_date, String end_date, String end_repeat, Lab lab) {
         super("scdl_"+id);
         this.course = course;
-        long startDate = Instant.parse(start_date).toEpochMilli()* 1000 * 60;
-        this.start_date = new Timestamp(startDate-startDate%(60*1000));
-        this.end_date = new Timestamp(Instant.parse(end_date).toEpochMilli());
-        this.end_repeat =new Timestamp(Instant.parse(end_repeat).toEpochMilli());
-        //this.end_repeat = Timestamp.valueOf(end_repeat);
+        this.start_date = LocalDateTime.parse(start_date);
+        this.end_date = LocalDateTime.parse(end_date);
+        this.end_repeat = LocalDateTime.parse(end_repeat);
         this.lab = lab;
     }
 
@@ -90,15 +87,4 @@ public class Schedule extends BasicEntity {
         this.lab = null;
         course = null;
     }
-
-    public int StartDate(){
-        return (int)start_date.getTime();
-    }
-
-    public int EndDate(){
-        return (int)end_date.getTime();
-    }
-
-    //Queries not in use
-//    @NamedQuery(name = "LabInPractice", query = "SELECT l FROM Lab l WHERE l.practice = 'practice' "),
 }

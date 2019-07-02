@@ -3,6 +3,7 @@ package il.ac.bgu.bp.cotextualBlockly;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -71,8 +72,7 @@ public class RunServlet extends HttpServlet {
 		contextService.run();
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
        // "2012-02-22T02:06:58.147Z"
-        final Instant parsed = Instant.parse("2019-06-29T05:00:00Z");
-		timeInjector = new SimulatedTimeInjector(parsed.toEpochMilli() ,50);
+		timeInjector = new SimulatedTimeInjector(LocalDateTime.parse("2019-07-02T05:00:00"),50);
 		timeInjectorThread = new Thread(timeInjector);
 		timeInjectorThread.run();
 	}
