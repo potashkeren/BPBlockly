@@ -2,16 +2,14 @@ package il.ac.bgu.bp.cotextualBlockly.context;
 
 import il.ac.bgu.bp.cotextualBlockly.RunServlet;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TimeInjector implements Runnable {
-    protected static String time = "current_time";
+    protected static AtomicReference<String> time = new AtomicReference<String>("current_timestamp");
 
     public static String getCurrentTime() {
-        return  time;
+        return  time.get();
     }
 
     private boolean stop = false;

@@ -3,10 +3,9 @@ package il.ac.bgu.bp.cotextualBlockly;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.websocket.server.ServerEndpointConfig;
-
 import com.google.common.collect.ImmutableMap;
+import il.ac.bgu.bp.cotextualBlockly.context.SimulatedTimeInjector;
 import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -16,22 +15,15 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
-
-import java.time.Clock;
-import java.time.Duration;
-import java.time.ZoneId;
-import java.util.List;
-
-import static java.time.Instant.ofEpochMilli;
+import java.time.LocalDateTime;
 
 /**
- * The save servlet is used to echo XML to the client, eg. for SVG export and
- * saving (see Dialogs.js:SaveDialog and ExportDialog). The export servlet is
- * used to implement image and PDF export (see Dialogs.js:ExportDialog). Note
- * that the CSS support is limited to the following for all HTML markup:
- * http://docs.oracle.com/javase/6/docs/api/index.html?javax/swing/text/html/CSS
- * .html The open servlet is used to open files. It does this by calling some
- * JavaScript hook in the client-side page (see open.html).
+ * The save servlet is used to echo XML to the client, eg. for SVG export and saving (see
+ * Dialogs.js:SaveDialog and ExportDialog). The export servlet is used to implement image and PDF
+ * export (see Dialogs.js:ExportDialog). Note that the CSS support is limited to the following for
+ * all HTML markup: http://docs.oracle.com/javase/6/docs/api/index.html?javax/swing/text/html/CSS
+ * .html The open servlet is used to open files. It does this by calling some JavaScript hook in the
+ * client-side page (see open.html).
  */
 public class BPServer {
 
@@ -47,11 +39,10 @@ public class BPServer {
     }
 
     /**
-     * Point your browser to
-     * http://localhost:8080/javascript/examples/floweditor/www/index.html
+     * Point your browser to http://localhost:8080/javascript/examples/floweditor/www/index.html
      */
     public static void main(String[] args) throws Exception {
-       // testTIme();
+        // testTIme();
         Server server = new Server(PORT);
 
         // Servlets
@@ -60,9 +51,9 @@ public class BPServer {
         context.setContextPath("/");
         server.setHandler(context);
 
-        //context.addServlet(new ServletHolder(new EchoServlet()), "/save");
-        //context.addServlet(new ServletHolder(new ExportServlet()), "/export");
-        //context.addServlet(new ServletHolder(new FlowOpenServlet()), "/open");
+        // context.addServlet(new ServletHolder(new EchoServlet()), "/save");
+        // context.addServlet(new ServletHolder(new ExportServlet()), "/export");
+        // context.addServlet(new ServletHolder(new FlowOpenServlet()), "/open");
         context.addServlet(new ServletHolder(new RunServlet()), "/run");
 
         ResourceHandler fileHandler = new ResourceHandler();
@@ -72,34 +63,65 @@ public class BPServer {
         ServerContainer container = WebSocketServerContainerInitializer.configureContext(context);
 
         // Add debug endpoint to server container
-        ServerEndpointConfig echoConfig = ServerEndpointConfig.Builder.create(DebugEndPoint.class, "/debug").build();
+        ServerEndpointConfig echoConfig =
+                ServerEndpointConfig.Builder.create(DebugEndPoint.class, "/debug").build();
         container.addEndpoint(echoConfig);
 
         // Add endpoint to server container
-        ServerEndpointConfig cfg = ServerEndpointConfig.Builder.create(EventQueue.class, "/eventqueue").build();
+        ServerEndpointConfig cfg =
+                ServerEndpointConfig.Builder.create(EventQueue.class, "/eventqueue").build();
         container.addEndpoint(cfg);
 
         HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{fileHandler, context});
+        handlers.setHandlers(new Handler[] {fileHandler, context});
         server.setHandler(handlers);
 
-        System.out.println(">> Go to http://localhost:" + PORT + "/blockly-editor/blockly-files/index.html");
-        // System.out.println(">> Go to http://localhost:" + PORT + "/blockly-editor/TicTacToe/TTT.html");
+        System.out.println(
+                ">> Go to http://localhost:" + PORT + "/blockly-editor/blockly-files/index.html");
+        // System.out.println(">> Go to http://localhost:" + PORT +
+        // "/blockly-editor/TicTacToe/TTT.html");
 
         server.start();
         server.join();
     }
 
     private static void testTIme() {
-        Clock constantClock = Clock.fixed(ofEpochMilli(0), ZoneId.of("UTC"));
 
-        System.out.println(constantClock.toString());
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory(
-                "ContextDB",
-                ImmutableMap.builderWithExpectedSize(1).put("javax.persistence.sharedCache.mode", "NONE").build());
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("ContextDB",
+                ImmutableMap.builderWithExpectedSize(1)
+                        .put("javax.persistence.sharedCache.mode", "NONE").build());
         EntityManager em = emf.createEntityManager();
-        List l = em.createNativeQuery("SElect datetime('now')").getResultList();
-        System.out.println(l);
+
+        String query = "select current_timestamp";
+
+        LocalDateTime a = LocalDateTime.now();
+        LocalDateTime rightNow = LocalDateTime.of(a.getYear(), a.getMonth(), a.getDayOfMonth(),
+                a.getHour() - 3, a.getMinute());
+        System.out.println("current datetime : " + rightNow);
+
+        new Thread(new SimulatedTimeInjector(rightNow, 50)).start();
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(1000);
+
+                        String testQuery = query.replaceAll("current_timestamp",
+                                "datetime('" + TimeInjector.getCurrentTime() + "')");
+                        System.out.println(testQuery);
+                        System.out.println(em.createNativeQuery(testQuery).getResultList());
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+        });
+        t.start();
+        try {
+            t.join(10000);
+        } catch (InterruptedException e) {
+        }
         System.exit(1);
     }
 }

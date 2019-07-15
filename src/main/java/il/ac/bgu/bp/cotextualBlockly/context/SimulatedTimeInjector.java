@@ -22,7 +22,7 @@ public class SimulatedTimeInjector extends TimeInjector{
     protected void sleep() throws InterruptedException {
         Thread.sleep(simulationMinutedInMilliseconds);
         minutesCounter++;
-        System.out.println(getTime().toString());
-        TimeInjector.time = getTime().toString();
+        // System.out.println(getTime().toString());
+        TimeInjector.time.set(getTime().toString());
     }
 }
