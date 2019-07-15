@@ -19,7 +19,8 @@ import java.util.List;
         @NamedQuery(name = "OpenTheLab", query = "Update Lab L set L.isLocked=false where L=:lab"),
         @NamedQuery(name = "CloseTheLab", query = "Update Lab L set L.isLocked=true where L=:lab"),
         @NamedQuery(name = "IsEvacuated", query = "Update Lab L set L.isEvacuated=:val where L=:lab"),
-        @NamedQuery(name = "FreeLearning", query = "Update Lab L set L.freeLearning=:val where L=:lab")
+        @NamedQuery(name = "FreeLearning", query = "Update Lab L set L.freeLearning=:true where L=:lab"),
+        @NamedQuery(name = "NotFreeLearning", query = "Update Lab L set L.freeLearning=:true where L=:lab")
 })
 
 public class Lab extends BasicEntity {

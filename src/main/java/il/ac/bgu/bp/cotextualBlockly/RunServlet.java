@@ -2,7 +2,6 @@ package il.ac.bgu.bp.cotextualBlockly;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 import javax.servlet.ServletException;
@@ -71,8 +70,10 @@ public class RunServlet extends HttpServlet {
 		// Start a new deployment
 		contextService.run();
 		try { Thread.sleep(2000); } catch (InterruptedException e) { }
-       // "2012-02-22T02:06:58.147Z"
-		timeInjector = new SimulatedTimeInjector(LocalDateTime.parse("2019-07-02T05:00:00"),50);
+		LocalDateTime a=LocalDateTime.now();
+		LocalDateTime rightNow = LocalDateTime.of(a.getYear(),a.getMonth(),a.getDayOfMonth(),a.getHour()-3,a.getMinute());
+		System.out.println("current datetime : " + rightNow);
+		timeInjector = new SimulatedTimeInjector(rightNow,50);
 		timeInjectorThread = new Thread(timeInjector);
 		timeInjectorThread.run();
 	}

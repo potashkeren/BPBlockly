@@ -1,11 +1,14 @@
 package il.ac.bgu.bp.cotextualBlockly.context.schema;
 
+import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 @NamedQueries(value = {
-        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date,'unixepoch', 'localtime') = current_date"),
+        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date,'unixepoch', 'localtime') = " + "current_timestamp"),
+//        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date,'unixepoch', 'localtime') = " + TimeInjector.getCurrentTime()),
         @NamedQuery(name = "BeforePractice", query = "SELECT s FROM Schedule s where " +
                 "(((julianday(time(start_date,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) BETWEEN 0 AND 60)\n" +
                 "  AND (\n" +
@@ -15,17 +18,35 @@ import java.time.LocalDateTime;
                 "      (julianday(current_timestamp)<julianday(end_repeat,'unixepoch', 'localtime')) AND (strftime('%w',current_timestamp)=strftime('%w',start_date,'unixepoch', 'localtime'))\n" +
                 "    )\n" +
                 "  )"),
-       /* @NamedQuery(name = "AfterPractice", query = "SELECT s FROM Schedule s where " +
-                "(cast((julianday(time(current_timestamp ))-julianday(time(end_date)))*24*60 as integer) between 0 and 60) " +
+        @NamedQuery(name = "AfterPractice", query = "SELECT s FROM Schedule s where " +
+                "(((julianday(time(current_timestamp ))-julianday(time(end_date,'unixepoch', 'localtime')))*24*60) between 0 and 60) " +
                 "AND (" +
-                "  (date(current_timestamp) = date(end_date))" +
+                "  (date(current_timestamp) = date(end_date,'unixepoch', 'localtime'))" +
                 "  OR (" +
                 "    (end_repeat is not null ) AND " +
-                "    (julianday(current_timestamp)<julianday(end_repeat)) AND " +
-                "    (strftime('%w',current_timestamp)=strftime('%w',end_date))" +
+                "    (julianday(current_timestamp)<julianday(end_repeat,'unixepoch', 'localtime')) AND " +
+                "    (strftime('%w',current_timestamp)=strftime('%w',end_date,'unixepoch', 'localtime'))" +
                 "  )" +
                 ")"),
-        @NamedQuery(name = "BeforePracticeFreeLearningLab", query = "SELECT s FROM Schedule s inner join s.lab l WHERE l.freeLearning =true AND"+
+        @NamedQuery(name = "BeforePracticeFreeLearningLab", query = "SELECT s FROM Schedule s inner join s.lab l WHERE l.freeLearning =true AND " +
+                "(((julianday(time(s.start_date,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) BETWEEN 0 AND 60)\n" +
+                "  AND (\n" +
+                "    (date(current_timestamp) = date(s.start_date,'unixepoch', 'localtime'))\n" +
+                "    OR (\n" +
+                "      (s.end_repeat is not null ) AND\n" +
+                "      (julianday(current_timestamp)<julianday(s.end_repeat,'unixepoch', 'localtime')) AND (strftime('%w',current_timestamp)=strftime('%w',s.start_date,'unixepoch', 'localtime'))\n" +
+                "    )\n" +
+                "  )"),
+        @NamedQuery(name = "BeforePracticeLockedLab", query = "SELECT s FROM Schedule s inner join s.lab l WHERE l.isLocked =true AND " +
+                "(((julianday(time(s.start_date,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) BETWEEN 0 AND 60)\n" +
+                "  AND (\n" +
+                "    (date(current_timestamp) = date(s.start_date,'unixepoch', 'localtime'))\n" +
+                "    OR (\n" +
+                "      (s.end_repeat is not null ) AND\n" +
+                "      (julianday(current_timestamp)<julianday(s.end_repeat,'unixepoch', 'localtime')) AND (strftime('%w',current_timestamp)=strftime('%w',s.start_date,'unixepoch', 'localtime'))\n" +
+                "    )\n" +
+                "  )"),
+       /* @NamedQuery(name = "BeforePracticeFreeLearningLab", query = "SELECT s FROM Schedule s inner join s.lab l WHERE l.freeLearning =true AND"+
                 "(cast((julianday(time(s.start_date))-julianday(time(current_timestamp)))*24*60 as integer) between 0 and 60) " +
                 "AND (" +
                 "  (date(current_timestamp) = date(s.start_date))" +

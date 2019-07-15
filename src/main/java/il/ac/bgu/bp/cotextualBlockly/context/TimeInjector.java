@@ -8,6 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TimeInjector implements Runnable {
+    protected static String time = "current_time";
+
+    public static String getCurrentTime() {
+        return  time;
+    }
+
     private boolean stop = false;
 
     protected LocalDateTime getTime() {
