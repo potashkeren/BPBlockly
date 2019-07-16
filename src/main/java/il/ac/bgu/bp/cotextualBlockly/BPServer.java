@@ -21,6 +21,9 @@ import org.sqlite.Function;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Formatter;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The save servlet is used to echo XML to the client, eg. for SVG export and saving (see
@@ -90,60 +93,65 @@ public class BPServer {
         server.join();
     }
 
-    private static void testTIme() {
+    private static void testTIme() throws InterruptedException {
 
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ContextDB",
                 ImmutableMap.builderWithExpectedSize(1)
                         .put("javax.persistence.sharedCache.mode", "NONE").build());
-        
-        String query = "select current_timestamp";
-        // System.out.println(emf.createEntityManager().createNativeQuery(query).getResultList());
+
+        String query = "select CURRENT_TIMESTAMP AS t";
 
         LocalDateTime a = LocalDateTime.now();
         LocalDateTime rightNow = LocalDateTime.of(a.getYear(), a.getMonth(), a.getDayOfMonth(),
-                a.getHour() - 3, a.getMinute());
-        // System.out.println("current datetime : " + rightNow);
-
+                a.getHour() - 3, a.getMinute(), 0, 0).minusDays(1);
+        System.out.println("init datetime : " + rightNow);
+        EntityManager em = emf.createEntityManager();
+        System.out.println("before mock: " + em.createNativeQuery(query).getResultList());
+        mockCurrentTime(em.unwrap(Session.class), rightNow);
+        System.out.println("mocked time: " +  em.createNativeQuery(query).getResultList());
         new Thread(new SimulatedTimeInjector(rightNow, 50)).start();
-
+        
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
                     try {
                         Thread.sleep(1000);
-                        
-                        String time = TimeInjector.getCurrentTime();
-                        System.out.println("time is " + time);
+
+                        LocalDateTime time = TimeInjector.getCurrentTime();
+                        // System.out.println("time is " + time);
                         EntityManager em = emf.createEntityManager();
                         mockCurrentTime(em.unwrap(Session.class), time);
-                        System.out.print("touched: ");
-                        System.out.flush();
-                        System.out.println(em.createNativeQuery(query).getResultList());
-                    } catch (InterruptedException e) {
-                    }
+                        System.out.println("mocked time: " + em.createNativeQuery(query).getResultList());
+                        em.close();
+                    } catch (InterruptedException e) { }
                 }
             }
         });
         t.start();
         try {
             t.join(10000);
-        } catch (InterruptedException e) {
-        }
+        } catch (InterruptedException e) { }
+        
         System.exit(1);
     }
-
-    private static void mockCurrentTime(Session session, String newTime) {
-        session.doWork(new Work(){
+    
+    private static void mockCurrentTime(Session session, LocalDateTime time) {
+        String sTime = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+        System.out.println("sTime=" + sTime);
+        addSqliteFunction(session,"CURRENT_TIMESTAMP", sTime);
+    }
+    private static void addSqliteFunction(Session session, String functionName, String retVal) {
+        session.doWork(new Work() {
             @Override
             public void execute(Connection connection) throws SQLException {
-              Function.create(connection, "CURRENT_TIMESTAMP", new Function(){
-                @Override
-                protected void xFunc() throws SQLException {
-                  System.out.println(newTime);
-                }
-              });
+                Function.create(connection, functionName, new Function() {
+                    @Override
+                    protected void xFunc() throws SQLException {
+                        result(retVal);
+                    }
+                });
             }
-          });
+        });
     }
 }

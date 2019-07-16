@@ -6,9 +6,9 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TimeInjector implements Runnable {
-    protected static AtomicReference<String> time = new AtomicReference<String>("current_timestamp");
+    protected static AtomicReference<LocalDateTime> time = new AtomicReference<LocalDateTime>(LocalDateTime.now());
 
-    public static String getCurrentTime() {
+    public static LocalDateTime getCurrentTime() {
         return  time.get();
     }
 

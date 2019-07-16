@@ -23,6 +23,6 @@ public class SimulatedTimeInjector extends TimeInjector{
         Thread.sleep(simulationMinutedInMilliseconds);
         minutesCounter++;
         // System.out.println(getTime().toString());
-        TimeInjector.time.set(getTime().toString());
+        TimeInjector.time.set(getTime());
     }
 }

@@ -9,6 +9,7 @@
             <!--<property name="hibernate.connection.url" value="jdbc:sqlite::memory:"/>-->
             <property name="hibernate.connection.url" value="jdbc:sqlite:${project.basedir}/src/main/resources/context.db"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.SQLiteDialect" />
+            <!-- <property name="hibernate.dialect" value="il.ac.bgu.bp.cotextualBlockly.context.MySqliteDialect" /> -->
             <property name="hibernate.connection.driver_class" value="org.sqlite.JDBC"/>
             <property name="hibernate.connection.username" value=""/>
             <property name="hibernate.connection.password" value=""/>
