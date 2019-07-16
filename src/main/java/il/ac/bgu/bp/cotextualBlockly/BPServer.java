@@ -15,6 +15,11 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.websocket.jsr356.server.ServerContainer;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
+import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
+import org.sqlite.Function;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 /**
@@ -42,7 +47,7 @@ public class BPServer {
      * Point your browser to http://localhost:8080/javascript/examples/floweditor/www/index.html
      */
     public static void main(String[] args) throws Exception {
-        // testTIme();
+        testTIme();
         Server server = new Server(PORT);
 
         // Servlets
@@ -90,14 +95,14 @@ public class BPServer {
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("ContextDB",
                 ImmutableMap.builderWithExpectedSize(1)
                         .put("javax.persistence.sharedCache.mode", "NONE").build());
-        EntityManager em = emf.createEntityManager();
-
+        
         String query = "select current_timestamp";
+        // System.out.println(emf.createEntityManager().createNativeQuery(query).getResultList());
 
         LocalDateTime a = LocalDateTime.now();
         LocalDateTime rightNow = LocalDateTime.of(a.getYear(), a.getMonth(), a.getDayOfMonth(),
                 a.getHour() - 3, a.getMinute());
-        System.out.println("current datetime : " + rightNow);
+        // System.out.println("current datetime : " + rightNow);
 
         new Thread(new SimulatedTimeInjector(rightNow, 50)).start();
 
@@ -107,11 +112,14 @@ public class BPServer {
                 while (true) {
                     try {
                         Thread.sleep(1000);
-
-                        String testQuery = query.replaceAll("current_timestamp",
-                                "datetime('" + TimeInjector.getCurrentTime() + "')");
-                        System.out.println(testQuery);
-                        System.out.println(em.createNativeQuery(testQuery).getResultList());
+                        
+                        String time = TimeInjector.getCurrentTime();
+                        System.out.println("time is " + time);
+                        EntityManager em = emf.createEntityManager();
+                        mockCurrentTime(em.unwrap(Session.class), time);
+                        System.out.print("touched: ");
+                        System.out.flush();
+                        System.out.println(em.createNativeQuery(query).getResultList());
                     } catch (InterruptedException e) {
                     }
                 }
@@ -123,5 +131,19 @@ public class BPServer {
         } catch (InterruptedException e) {
         }
         System.exit(1);
+    }
+
+    private static void mockCurrentTime(Session session, String newTime) {
+        session.doWork(new Work(){
+            @Override
+            public void execute(Connection connection) throws SQLException {
+              Function.create(connection, "CURRENT_TIMESTAMP", new Function(){
+                @Override
+                protected void xFunc() throws SQLException {
+                  System.out.println(newTime);
+                }
+              });
+            }
+          });
     }
 }
