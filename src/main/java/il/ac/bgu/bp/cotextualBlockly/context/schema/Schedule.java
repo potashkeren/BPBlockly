@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @NamedQueries(value = {
-        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date,'unixepoch', 'localtime') = " + "current_timestamp"),
+        @NamedQuery(name = "Schedule", query = "SELECT s FROM Schedule s WHERE date(start_date,'unixepoch', 'localtime') = current_timestamp"),
         @NamedQuery(name = "BeforePractice", query = "SELECT s FROM Schedule s where " +
                 "(((julianday(time(start_date,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) BETWEEN 0 AND 60)\n" +
                 "  AND (\n" +

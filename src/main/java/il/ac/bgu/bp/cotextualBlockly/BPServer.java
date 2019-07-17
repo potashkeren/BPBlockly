@@ -50,7 +50,7 @@ public class BPServer {
      * Point your browser to http://localhost:8080/javascript/examples/floweditor/www/index.html
      */
     public static void main(String[] args) throws Exception {
-        testTIme();
+        // testTIme();
         Server server = new Server(PORT);
 
         // Servlets
@@ -99,7 +99,7 @@ public class BPServer {
                 ImmutableMap.builderWithExpectedSize(1)
                         .put("javax.persistence.sharedCache.mode", "NONE").build());
 
-        String query = "select CURRENT_TIMESTAMP AS t";
+        String query = "select strftime('%w',current_timestamp) AS t";
 
         LocalDateTime a = LocalDateTime.now();
         LocalDateTime rightNow = LocalDateTime.of(a.getYear(), a.getMonth(), a.getDayOfMonth(),
@@ -107,8 +107,8 @@ public class BPServer {
         System.out.println("init datetime : " + rightNow);
         EntityManager em = emf.createEntityManager();
         System.out.println("before mock: " + em.createNativeQuery(query).getResultList());
-        mockCurrentTime(em.unwrap(Session.class), rightNow);
-        System.out.println("mocked time: " +  em.createNativeQuery(query).getResultList());
+        // mockCurrentTime(em.unwrap(Session.class), rightNow);
+        // System.out.println("mocked time: " +  em.createNativeQuery(query).getResultList());
         new Thread(new SimulatedTimeInjector(rightNow, 50)).start();
         
         Thread t = new Thread(new Runnable() {
@@ -119,7 +119,7 @@ public class BPServer {
                         Thread.sleep(1000);
 
                         LocalDateTime time = TimeInjector.getCurrentTime();
-                        // System.out.println("time is " + time);
+                        System.out.println("time is " + time);
                         EntityManager em = emf.createEntityManager();
                         mockCurrentTime(em.unwrap(Session.class), time);
                         System.out.println("mocked time: " + em.createNativeQuery(query).getResultList());
@@ -138,7 +138,6 @@ public class BPServer {
     
     private static void mockCurrentTime(Session session, LocalDateTime time) {
         String sTime = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
-        System.out.println("sTime=" + sTime);
         addSqliteFunction(session,"CURRENT_TIMESTAMP", sTime);
     }
     private static void addSqliteFunction(Session session, String functionName, String retVal) {

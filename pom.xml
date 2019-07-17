@@ -60,7 +60,7 @@
 		<dependency>
 			<groupId>com.github.bThink-BGU.BPjs-Context</groupId>
 			<artifactId>BPjs-Context-Core</artifactId>
-			<version>30f805a</version>
+			<version>24dc708</version>
 		</dependency>
 
 		<dependency>
