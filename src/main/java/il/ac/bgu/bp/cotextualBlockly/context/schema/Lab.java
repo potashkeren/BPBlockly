@@ -18,9 +18,10 @@ import java.util.List;
         @NamedQuery(name = "NotOccupied", query = "SELECT l FROM Lab l WHERE l.occupancy < l.capacity/2 "),
         @NamedQuery(name = "OpenTheLab", query = "Update Lab L set L.isLocked=false where L=:lab"),
         @NamedQuery(name = "CloseTheLab", query = "Update Lab L set L.isLocked=true where L=:lab"),
-        @NamedQuery(name = "IsEvacuated", query = "Update Lab L set L.isEvacuated=:val where L=:lab"),
-        @NamedQuery(name = "FreeLearning", query = "Update Lab L set L.freeLearning=:true where L=:lab"),
-        @NamedQuery(name = "NotFreeLearning", query = "Update Lab L set L.freeLearning=:true where L=:lab")
+        @NamedQuery(name = "EvacuateTheLab", query = "Update Lab L set L.isEvacuated=true where L=:lab"),
+        @NamedQuery(name = "NotEvacuateTheLab", query = "Update Lab L set L.isEvacuated=false where L=:lab"),
+        @NamedQuery(name = "FreeLearningLab", query = "Update Lab L set L.freeLearning=true where L=:lab"),
+        @NamedQuery(name = "NotFreeLearningLab", query = "Update Lab L set L.freeLearning=false where L=:lab")
 })
 
 public class Lab extends BasicEntity {
