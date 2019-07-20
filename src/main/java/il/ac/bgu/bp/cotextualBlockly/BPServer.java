@@ -50,7 +50,7 @@ public class BPServer {
      * Point your browser to http://localhost:8080/javascript/examples/floweditor/www/index.html
      */
     public static void main(String[] args) throws Exception {
-        // testTIme();
+       // testTIme();
         Server server = new Server(PORT);
 
         // Servlets
@@ -99,7 +99,10 @@ public class BPServer {
                 ImmutableMap.builderWithExpectedSize(1)
                         .put("javax.persistence.sharedCache.mode", "NONE").build());
 
-        String query = "select strftime('%w',current_timestamp) AS t";
+        //String query = "select strftime('%w',current_timestamp) AS t";
+        //String query = "select julianday(time(current_timestamp)) AS t";
+        String query = "select ((julianday(time(1563362280,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) AS t";
+
 
         LocalDateTime a = LocalDateTime.now();
         LocalDateTime rightNow = LocalDateTime.of(a.getYear(), a.getMonth(), a.getDayOfMonth(),
@@ -135,7 +138,7 @@ public class BPServer {
         
         System.exit(1);
     }
-    
+
     private static void mockCurrentTime(Session session, LocalDateTime time) {
         String sTime = time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
         addSqliteFunction(session,"CURRENT_TIMESTAMP", sTime);
@@ -153,4 +156,5 @@ public class BPServer {
             }
         });
     }
+
 }
