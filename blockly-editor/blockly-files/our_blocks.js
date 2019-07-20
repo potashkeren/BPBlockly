@@ -1469,7 +1469,7 @@ Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutato
 var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab","LabNeedToBeEvacuated",
                    "IsOccupied","NotOccupied","Schedule", "LabInPractice", "BeforePractice", "AfterPractice",
                      "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab"];
-var commands =["OpenTheLab","CloseTheLab", "IsEvacuated", "FreeLearning"];
+var commands =["OpenTheLab","CloseTheLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab"];
 var context_name_TTT = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
 var commands_TTT =["UpdateCell","Finish the game"];
 var context= {

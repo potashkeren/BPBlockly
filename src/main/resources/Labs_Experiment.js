@@ -4,7 +4,7 @@ importPackage(Packages.il.ac.bgu.bp.cotextualBlockly.context.schema);
 var member, lab, hour, tenMinBefore, labSchedule, e, tenMinAfter, amount, facultyMembers, schedule, i;
 
 var timeEvents = bp.EventSet("", function(e) {
-   return e.name.equals("Time");
+    return e.name.equals("Time");
 });
 bp.registerBThread('update time', function () {
     while(true) {
@@ -52,13 +52,13 @@ bp.registerBThread('start after init ', function () {
     });
 
 // req 3.2
-/*    CTX.subscribe('open lab before practice', "BeforePracticeFreeLearningLab", function (c) {
-        bp.sync({
-            waitFor: CTX.ContextEndedEvent("BeforePracticeFreeLearningLab", c),
-            request: CTX.UpdateEvent("EvacuateTheLab", {lab: c})
-        });
+    /*    CTX.subscribe('open lab before practice', "BeforePracticeFreeLearningLab", function (c) {
+            bp.sync({
+                waitFor: CTX.ContextEndedEvent("BeforePracticeFreeLearningLab", c),
+                request: CTX.UpdateEvent("EvacuateTheLab", {lab: c})
+            });
 
-    });*/
+        });*/
 // req 3.3
     CTX.subscribe('locked lab before practice', "BeforePracticeLockedLab", function (c) {
         tenMinBefore = c.StartDate() - 600000;
@@ -105,18 +105,18 @@ bp.registerBThread('start after init ', function () {
 
 // req 7
     CTX.subscribe('Lab need to be evacuated', "LabNeedToBeEvacuated", function (c) {
-/*        e = CTX.getContextInstances("FreeLearningLab");
-        if (e.length > 0) {
-            bp.sync({
-                request: CTX.TransactionEvent(
-                    CTX.UpdateEvent("OpenTheLab", {lab: c}),
-                    CTX.UpdateEvent("FreeLearningLab", {lab: c}))
-            });
-        }
-        for (var count = 0; count < 3; count++) {
-            bp.sync({waitFor: CTX.TickEvent((c.tick + 5))});
-            window.alert('go to open lab:' + (CTX.getContextInstances("FreeLearningLab")[0]));
-        }
-        bp.sync({request: CTX.UpdateEvent("NotEvacuateTheLab", {lab: c})});*/
+        /*        e = CTX.getContextInstances("FreeLearningLab");
+                if (e.length > 0) {
+                    bp.sync({
+                        request: CTX.TransactionEvent(
+                            CTX.UpdateEvent("OpenTheLab", {lab: c}),
+                            CTX.UpdateEvent("FreeLearningLab", {lab: c}))
+                    });
+                }
+                for (var count = 0; count < 3; count++) {
+                    bp.sync({waitFor: CTX.TickEvent((c.tick + 5))});
+                    window.alert('go to open lab:' + (CTX.getContextInstances("FreeLearningLab")[0]));
+                }
+                bp.sync({request: CTX.UpdateEvent("NotEvacuateTheLab", {lab: c})});*/
     });
 });

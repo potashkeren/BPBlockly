@@ -43,28 +43,7 @@ import java.time.LocalDateTime;
                 "      (s.end_repeat is not null ) AND\n" +
                 "      (julianday(current_timestamp)<julianday(s.end_repeat,'unixepoch', 'localtime')) AND (strftime('%w',current_timestamp)=strftime('%w',s.start_date,'unixepoch', 'localtime'))\n" +
                 "    )\n" +
-                "  )"),
-       /* @NamedQuery(name = "BeforePracticeFreeLearningLab", query = "SELECT s FROM Schedule s inner join s.lab l WHERE l.freeLearning =true AND"+
-                "(cast((julianday(time(s.start_date))-julianday(time(current_timestamp)))*24*60 as integer) between 0 and 60) " +
-                "AND (" +
-                "  (date(current_timestamp) = date(s.start_date))" +
-                "  OR (" +
-                "    (s.end_repeat is not null ) AND " +
-                "    (julianday(current_timestamp)<julianday(s.end_repeat)) AND " +
-                "    (strftime('%w',current_timestamp)=strftime('%w',s.start_date))" +
-                "  )" +
-                ")"),
-        @NamedQuery(name = "BeforePracticeLockedLab", query = "SELECT s FROM Schedule s inner join s.lab l WHERE l.isLocked =true AND"+
-                "(cast((julianday(time(s.start_date))-julianday(time(current_timestamp)))*24*60 as integer) between 0 and 60) " +
-                "AND (" +
-                "  (date(current_timestamp) = date(s.start_date))" +
-                "  OR (" +
-                "    (s.end_repeat is not null ) AND " +
-                "    (julianday(current_timestamp)<julianday(s.end_repeat)) AND " +
-                "    (strftime('%w',current_timestamp)=strftime('%w',s.start_date))" +
-                "  )" +
-                ")"
-        )*/
+                "  )")
 })
 
 @Table(name = "Schedule")
