@@ -1466,9 +1466,9 @@ Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutato
 //endregion Object Blocks
 
 //#region Context
-var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab","LabNeedToBeEvacuated",
-                   "IsOccupied","NotOccupied","Schedule", "LabInPractice", "BeforePractice", "AfterPractice",
-                     "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab"];
+var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab",
+    "LabNeedToBeEvacuated", "IsOccupied", "NotOccupied", "Schedule", "TodaySchedules", "LabInPractice", "BeforePractice",
+    "AfterPractice", "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab"];
 var commands =["OpenTheLab","CloseTheLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab"];
 var context_name_TTT = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
 var commands_TTT =["UpdateCell","Finish the game"];
@@ -1631,7 +1631,7 @@ Blockly.Blocks['ctx_get_instances'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.getContextOfType')
+            .appendField('CTX.getContextInstances')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'PROPERTY');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1640,7 +1640,7 @@ Blockly.Blocks['ctx_get_instances'] = {
 
 Blockly.JavaScript['ctx_get_instances'] = function (block) {
     var property = block.getFieldValue('PROPERTY');
-    var code = "CTX.getContextOfType(\""+property+"\")";
+    var code = "CTX.getContextInstances(\""+property+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1847,7 +1847,7 @@ Blockly.Blocks['ctx_any_new_context'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.AnyNewContextEventSet')
+            .appendField('CTX.AnyNewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -1858,7 +1858,7 @@ Blockly.Blocks['ctx_any_new_context'] = {
 Blockly.JavaScript['ctx_any_new_context'] = function(block) {
     var command = block.getFieldValue('COMMAND');
 
-    var code = "CTX.AnyNewContextEventSet(\""+command+"\")";
+    var code = "CTX.AnyNewContextEvent(\""+command+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1867,7 +1867,7 @@ Blockly.Blocks['ctx_any_context_ended'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.AnyContextEndedEventSet')
+            .appendField('CTX.AnyContextEndedEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -1878,7 +1878,7 @@ Blockly.Blocks['ctx_any_context_ended'] = {
 Blockly.JavaScript['ctx_any_context_ended'] = function(block) {
     var command = block.getFieldValue('COMMAND');
 
-    var code = "CTX.AnyContextEndedEventSet(\""+command+"\")";
+    var code = "CTX.AnyContextEndedEvent(\""+command+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -2456,7 +2456,7 @@ Blockly.Extensions.registerMutator('bsync_mutator_output',
 
 Blockly.JavaScript['ctx_transaction'] = function(block) {
     if (!block.itemCount_ ) {
-        return ['CTX.Transaction()', Blockly.JavaScript.ORDER_NONE];
+        return ['CTX.TransactionEvent()', Blockly.JavaScript.ORDER_NONE];
     }
 
     var fieldInitCode = '';
@@ -2469,13 +2469,13 @@ Blockly.JavaScript['ctx_transaction'] = function(block) {
     const fieldValue = Blockly.JavaScript.valueToCode(block, 'item' + i, Blockly.JavaScript.ORDER_ATOMIC);
     fieldInitCode +="\t"+ fieldValue;
 
-    const code = "CTX.Transaction(\n" +fieldInitCode+ ")\n";
+    const code = "CTX.TransactionEvent(\n" +fieldInitCode+ ")\n";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 const transactionDef = {
     "type": "ctx_transaction",
-    "message0": "CTX.Transaction",
+    "message0": "CTX.TransactionEvent",
     "output": null,
     "mutator": "transaction_mutator",
     "colour": 240,
@@ -2513,7 +2513,7 @@ Blockly.Blocks['ctx_field'] = {
 
 const ctxTransactionMutatorBlockDef = {
     "type": "ctx_transaction_mutator",
-    "message0": "CTX.Transaction",
+    "message0": "CTX.TransactionEvent",
     "nextStatement": null,
     "colour": 240,
     "tooltip": "",
