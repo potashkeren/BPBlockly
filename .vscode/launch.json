@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - TestRun",
+      "request": "launch",
+      "mainClass": "il.ac.bgu.bp.cotextualBlockly.TestRun",
+      "projectName": "Contextual-Blockly"
+    },
+    {
+      "type": "java",
       "name": "Debug (Launch) - Current File",
       "request": "launch",
       "mainClass": "${file}"
