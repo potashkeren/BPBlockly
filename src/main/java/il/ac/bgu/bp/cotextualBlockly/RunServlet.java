@@ -28,77 +28,16 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 public class RunServlet extends HttpServlet {
 	private static String code;
 	final static Logger LOG = LoggerFactory.getLogger(RunServlet.class);
+	private ContextInstance contextInstance;
+
+	public RunServlet(ContextInstance contextInstance) {
+		this.contextInstance= contextInstance;
+	}
 
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -1598336877581962216L;
-
-	// A hack that only works if one program is running at a time!
-	private static BProgram bprog;
-	private static ContextService contextService;
-	private static Thread timeInjectorThread;
-	private static TimeInjector timeInjector;
-
-	public static boolean pushToExternal(BEvent event){
-		if(bprog != null) {
-			bprog.enqueueExternalEvent(event);
-			return true;
-		}
-		return false;
-	}
-
-	public static boolean addListener(BProgramRunnerListener listener){
-		if (contextService != null) {
-			contextService.addListener(listener);
-			return true;
-		}
-		return false;
-	}
-
-	public static void reset(){
-		// Stop the current deployment
-		if (contextService != null) {
-			contextService.close();
-			timeInjector.stop();
-			timeInjectorThread = null;
-		}
-		contextService = ContextService.getInstance();
-
-//		Use contextService.initFromString to init from the blockly code
-		contextService.initFromResources("ContextDB",  "Tests.js","Labs_Experiment.js");
-//		contextService.initFromString("ContextDB", code);
-		contextService.addEntityManagerCreateHook(new EntityManagerCreateHook(){
-			@Override
-			public void hook(EntityManager em) {
-				Session session = em.unwrap(Session.class);
-				
-				session.doWork(new Work() {
-					@Override
-					public void execute(Connection connection) throws SQLException {
-							Function.create(connection, "CURRENT_TIMESTAMP", new Function() {
-									@Override
-									protected void xFunc() throws SQLException {
-											result(TimeInjector.getCurrentTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss")));
-									}
-							});
-					}
-			});
-			}
-		});
-		bprog = contextService.getBProgram();
-		bprog.setWaitForExternalEvents(true);
-
-		// Start a new deployment
-		contextService.run();
-		try { Thread.sleep(2000); } catch (InterruptedException e) { }
-		LocalDateTime a=LocalDateTime.now();
-		LocalDateTime rightNow = LocalDateTime.of(a.getYear(),a.getMonth(),a.getDayOfMonth(),a.getHour()-3,a.getMinute());
-		System.out.println("current datetime : " + rightNow);
-		timeInjector = new SimulatedTimeInjector(rightNow,50);
-		timeInjectorThread = new Thread(timeInjector);
-		timeInjectorThread.run();
-	}
 
 	/**
 	 * Handles save request and prints XML.
@@ -109,7 +48,7 @@ public class RunServlet extends HttpServlet {
 		// Extract the XML fro the message
 		BufferedReader br = request.getReader();
 		RunServlet.code = IOUtils.toString(br);
-		reset();
+		contextInstance.reset();
 		response.getOutputStream().println("Succesfully deployed:");
 		response.setStatus(HttpServletResponse.SC_OK);
 	}

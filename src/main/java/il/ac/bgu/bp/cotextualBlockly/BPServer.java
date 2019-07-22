@@ -37,6 +37,7 @@ public class BPServer {
 
 
     public static int PORT = 8080;
+    private static ContextInstance contextInstance;
 
     /**
      * Uncomment this for better font size rendering in px units within labels.
@@ -50,6 +51,8 @@ public class BPServer {
      * Point your browser to http://localhost:8080/javascript/examples/floweditor/www/index.html
      */
     public static void main(String[] args) throws Exception {
+
+        contextInstance = new ContextInstance("Tests.js","Labs_Experiment.js");
        // testTIme();
         Server server = new Server(PORT);
 
@@ -62,7 +65,7 @@ public class BPServer {
         // context.addServlet(new ServletHolder(new EchoServlet()), "/save");
         // context.addServlet(new ServletHolder(new ExportServlet()), "/export");
         // context.addServlet(new ServletHolder(new FlowOpenServlet()), "/open");
-        context.addServlet(new ServletHolder(new RunServlet()), "/run");
+        context.addServlet(new ServletHolder(new RunServlet(contextInstance)), "/run");
 
         ResourceHandler fileHandler = new ResourceHandler();
         fileHandler.setResourceBase(".");
@@ -112,7 +115,7 @@ public class BPServer {
         System.out.println("before mock: " + em.createNativeQuery(query).getResultList());
         // mockCurrentTime(em.unwrap(Session.class), rightNow);
         // System.out.println("mocked time: " +  em.createNativeQuery(query).getResultList());
-        new Thread(new SimulatedTimeInjector(rightNow, 50)).start();
+        new Thread(new SimulatedTimeInjector(contextInstance, rightNow, 50)).start();
         
         Thread t = new Thread(new Runnable() {
             @Override
