@@ -13,7 +13,7 @@ var times = [];
 var test_times = [];
 
 bp.registerBThread('test-db population', function(){
-    var Labs = [], Schedules =[];
+    var Labs = [], Schedules =[], Sensors=[];
 
     //create first time
     date.setHours(date.getHours() - 1);
@@ -69,6 +69,10 @@ bp.registerBThread('test-db population', function(){
     Schedules.push(new Schedule('4', 'NLP2',times[5],times[6], end_repeat, lab2));
     Schedules.push(new Schedule('5', 'NLP3',times[0],times[1],end_repeat , lab1));
 
+    // add Sensors
+    Sensors.push(new Sensor('1', 1, 10, 11, 20, 21, 30));
+    Sensors.push(new Sensor('2', 1, 5, 6, 10, 11, 15));
+    Sensors.push(new Sensor('3', 1, 3, 4, 7, 8, 10));
     /*
     Schedules.push(new Schedule('5','ML3','2019-06-29 09:00:00','2019-06-29 10:00:00', '2019-07-01', 'lab_1'));
     Schedules.push(new Schedule('6','DB1','2019-06-29 13:00:00','2019-06-29 14:00:00', '2019-07-01', 'lab_1'));
@@ -84,11 +88,14 @@ bp.registerBThread('test-db population', function(){
     bp.sync({ request: CTX.InsertEvent(System()) });
     bp.sync({ request: CTX.InsertEvent(Labs) });
     bp.sync({ request: CTX.InsertEvent(Schedules) });
+    bp.sync({ request: CTX.InsertEvent(Sensors) });
 
     bp.sync({ request: bp.Event("Context Population Ended") });
 
 });
 
+
+//#region Context Tests
 // test_1 - check Lab context
 /*bp.registerBThread('test - Lab context', function() {
     bp.sync({ waitFor: bp.Event("Context Population Ended") });
@@ -290,6 +297,7 @@ bp.registerBThread('test-db population', function(){
     });
 });*/
 
+
 // test_11 - check Schedule context
 /*bp.registerBThread('test - schedule context', function() {
     bp.sync({ waitFor: bp.Event("Context Population Ended") });
@@ -443,6 +451,127 @@ bp.registerBThread('test-db population', function(){
         }
         if (!schedules.get(0).course.equals("ML1"))
             bp.ASSERT(false, "the context does not match the right lab");
+    });
+});*/
+
+
+// test_20 - check Sensor context
+bp.registerBThread('test - Sensor context', function() {
+    bp.sync({ waitFor: bp.Event("Context Population Ended") });
+
+    var a = LocalDateTime.parse(test_times[0]);
+    CTX.subscribeWithParameters("test - Sensor context","SpecificTime", "Time_"+a, {"time": a},function(t) {
+        sensors = CTX.getContextInstances("Sensor");
+         bp.log.info("Sensors: " + sensors);
+         for(var i = 0; i<sensors.size(); i++) {
+             bp.log.info("Sensor: "+sensors.get(i));
+         }
+         if(sensors.size() !==3) {
+             bp.ASSERT(false, "didn't get all sensors ");
+         }
+    });
+});
+
+// test_21 - check UpdateLevel command
+/*bp.registerBThread('test - IncreaseStatus command', function() {
+    bp.sync({ waitFor: bp.Event("Context Population Ended") });
+
+    var sensors = CTX.getContextInstances("Sensor");
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 4, sensor: sensors.get(0)})});
+
+    var a = LocalDateTime.parse(test_times[2]);
+    CTX.subscribeWithParameters("test - UpdateLevel command","SpecificTime", "Time_"+a, {"time": a},function(a) {
+        sensors = CTX.getContextInstances("Sensor");
+
+        for(var i = 0; i<sensors.size(); i++) {
+            bp.log.info("Sensor currentStatus: "+sensors.get(i).currentStatus);
+        }
+
+        if(sensors.get(0).currentStatus !== 4) {
+            bp.ASSERT(false, "currentStatus should be 4 ");
+        }
+    });
+});*/
+
+// test_22 - check LowLevelSensors context
+/*bp.registerBThread('test - LowLevelSensors context', function() {
+    bp.sync({ waitFor: bp.Event("Context Population Ended") });
+
+    var sensors = CTX.getContextInstances("Sensor");
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 4, sensor: sensors.get(0)})});
+
+    var a = LocalDateTime.parse(test_times[0]);
+    CTX.subscribeWithParameters("test - LowLevelSensors context","SpecificTime", "Time_"+a, {"time": a},function(t) {
+        sensors = CTX.getContextInstances("LowLevelSensors");
+         bp.log.info("Sensors: " + sensors);
+         for(var i = 0; i<sensors.size(); i++) {
+             bp.log.info("Sensor: "+sensors.get(i));
+         }
+         if(sensors.size() !==1) {
+             bp.ASSERT(false, "didn't get all sensors ");
+         }
+    });
+});*/
+
+// test_23 - check MediumLevelSensors context
+/*bp.registerBThread('test - MediumLevelSensors context', function() {
+    bp.sync({ waitFor: bp.Event("Context Population Ended") });
+
+    var sensors = CTX.getContextInstances("Sensor");
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 15, sensor: sensors.get(0)})});
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: (-2), sensor: sensors.get(0)})});
+
+    var a = LocalDateTime.parse(test_times[0]);
+    CTX.subscribeWithParameters("test - MediumLevelSensors context","SpecificTime", "Time_"+a, {"time": a},function(t) {
+        sensors = CTX.getContextInstances("MediumLevelSensors");
+        bp.log.info("Sensors: " + sensors);
+        for(var i = 0; i<sensors.size(); i++) {
+            bp.log.info("Sensor: "+sensors.get(i));
+        }
+        if(sensors.size() !==1) {
+            bp.ASSERT(false, "didn't get all sensors ");
+        }
+    });
+});*/
+
+// test_24 - check HighLevelSensors context
+/*bp.registerBThread('test - HighLevelSensors context', function() {
+    bp.sync({ waitFor: bp.Event("Context Population Ended") });
+
+    var sensors = CTX.getContextInstances("Sensor");
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 25, sensor: sensors.get(0)})});
+
+    var a = LocalDateTime.parse(test_times[0]);
+    CTX.subscribeWithParameters("test - HighLevelSensors context","SpecificTime", "Time_"+a, {"time": a},function(t) {
+        sensors = CTX.getContextInstances("HighLevelSensors");
+        bp.log.info("Sensors: " + sensors);
+        for(var i = 0; i<sensors.size(); i++) {
+            bp.log.info("Sensor: "+sensors.get(i));
+        }
+        if(sensors.size() !==1) {
+            bp.ASSERT(false, "didn't get all sensors ");
+        }
+    });
+});*/
+
+
+
+//endregion Context Tests
+
+
+// Init experiment
+/*bp.registerBThread('init', function() {
+    bp.sync({ waitFor: bp.Event("Context Population Ended") });
+
+    //req 1.1 -  At least one laboratory will be open free for students to learn independently.
+    labs = CTX.getContextInstances("Lab");
+    bp.sync({request: CTX.UpdateEvent("FreeLearningLab", {lab: labs.get(0)})});
+    bp.sync({request: CTX.UpdateEvent("OpenTheLab", {lab: labs.get(0)})});
+
+    var a = LocalDateTime.parse(test_times[0]);
+    CTX.subscribeWithParameters("test - Lab context","SpecificTime", "Time_"+a, {"time": a},function(t) {
+
+
     });
 });*/
 
