@@ -3,16 +3,12 @@ package il.ac.bgu.bp.cotextualBlockly;
 import il.ac.bgu.bp.cotextualBlockly.context.SimulatedTimeInjector;
 import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
 import il.ac.bgu.cs.bp.bpjs.context.ContextService;
-import il.ac.bgu.cs.bp.bpjs.context.EntityManagerCreateHook;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
 import org.sqlite.Function;
 
-import javax.persistence.EntityManager;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -21,6 +17,8 @@ public class ContextInstance {
     private String[] programs;
     private BProgram bprog;
     private ContextService contextService;
+    private static Thread timeInjectorThread;
+    private static TimeInjector timeInjector;
 
 
     public ContextInstance(String ... programs) {
@@ -68,6 +66,13 @@ public class ContextInstance {
 
         // Start a new deployment
         contextService.run();
+        try { Thread.sleep(2000); } catch (InterruptedException e) { }
+        LocalDateTime a=LocalDateTime.now();
+        LocalDateTime rightNow = LocalDateTime.of(a.getYear(),a.getMonth(),a.getDayOfMonth(),a.getHour()-3,a.getMinute());
+        System.out.println("current datetime : " + rightNow);
+        timeInjector = new SimulatedTimeInjector(rightNow,50,this);
+        timeInjectorThread = new Thread(timeInjector);
+        timeInjectorThread.run();
 
     }
 }

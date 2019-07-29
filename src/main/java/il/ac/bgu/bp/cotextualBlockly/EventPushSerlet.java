@@ -17,6 +17,8 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 public class EventPushSerlet extends HttpServlet {
 
+    private static ContextInstance contextInstance = new ContextInstance();
+
     final static Logger LOG = LoggerFactory.getLogger(EventPushSerlet.class);
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -24,7 +26,7 @@ public class EventPushSerlet extends HttpServlet {
 
         BufferedReader br = request.getReader();
         String name = IOUtils.toString(br);
-        if(!RunServlet.pushToExternal(new BEvent(name)))
+        if(!contextInstance.pushToExternal(new BEvent(name)))
             LOG.warn("Event " + name + " is ignored because there is no active deployment");
 
     }

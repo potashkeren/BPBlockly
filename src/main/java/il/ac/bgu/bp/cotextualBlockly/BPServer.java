@@ -115,7 +115,7 @@ public class BPServer {
         System.out.println("before mock: " + em.createNativeQuery(query).getResultList());
         // mockCurrentTime(em.unwrap(Session.class), rightNow);
         // System.out.println("mocked time: " +  em.createNativeQuery(query).getResultList());
-        new Thread(new SimulatedTimeInjector(contextInstance, rightNow, 50)).start();
+        new Thread(new SimulatedTimeInjector(rightNow, 50, contextInstance)).start();
         
         Thread t = new Thread(new Runnable() {
             @Override

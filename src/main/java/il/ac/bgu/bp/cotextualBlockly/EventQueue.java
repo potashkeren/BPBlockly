@@ -12,6 +12,7 @@ import java.io.StringReader;
 
 public class EventQueue extends Endpoint implements MessageHandler.Whole<String> {
     private static final Logger LOG = Log.getLogger(EventQueue.class);
+    private static ContextInstance contextInstance = new ContextInstance();
 
     private RemoteEndpoint.Async remote;
 
@@ -30,7 +31,7 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
         session.addMessageHandler(this);
 
         // Start reporting BP events
-        RunServlet.addListener(new BProgramRunnerListenerAdapter() {
+        contextInstance.addListener(new BProgramRunnerListenerAdapter() {
             public void eventSelected(BProgram bp, BEvent event) {
                 if (remote != null) {
                     Object data = event.maybeData;
@@ -53,7 +54,7 @@ public class EventQueue extends Endpoint implements MessageHandler.Whole<String>
     public void onMessage(String m) {
         LOG.info("Recieved external event {}", m);
         if(m.equals("RESET")){
-            RunServlet.reset();
+            contextInstance.reset();
             return;
         }
         JsonReader jsonReader = Json.createReader(new StringReader(m));
