@@ -1804,7 +1804,7 @@ Blockly.Blocks['ctx_context_ended'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.ContextEndedEvent')
+            .appendField('CTX.AnyContextEndedEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -1815,7 +1815,7 @@ Blockly.Blocks['ctx_context_ended'] = {
 Blockly.JavaScript['ctx_context_ended'] = function(block) {
     var command = block.getFieldValue('COMMAND');
 
-    var code = "CTX.ContextEndedEvent(\""+command+"\")";
+    var code = "CTX.AnyContextEndedEvent(\""+command+"\")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1824,7 +1824,7 @@ Blockly.Blocks['ctx_context_ended_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.ContextEndedEvent')
+            .appendField('CTX.AnyContextEndedEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -1838,7 +1838,7 @@ Blockly.JavaScript['ctx_context_ended_data'] = function(block) {
     var command = block.getFieldValue('COMMAND');
     var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = "CTX.ContextEndedEvent(\""+command+"\","+data+")";
+    var code = "CTX.AnyContextEndedEvent(\""+command+"\","+data+")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 

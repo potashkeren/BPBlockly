@@ -35,7 +35,7 @@ bp.registerBThread('At least one lab will be open for free learning', function (
 // req 1.3
 CTX.subscribe('try to lock the Lab', "EmptyLab", function (c) {
     bp.sync({
-        waitFor: CTX.ContextEndedEvent("EmptyLab", c),
+        waitFor: CTX.AnyContextEndedEvent("EmptyLab", c),
         request: CTX.TransactionEvent(
             CTX.UpdateEvent("CloseTheLab", {lab: c}),
             CTX.UpdateEvent("NotFreeLearningLab", {lab: c}))
@@ -46,7 +46,7 @@ CTX.subscribe('try to lock the Lab', "EmptyLab", function (c) {
 CTX.subscribe('do not close labs with students', "NonEmptyLab", function (c) {
     bp.sync({
         block: CTX.UpdateEvent("CloseTheLab", {lab: c}),
-        interrupt: CTX.ContextEndedEvent("NonEmptyLab", c)
+        interrupt: CTX.AnyContextEndedEvent("NonEmptyLab", c)
     });
 
 });
@@ -54,7 +54,7 @@ CTX.subscribe('do not close labs with students', "NonEmptyLab", function (c) {
 // req 3.2
     CTX.subscribe('open lab before practice', "BeforePracticeFreeLearningLab", function (c) {
     bp.sync({
-        waitFor: CTX.ContextEndedEvent("BeforePracticeFreeLearningLab", c),
+        waitFor: CTX.AnyContextEndedEvent("BeforePracticeFreeLearningLab", c),
         request: CTX.UpdateEvent("EvacuateTheLab", {lab: c})
     });
 
@@ -65,7 +65,7 @@ CTX.subscribe('locked lab before practice', "BeforePracticeLockedLab", function 
     bp.sync({
         waitFor: bp.Event('Time', tenMinBefore),
         block: CTX.UpdateEvent("OpenTheLab", {lab: c}),
-        interrupt: CTX.ContextEndedEvent("BeforePracticeLockedLab", c)
+        interrupt: CTX.AnyContextEndedEvent("BeforePracticeLockedLab", c)
     });
 
 });
@@ -76,7 +76,7 @@ CTX.subscribe('locked lab before practice', "BeforePractice", function (c) {
     bp.sync({
         request: CTX.UpdateEvent("OpenTheLab", {lab: c}),
         block: CTX.UpdateEvent("CloseTheLab", {lab: c}),
-        interrupt: CTX.ContextEndedEvent("BeforePractice", c)
+        interrupt: CTX.AnyContextEndedEvent("BeforePractice", c)
     });
 
 });
@@ -89,7 +89,7 @@ CTX.subscribe('don\'t allow lab lock during practice', "TodaySchedules", functio
     bp.sync({
         waitFor: bp.Event('Time', tenMinAfter),
         block: [CTX.UpdateEvent("CloseTheLab", {lab: c}), CTX.UpdateEvent("EvacuateTheLab", {lab: c})],
-        interrupt: CTX.ContextEndedEvent("TodaySchedules",c)
+        interrupt: CTX.AnyContextEndedEvent("TodaySchedules",c)
     });
 
 });
@@ -119,4 +119,13 @@ CTX.subscribe('Lab need to be evacuated', "LabNeedToBeEvacuated", function (c) {
     }
     bp.sync({request: CTX.UpdateEvent("NotEvacuateTheLab", {lab: c})});
 });
+});
+
+
+CTX.subscribe('Don\'t lock people', "Lab", function (lab) {
+    while(true) {
+        // wait lock lab
+        //var realOccupancy = get...
+        // bp.Assert(realOccupancy>0,"hey you locked someone");
+    }
 });
