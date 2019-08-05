@@ -11,6 +11,13 @@ import javax.persistence.Table;
         @NamedQuery(name = "UpdateTemperature", query = "Update TemperatureSensor s set s.level =:level where s=:sensor"),
 })
 
-@Table()
-public class TemperatureSensor extends Sensor {
+public class TemperatureSensor extends RangeSensor {
+
+    public TemperatureSensor(){
+        super();
+    }
+
+    public TemperatureSensor(String name, double lowLower, double lowUpper, double mediumLower, double mediumUpper, double highLower, double highUpper){
+        super("tempSensor_"+name,lowLower,lowUpper,mediumLower,mediumUpper,highLower,highUpper);
+    }
 }

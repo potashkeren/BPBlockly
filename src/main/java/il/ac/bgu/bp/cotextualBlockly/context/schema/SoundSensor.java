@@ -11,6 +11,14 @@ import javax.persistence.Table;
         @NamedQuery(name = "UpdateSound", query = "Update SoundSensor s set s.level =:level where s=:sensor"),
 })
 
-@Table()
-public class SoundSensor extends Sensor {
+
+public class SoundSensor extends RangeSensor {
+
+    public SoundSensor(){
+        super();
+    }
+
+    public SoundSensor(String name, double lowLower, double lowUpper, double mediumLower, double mediumUpper, double highLower, double highUpper){
+        super("soundSensor_"+name,lowLower,lowUpper,mediumLower,mediumUpper,highLower,highUpper);
+    }
 }
