@@ -22,8 +22,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Formatter;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The save servlet is used to echo XML to the client, eg. for SVG export and saving (see
@@ -52,7 +50,7 @@ public class BPServer {
      */
     public static void main(String[] args) throws Exception {
 
-        contextInstance = new ContextInstance("Tests.js","Labs_Experiment.js");
+        contextInstance = new ContextInstance("UnitTests.js","Labs_Experiment.js");
        // testTIme();
         Server server = new Server(PORT);
 
