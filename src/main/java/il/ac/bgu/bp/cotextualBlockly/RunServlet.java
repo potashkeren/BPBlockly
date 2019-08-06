@@ -2,28 +2,13 @@ package il.ac.bgu.bp.cotextualBlockly;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import il.ac.bgu.bp.cotextualBlockly.context.SimulatedTimeInjector;
-import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
-import il.ac.bgu.cs.bp.bpjs.context.ContextService;
-import il.ac.bgu.cs.bp.bpjs.context.EntityManagerCreateHook;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import org.apache.commons.io.IOUtils;
-import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sqlite.Function;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
 public class RunServlet extends HttpServlet {
 	private static String code;

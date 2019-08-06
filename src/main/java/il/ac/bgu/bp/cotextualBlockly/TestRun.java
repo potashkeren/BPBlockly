@@ -9,8 +9,8 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import java.time.LocalDateTime;
 
 public class TestRun {
-  private static ContextInstance server = new ContextInstance("Server.js","Server_init.js"); //"UnitTests.js","Labs_Experiment.js"
-  private static ContextInstance simulation = new ContextInstance("Simulation.js");
+  private static ContextInstance server = new ContextInstance("Server.js","Server_init.js", "db_population.js");
+  private static ContextInstance simulation = new ContextInstance("Simulation.js", "db_population.js");
 
   private static Thread timeInjectorThread;
   private static TimeInjector timeInjector;

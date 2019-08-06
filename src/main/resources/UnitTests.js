@@ -81,7 +81,6 @@ bp.registerBThread('test-db population', function(){
     var lab4 = new Lab('4', 35, 0, 0, doorSens4, motionSens4, tempSens4, soundSens4);
     Labs.push(lab1, lab2, lab3, lab4);
 
-
     // add Schedules
     Schedules.push(new Schedule('1', 'NLP',times[1],times[2],end_repeat , lab1));
     Schedules.push(new Schedule('2', 'ML1',times[2],times[3], end_repeat, lab1));
@@ -89,27 +88,11 @@ bp.registerBThread('test-db population', function(){
     Schedules.push(new Schedule('4', 'NLP2',times[5],times[6], end_repeat, lab2));
     Schedules.push(new Schedule('5', 'NLP3',times[0],times[1],end_repeat , lab1));
 
-    // add Sensors
-/*    Sensors.push(new Sensor('1', 1, 10, 11, 20, 21, 30));
-    Sensors.push(new Sensor('2', 1, 5, 6, 10, 11, 15));
-    Sensors.push(new Sensor('3', 1, 3, 4, 7, 8, 10));*/
-
-    /*
-    Schedules.push(new Schedule('5','ML3','2019-06-29 09:00:00','2019-06-29 10:00:00', '2019-07-01', 'lab_1'));
-    Schedules.push(new Schedule('6','DB1','2019-06-29 13:00:00','2019-06-29 14:00:00', '2019-07-01', 'lab_1'));
-    Schedules.push(new Schedule('7','ML4','2019-06-29 14:00:00','2019-06-29 15:00:00', '2019-07-01', 'lab_1'));
-    Schedules.push(new Schedule('8','NLP3','2019-06-02 10:00:00','2019-06-02 11:00:00', '2019-07-01', 'lab_1'));
-    Schedules.push(new Schedule('9','ML5','2019-06-02 08:00:00','2019-06-02 09:00:00', '2019-07-01', 'lab_1'));
-    Schedules.push(new Schedule('10','ML6','2019-06-02 14:00:00','2019-06-02 15:00:00', '2019-07-01', 'lab_2'));
-    Schedules.push(new Schedule('11','ML7','2019-06-02 12:00:00','2019-06-02 15:00:00', '2019-07-01', 'lab_2'));
-    Schedules.push(new Schedule('12','ML8','2019-06-02 14:00:00','2019-06-02 015:00:00', '2019-07-01', 'lab_3'));
-*/
 
     //add finished event
     bp.sync({ request: CTX.InsertEvent(System()) });
     bp.sync({ request: CTX.InsertEvent(Labs) });
     bp.sync({ request: CTX.InsertEvent(Schedules) });
-    //bp.sync({ request: CTX.InsertEvent(Sensors) });
     bp.sync({ request: CTX.InsertEvent(SoundSensors) });
     bp.sync({ request: CTX.InsertEvent(TemperatureSensors) });
     bp.sync({ request: CTX.InsertEvent(MotionSensors) });
@@ -123,7 +106,7 @@ bp.registerBThread('test-db population', function(){
 //#region Context Tests
 
 // test_1 - check Lab context
-/*bp.registerBThread('test - Lab context', function() {
+bp.registerBThread('test - Lab context', function() {
     bp.sync({ waitFor: bp.Event("Context Population Ended") });
 
     var a = LocalDateTime.parse(test_times[0]);
@@ -137,7 +120,7 @@ bp.registerBThread('test-db population', function(){
              bp.ASSERT(false, "didn't get all labs ");
          }
     });
-});*/
+});
 
 // test_2 - check OpenLab + LockedLab context
 /*bp.registerBThread('test - OpenLab + LockedLab context', function() {

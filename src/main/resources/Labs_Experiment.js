@@ -122,10 +122,10 @@ CTX.subscribe('Lab need to be evacuated', "LabNeedToBeEvacuated", function (c) {
 });
 
 
-CTX.subscribe('Don\'t lock people', "Lab", function (lab) {
+/*CTX.subscribe('Don\'t lock people', "Lab", function (lab) {
     while(true) {
         // wait lock lab
         //var realOccupancy = get...
         // bp.Assert(realOccupancy>0,"hey you locked someone");
     }
-});
+})*/;

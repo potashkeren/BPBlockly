@@ -100,8 +100,6 @@ public class BPServer {
                 ImmutableMap.builderWithExpectedSize(1)
                         .put("javax.persistence.sharedCache.mode", "NONE").build());
 
-        //String query = "select strftime('%w',current_timestamp) AS t";
-        //String query = "select julianday(time(current_timestamp)) AS t";
         String query = "select ((julianday(time(1563362280,'unixepoch', 'localtime'))-julianday(time(current_timestamp)))*24*60) AS t";
 
 
@@ -111,8 +109,6 @@ public class BPServer {
         System.out.println("init datetime : " + rightNow);
         EntityManager em = emf.createEntityManager();
         System.out.println("before mock: " + em.createNativeQuery(query).getResultList());
-        // mockCurrentTime(em.unwrap(Session.class), rightNow);
-        // System.out.println("mocked time: " +  em.createNativeQuery(query).getResultList());
         new Thread(new SimulatedTimeInjector(rightNow, 50, contextInstance)).start();
         
         Thread t = new Thread(new Runnable() {
