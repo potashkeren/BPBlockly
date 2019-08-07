@@ -14,7 +14,7 @@ var test_times = [];
 
 bp.registerBThread('test-db population', function(){
     var Labs = [], Schedules = [], Sensors = [], SoundSensors = [],
-        TemperatureSensors = [], MotionSensors = [], DoorSensors = [];
+        TemperatureSensors = [], MotionSensors = [], DoorSensors = [], VolumeSensors = [];
 
     //create first time
     date.setHours(date.getHours() - 1);
@@ -74,11 +74,17 @@ bp.registerBThread('test-db population', function(){
         tempSens4 = new TemperatureSensor('4', 1, 2, 3, 4, 5, 6);
     TemperatureSensors.push(tempSens1, tempSens2, tempSens3, tempSens4);
 
+    var volSens1 = new VolumeSensor('1', 1, 10, 11, 20, 21, 30),
+        volSens2 = new VolumeSensor('2', 1, 5, 6, 10, 11, 15),
+        volSens3 = new VolumeSensor('3', 1, 3, 4, 7, 8, 10),
+        volSens4 = new VolumeSensor('4', 1, 2, 3, 4, 5, 6);
+    VolumeSensors.push(volSens1, volSens2, volSens3, volSens4);
+
     // add Labs
-    var lab1 = new Lab('1', 50, 48, 48, doorSens1, motionSens1, tempSens1, soundSens1);
-    var lab2 = new Lab('2', 30, 3, 3, doorSens2, motionSens2, tempSens2, soundSens2);
-    var lab3 = new Lab('3', 32, 0, 0, doorSens3, motionSens3, tempSens3, soundSens3);
-    var lab4 = new Lab('4', 35, 0, 0, doorSens4, motionSens4, tempSens4, soundSens4);
+    var lab1 = new Lab('1', 50, 48, 48, doorSens1, motionSens1, tempSens1, soundSens1, volSens1);
+    var lab2 = new Lab('2', 30, 3, 3, doorSens2, motionSens2, tempSens2, soundSens2, volSens2);
+    var lab3 = new Lab('3', 32, 0, 0, doorSens3, motionSens3, tempSens3, soundSens3, volSens3);
+    var lab4 = new Lab('4', 35, 0, 0, doorSens4, motionSens4, tempSens4, soundSens4, volSens4);
     Labs.push(lab1, lab2, lab3, lab4);
 
     // add Schedules
@@ -97,6 +103,7 @@ bp.registerBThread('test-db population', function(){
     bp.sync({ request: CTX.InsertEvent(TemperatureSensors) });
     bp.sync({ request: CTX.InsertEvent(MotionSensors) });
     bp.sync({ request: CTX.InsertEvent(DoorSensors) });
+    bp.sync({ request: CTX.InsertEvent(VolumeSensors) });
 
     bp.sync({ request: bp.Event("Context Population Ended") });
 
@@ -106,7 +113,7 @@ bp.registerBThread('test-db population', function(){
 //#region Context Tests
 
 // test_1 - check Lab context
-bp.registerBThread('test - Lab context', function() {
+/*bp.registerBThread('test - Lab context', function() {
     bp.sync({ waitFor: bp.Event("Context Population Ended") });
 
     var a = LocalDateTime.parse(test_times[0]);
@@ -120,7 +127,7 @@ bp.registerBThread('test - Lab context', function() {
              bp.ASSERT(false, "didn't get all labs ");
          }
     });
-});
+});*/
 
 // test_2 - check OpenLab + LockedLab context
 /*bp.registerBThread('test - OpenLab + LockedLab context', function() {
@@ -591,7 +598,7 @@ bp.registerBThread('test - Lab context', function() {
 
 
 
-// test_26 - check RangeSensor, SoundSensors, TemperatureSensors, MotionSensors, DoorSensors context
+// test_26 - check RangeSensor, SoundSensors, TemperatureSensors, MotionSensors, DoorSensors, VolumeSensors context
 /*bp.registerBThread('test - Sensor context', function() {
     bp.sync({ waitFor: bp.Event("Context Population Ended") });
 
@@ -602,10 +609,10 @@ bp.registerBThread('test - Lab context', function() {
          for(var i = 0; i<sensors.size(); i++) {
              bp.log.info("Sensor: "+sensors.get(i));
          }
-         bp.ASSERT(sensors.size() == 16, "didn't get all sensors ");
+         bp.ASSERT(sensors.size() == 20, "didn't get all sensors ");
 
         var rangeSensors = CTX.getContextInstances("RangeSensor");
-        bp.ASSERT(rangeSensors.size() == 8, "didn't get all RangeSensor ");
+        bp.ASSERT(rangeSensors.size() == 12, "didn't get all RangeSensor ");
 
         var temperatureSensors = CTX.getContextInstances("TemperatureSensors");
         bp.ASSERT(temperatureSensors.size() == 4, "didn't get all TemperatureSensors ");
@@ -618,14 +625,15 @@ bp.registerBThread('test - Lab context', function() {
 
         var doorSensors = CTX.getContextInstances("DoorSensors");
         bp.ASSERT(doorSensors.size() == 4, "didn't get all DoorSensors ");
-        bp.log.info("doorSensors: " + doorSensors.size());
-        for(var a = 0; a<doorSensors.size(); a++) {
-            bp.log.info("doorSensors: "+doorSensors.get(a));
-        }
+
+        var volumeSensors = CTX.getContextInstances("VolumeSensors");
+        bp.ASSERT(volumeSensors.size() == 4, "didn't get all VolumeSensors ");
+
+
     });
 });*/
 
-// test_27 - check all sensors UpdateLevel command - UpdateTemperature, UpdateSound, UpdateMotion, UpdateDoor
+// test_27 - check all sensors UpdateLevel command - UpdateTemperature, UpdateSound, UpdateMotion, UpdateDoor, UpdateVolume
 /*bp.registerBThread('test - IncreaseStatus command', function() {
     bp.sync({ waitFor: bp.Event("Context Population Ended") });
 
@@ -640,6 +648,9 @@ bp.registerBThread('test - Lab context', function() {
     bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 0, sensor: sensors.get(9)})});
     bp.sync({request: CTX.UpdateEvent("UpdateDoor", {isClose: 1, sensor: sensors.get(12)})});
     bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 0, sensor: sensors.get(13)})});
+    bp.sync({request: CTX.UpdateEvent("UpdateVolume", {level: 2, sensor: sensors.get(16)})});
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 7, sensor: sensors.get(17)})});
+    bp.sync({request: CTX.UpdateEvent("UpdateLevel", {level: 9, sensor: sensors.get(18)})});
 
 
     var a = LocalDateTime.parse(test_times[1]);

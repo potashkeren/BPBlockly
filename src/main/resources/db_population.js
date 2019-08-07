@@ -1,4 +1,5 @@
-/*
+importPackage(Packages.il.ac.bgu.cs.bp.bpjs.context);
+importPackage(Packages.il.ac.bgu.bp.cotextualBlockly.context.schema);
 importPackage(Packages.java.time);
 
 
@@ -13,7 +14,7 @@ var curr_date = new Date();
 var times = [];
 var test_times = [];
 var Labs = [], Schedules = [], Sensors = [], SoundSensors = [],
-    TemperatureSensors = [], MotionSensors = [], DoorSensors = [];
+    TemperatureSensors = [], MotionSensors = [], DoorSensors = [], VolumeSensors = [];;
 
 bp.registerBThread('test-db population', function(){
 
@@ -75,11 +76,17 @@ bp.registerBThread('test-db population', function(){
         tempSens4 = new TemperatureSensor('4', 1, 2, 3, 4, 5, 6);
     TemperatureSensors.push(tempSens1, tempSens2, tempSens3, tempSens4);
 
+    var volSens1 = new VolumeSensor('1', 1, 10, 11, 20, 21, 30),
+        volSens2 = new VolumeSensor('2', 1, 5, 6, 10, 11, 15),
+        volSens3 = new VolumeSensor('3', 1, 3, 4, 7, 8, 10),
+        volSens4 = new VolumeSensor('4', 1, 2, 3, 4, 5, 6);
+    VolumeSensors.push(volSens1, volSens2, volSens3, volSens4);
+
     // add Labs
-    var lab1 = new Lab('1', 50, 48, 48, doorSens1, motionSens1, tempSens1, soundSens1);
-    var lab2 = new Lab('2', 30, 3, 3, doorSens2, motionSens2, tempSens2, soundSens2);
-    var lab3 = new Lab('3', 32, 0, 0, doorSens3, motionSens3, tempSens3, soundSens3);
-    var lab4 = new Lab('4', 35, 0, 0, doorSens4, motionSens4, tempSens4, soundSens4);
+    var lab1 = new Lab('1', 50, 48, 48, doorSens1, motionSens1, tempSens1, soundSens1, volSens1);
+    var lab2 = new Lab('2', 30, 3, 3, doorSens2, motionSens2, tempSens2, soundSens2, volSens2);
+    var lab3 = new Lab('3', 32, 0, 0, doorSens3, motionSens3, tempSens3, soundSens3, volSens3);
+    var lab4 = new Lab('4', 35, 0, 0, doorSens4, motionSens4, tempSens4, soundSens4, volSens4);
     Labs.push(lab1, lab2, lab3, lab4);
 
     // add Schedules
@@ -98,6 +105,7 @@ bp.registerBThread('test-db population', function(){
     bp.sync({ request: CTX.InsertEvent(TemperatureSensors) });
     bp.sync({ request: CTX.InsertEvent(MotionSensors) });
     bp.sync({ request: CTX.InsertEvent(DoorSensors) });
+    bp.sync({ request: CTX.InsertEvent(VolumeSensors) });
 
     Labs.forEach(function (l) {
         CTX.registerParameterizedContextQuery("SpecificLab", "SpecificLab_" + l.id, {lab:l});
@@ -105,4 +113,4 @@ bp.registerBThread('test-db population', function(){
 
     bp.sync({ request: bp.Event("Context Population Ended") });
 
-});*/
+});

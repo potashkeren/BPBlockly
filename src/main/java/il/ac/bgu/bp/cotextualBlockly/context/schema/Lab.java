@@ -47,6 +47,8 @@ public class Lab extends BasicEntity {
     public final TemperatureSensor temperatureSensor;
     @OneToOne(fetch=FetchType.LAZY)
     public final SoundSensor soundSensor;
+    @OneToOne(fetch=FetchType.LAZY)
+    public final VolumeSensor volumeSensor;
 
 /*  @OneToOne(fetch=FetchType.LAZY)
   @JoinColumn(name="ADDRESS_ID")
@@ -55,11 +57,11 @@ public class Lab extends BasicEntity {
 
 
     protected Lab() {
-        this("",0,0, 0, null, null, null, null);
+        this("",0,0, 0, null, null, null, null, null);
     }
 
     public Lab(String name, int capacity, int occupancy, int realOccupancy, DoorSensor doorSensor,
-               MotionSensor motionSensor, TemperatureSensor temperatureSensor, SoundSensor soundSensor) {
+               MotionSensor motionSensor, TemperatureSensor temperatureSensor, SoundSensor soundSensor, VolumeSensor volumeSensor) {
         super("lab_"+name);
         this.capacity = capacity;
         this.occupancy = occupancy;
@@ -68,6 +70,7 @@ public class Lab extends BasicEntity {
         this.motionSensor = motionSensor;
         this.temperatureSensor = temperatureSensor;
         this.soundSensor = soundSensor;
+        this.volumeSensor = volumeSensor;
     }
 
     @Override
