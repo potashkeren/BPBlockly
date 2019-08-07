@@ -1,8 +1,22 @@
+importPackage(Packages.il.ac.bgu.cs.bp.bpjs.context);
+importPackage(Packages.il.ac.bgu.bp.cotextualBlockly.context.schema);
+
+bp.registerBThread('start after db pop ', function () {
+    bp.sync({waitFor: bp.Event("a")});
+
+    var labs = CTX.getContextInstances("Lab");
+    bp.log.info("lab: " + labs);
+
+    var sensors = CTX.getContextInstances("Sensor");
+    bp.log.info("sensors: " + sensors);
+});
 
 bp.registerBThread('start after init ', function () {
     bp.sync({waitFor: bp.Event("Context Population Ended")});
 
     //region Basic Behavior
+
+    //enter Lab
     function enterALab(lab, amount) {
         bp.sync({request: bp.Event("TryToEnterLab", {lab: lab, amount: amount})});
         bp.sync({request: bp.Event("EnteredLab", {lab: lab, amount: amount})});
@@ -30,7 +44,23 @@ bp.registerBThread('start after init ', function () {
         }
     });
 
+    //exit lab
+    function exitALab(lab, amount) {
+        bp.sync({request: bp.Event("TryToExitLab", {lab: lab, amount: amount})});
+    }
 
+    CTX.subscribe('Handle door upon exit', "Lab", function (lab) {
+        while (true) {
+            var e = bp.sync({waitFor: bp.EventSet("", function (e) {
+                    return e.name.equals("TryToExitLab") && e.data.lab.id(lab.id)})});
+            bp.sync({request: CTX.UpdateEvent("OpenTheDoor", {lab: lab})});
+            bp.sync({request: CTX.TransactionEvent(
+                    CTX.UpdateEvent("CloseTheDoor", {sensor: lab.doorSensor}),
+                    CTX.UpdateEvent("UpdateOccupancy", {lab: lab, amount: e.amount}))});
+        }
+    });
+
+    //handle motion
     function motionDistribution(occupancy) {
         return Math.min(1, occupancy * 0.1);
     }

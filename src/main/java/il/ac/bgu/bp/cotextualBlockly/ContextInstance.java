@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 public class ContextInstance {
     private String[] programs;
     private BProgram bprog;
-    private ContextService contextService;
+    public ContextService contextService;
     private static Thread timeInjectorThread;
     private static TimeInjector timeInjector;
 
