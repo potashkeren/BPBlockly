@@ -2,9 +2,6 @@ package il.ac.bgu.bp.cotextualBlockly;
 
 import il.ac.bgu.bp.cotextualBlockly.context.SimulatedTimeInjector;
 import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
 import java.time.LocalDateTime;
 
