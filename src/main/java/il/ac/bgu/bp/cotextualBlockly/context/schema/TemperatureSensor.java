@@ -17,7 +17,7 @@ public class TemperatureSensor extends RangeSensor {
         super();
     }
 
-    public TemperatureSensor(String name, double lowLower, double lowUpper, double mediumLower, double mediumUpper, double highLower, double highUpper){
+    public TemperatureSensor(String name, Double lowLower, Double lowUpper, Double mediumLower, Double mediumUpper, Double highLower, Double highUpper){
         super("tempSensor_"+name,lowLower,lowUpper,mediumLower,mediumUpper,highLower,highUpper);
     }
 }

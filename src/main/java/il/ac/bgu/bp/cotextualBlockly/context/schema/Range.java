@@ -7,12 +7,12 @@ import javax.persistence.Embeddable;
 public class Range {
 
     @Column(name = "lower")
-    public final double lower;
+    public final Double lower;
 
     @Column(name = "upper")
-    public final double upper;
+    public final Double upper;
 
-    public Range(double lower, double upper) {
+    public Range(Double lower, Double upper) {
         this.lower = lower;
         this.upper = upper;
     }

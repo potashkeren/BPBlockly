@@ -18,7 +18,7 @@ public class SoundSensor extends RangeSensor {
         super();
     }
 
-    public SoundSensor(String name, double lowLower, double lowUpper, double mediumLower, double mediumUpper, double highLower, double highUpper){
+    public SoundSensor(String name, Double lowLower, Double lowUpper, Double mediumLower, Double mediumUpper, Double highLower, Double highUpper){
         super("soundSensor_"+name,lowLower,lowUpper,mediumLower,mediumUpper,highLower,highUpper);
     }
 }

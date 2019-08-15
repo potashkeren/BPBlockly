@@ -18,7 +18,7 @@ public class RangeSensor extends Sensor {
         super();
     }
 
-    public RangeSensor(String name, double lowLower, double lowUpper, double mediumLower, double mediumUpper, double highLower, double highUpper){
+    public RangeSensor(String name, Double lowLower, Double lowUpper, Double mediumLower, Double mediumUpper, Double highLower, Double highUpper){
         super(name,lowLower,lowUpper,mediumLower,mediumUpper,highLower,highUpper);
     }
 }

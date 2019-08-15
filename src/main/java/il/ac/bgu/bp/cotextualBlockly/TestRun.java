@@ -6,18 +6,13 @@ import il.ac.bgu.bp.cotextualBlockly.context.TimeInjector;
 import java.time.LocalDateTime;
 
 public class TestRun {
-  private static ContextInstance server = new ContextInstance("Server.js","Server_init.js", "db_population.js","Simulation.js");
+  private static ContextInstance server = new ContextInstance("Server.js","Server_init.js", "db_population.js","SimulationEngine.js", "AcceptanceTests_Sequential.js");
 
   private static Thread timeInjectorThread;
   private static TimeInjector timeInjector;
 
   public static void main(String[] args) throws Exception {
     server.reset();
-
-//      Thread.sleep(4000);
-//      ContextService.getContextInstances("Cell", Cell.class)
-//              .forEach(cell -> bprog.enqueueExternalEvent(new BEvent("Click",cell)));
-
 
     try { Thread.sleep(2000); } catch (InterruptedException e) { }
     LocalDateTime a=LocalDateTime.now();
