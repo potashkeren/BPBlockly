@@ -7,7 +7,7 @@ import javax.persistence.MappedSuperclass;
 @SuppressWarnings("WeakerAccess")
 public abstract class BasicEntity {
     @Id
-	private final String id;
+	public final String id;
 
     protected BasicEntity() {
         id = "";
