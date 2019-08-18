@@ -18,18 +18,18 @@ var Labs = [], Schedules = [], Sensors = [], SoundSensors = [],
 
 bp.registerBThread('test-db population', function(){
 
-    //create first time
+    //create first time - 50 min before
     date.setHours(date.getHours() - 1);
     date.setMinutes(date.getMinutes() + 10);
-    var time = ("0" + (date.getHours()-3)).slice(-2) + ":" +(date.getMinutes()<10?'0':'')+ date.getMinutes() + ":00" ;
+    var time = ("0" + (date.getHours())).slice(-2) + ":" +(date.getMinutes()<10?'0':'')+ date.getMinutes() + ":00" ;
     var curr = today.concat('T').concat(time);
     times.push(curr);
     date.setMinutes(date.getMinutes() - 10);
 
     //create more times in hour hops
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 10; i++) {
         date.setHours(date.getHours() + 1);
-        time =("0" + (date.getHours()-3)).slice(-2) + ":" + (date.getMinutes()<10?'0':'')+date.getMinutes() + ":00";
+        time =("0" + (date.getHours())).slice(-2) + ":" + (date.getMinutes()<10?'0':'')+date.getMinutes() + ":00";
         if (i<4){
             curr = today.concat('T').concat(time);
         }
@@ -48,7 +48,7 @@ bp.registerBThread('test-db population', function(){
     var check_times = [2,2,2,2,2,52];
     for (i = 0; i < check_times.length; i++) {
         curr_date.setMinutes(curr_date.getMinutes() + check_times[i]);
-        time = ("0" + (curr_date.getHours()-3)).slice(-2) + ":" + (curr_date.getMinutes()<10?'0':'')+curr_date.getMinutes() + ":00";
+        time = ("0" + (curr_date.getHours())).slice(-2) + ":" + (curr_date.getMinutes()<10?'0':'')+curr_date.getMinutes() + ":00";
         curr = today.concat('T').concat(time);
         test_times.push(curr);
     }
@@ -83,8 +83,8 @@ bp.registerBThread('test-db population', function(){
     VolumeSensors.push(volSens1, volSens2, volSens3, volSens4);
 
     // add Labs
-    var lab1 = new Lab('1', 50, 48, 48, doorSens1, motionSens1, tempSens1, soundSens1, volSens1);
-    var lab2 = new Lab('2', 30, 3, 3, doorSens2, motionSens2, tempSens2, soundSens2, volSens2);
+    var lab1 = new Lab('1', 50, 0, 0, doorSens1, motionSens1, tempSens1, soundSens1, volSens1);
+    var lab2 = new Lab('2', 30, 0, 0, doorSens2, motionSens2, tempSens2, soundSens2, volSens2);
     var lab3 = new Lab('3', 32, 0, 0, doorSens3, motionSens3, tempSens3, soundSens3, volSens3);
     var lab4 = new Lab('4', 35, 0, 0, doorSens4, motionSens4, tempSens4, soundSens4, volSens4);
     Labs.push(lab1, lab2, lab3, lab4);
@@ -93,7 +93,7 @@ bp.registerBThread('test-db population', function(){
     Schedules.push(new Schedule('1', 'NLP',times[1],times[2],end_repeat , lab1));
     Schedules.push(new Schedule('2', 'ML1',times[2],times[3], end_repeat, lab1));
     Schedules.push(new Schedule('3', 'ML2',times[3],times[4], end_repeat, lab1));
-    Schedules.push(new Schedule('4', 'NLP2',times[5],times[6], end_repeat, lab2));
+    Schedules.push(new Schedule('4', 'NLP2',times[3],times[4], end_repeat, lab2));
     Schedules.push(new Schedule('5', 'NLP3',times[0],times[1],end_repeat , lab1));
 
 

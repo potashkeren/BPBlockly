@@ -16,7 +16,7 @@ public class TestRun {
 
     try { Thread.sleep(2000); } catch (InterruptedException e) { }
     LocalDateTime a=LocalDateTime.now();
-    LocalDateTime rightNow = LocalDateTime.of(a.getYear(),a.getMonth(),a.getDayOfMonth(),a.getHour()-3,a.getMinute());
+    LocalDateTime rightNow = LocalDateTime.of(a.getYear(),a.getMonth(),a.getDayOfMonth(),a.getHour(),a.getMinute());
     System.out.println("current datetime : " + rightNow);
     timeInjector = new SimulatedTimeInjector(rightNow,50,new ContextInstance[]{server});
     timeInjectorThread = new Thread(timeInjector);

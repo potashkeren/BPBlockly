@@ -8,10 +8,10 @@ import javax.persistence.*;
         @NamedQuery(name = "SpecificLab", query = "SELECT l FROM Lab l where l=:lab"),
         @NamedQuery(name = "OpenLab", query = "SELECT l FROM Lab l WHERE l.isLocked = false "),
         @NamedQuery(name = "LockedLab", query = "SELECT l FROM Lab l WHERE l.isLocked = true "),
-        @NamedQuery(name = "NonEmptyLab", query = "SELECT l FROM Lab l WHERE l.occupancy > 0"),
-        @NamedQuery(name = "EmptyLab", query = "SELECT l FROM Lab l WHERE l.occupancy = 0"),
+        @NamedQuery(name = "NonEmptyLab", query = "SELECT l FROM Lab l WHERE l.realOccupancy > 0"),
+        @NamedQuery(name = "EmptyLab", query = "SELECT l FROM Lab l WHERE l.realOccupancy = 0"),
         @NamedQuery(name = "FreeLearningOpenLab", query = "SELECT l FROM Lab l WHERE l.freeLearning = true AND l.isLocked = false"),
-        @NamedQuery(name = "FreeLearningEmptyLab", query = "SELECT l FROM Lab l WHERE (l.occupancy = 0 AND l.freeLearning = true)"),
+        @NamedQuery(name = "FreeLearningEmptyLab", query = "SELECT l FROM Lab l WHERE (l.realOccupancy = 0 AND l.freeLearning = true)"),
         @NamedQuery(name = "LabNeedToBeEvacuated", query = "SELECT l FROM Lab l WHERE  l.isEvacuated = true "),
         @NamedQuery(name = "IsOccupied", query = "SELECT l FROM Lab l WHERE (l.capacity - l.occupancy) < 5"),
         @NamedQuery(name = "NotOccupied", query = "SELECT l FROM Lab l WHERE l.occupancy < l.capacity/2 "),
@@ -27,11 +27,11 @@ import javax.persistence.*;
 
 public class Lab extends BasicEntity {
     @Column
-    public final int capacity;
+    public final Integer capacity;
     @Column
-    public final int occupancy;
+    public final Integer occupancy;
     @Column
-    public final int realOccupancy;
+    public final Integer realOccupancy;
     @Column
     public final boolean isLocked = true;
     @Column
@@ -60,7 +60,7 @@ public class Lab extends BasicEntity {
         this("",0,0, 0, null, null, null, null, null);
     }
 
-    public Lab(String name, int capacity, int occupancy, int realOccupancy, DoorSensor doorSensor,
+    public Lab(String name, Integer capacity, Integer occupancy, Integer realOccupancy, DoorSensor doorSensor,
                MotionSensor motionSensor, TemperatureSensor temperatureSensor, SoundSensor soundSensor, VolumeSensor volumeSensor) {
         super("lab_"+name);
         this.capacity = capacity;
@@ -78,7 +78,7 @@ public class Lab extends BasicEntity {
         return getId();
     }
 
-    public int getOccupancy() {
+    public Integer getOccupancy() {
         return occupancy;
     }
 }
