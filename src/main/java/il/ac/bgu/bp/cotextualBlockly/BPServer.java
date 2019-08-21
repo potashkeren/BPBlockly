@@ -105,7 +105,7 @@ public class BPServer {
 
         LocalDateTime a = LocalDateTime.now();
         LocalDateTime rightNow = LocalDateTime.of(a.getYear(), a.getMonth(), a.getDayOfMonth(),
-                a.getHour() - 3, a.getMinute(), 0, 0).minusDays(1);
+                a.getHour(), a.getMinute(), 0, 0).minusDays(1);
         System.out.println("init datetime : " + rightNow);
         EntityManager em = emf.createEntityManager();
         System.out.println("before mock: " + em.createNativeQuery(query).getResultList());

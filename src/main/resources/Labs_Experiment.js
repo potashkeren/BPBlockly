@@ -103,7 +103,7 @@ CTX.subscribe('after the practice', "AfterPracticeLab", function (c) {
     });
 });
 
-// req 7
+// req 6
 CTX.subscribe('Lab need to be evacuated', "LabNeedToBeEvacuated", function (c) {
     e = CTX.getContextInstances("FreeLearningLab");
     if (e.length > 0) {

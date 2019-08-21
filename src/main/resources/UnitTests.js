@@ -19,7 +19,7 @@ bp.registerBThread('test-db population', function(){
     //create first time
     date.setHours(date.getHours() - 1);
     date.setMinutes(date.getMinutes() + 10);
-    var time = ("0" + (date.getHours()-3)).slice(-2) + ":" +(date.getMinutes()<10?'0':'')+ date.getMinutes() + ":00" ;
+    var time = ("0" + (date.getHours())).slice(-2) + ":" +(date.getMinutes()<10?'0':'')+ date.getMinutes() + ":00" ;
     var curr = today.concat('T').concat(time);
     times.push(curr);
     date.setMinutes(date.getMinutes() - 10);
@@ -27,7 +27,7 @@ bp.registerBThread('test-db population', function(){
     //create more times in hour hops
     for (var i = 0; i < 6; i++) {
         date.setHours(date.getHours() + 1);
-        time =("0" + (date.getHours()-3)).slice(-2) + ":" + (date.getMinutes()<10?'0':'')+date.getMinutes() + ":00";
+        time =("0" + (date.getHours())).slice(-2) + ":" + (date.getMinutes()<10?'0':'')+date.getMinutes() + ":00";
         if (i<4){
             curr = today.concat('T').concat(time);
         }
@@ -46,7 +46,7 @@ bp.registerBThread('test-db population', function(){
     var check_times = [2,2,2,2,2,52];
     for (i = 0; i < check_times.length; i++) {
         curr_date.setMinutes(curr_date.getMinutes() + check_times[i]);
-        time = ("0" + (curr_date.getHours()-3)).slice(-2) + ":" + (curr_date.getMinutes()<10?'0':'')+curr_date.getMinutes() + ":00";
+        time = ("0" + (curr_date.getHours())).slice(-2) + ":" + (curr_date.getMinutes()<10?'0':'')+curr_date.getMinutes() + ":00";
         curr = today.concat('T').concat(time);
         test_times.push(curr);
     }
@@ -176,11 +176,16 @@ bp.registerBThread('test-db population', function(){
 
     var labs = CTX.getContextInstances("LockedLab");
     bp.sync({request: CTX.UpdateEvent("OpenTheLab", {lab: labs.get(0)})});
+    bp.sync({request: CTX.UpdateEvent("FreeLearningLab", {lab: labs.get(0)})});
+
     labs = CTX.getContextInstances("OpenLab");
+    bp.log.info("lab.freeLearning: "+labs.get(0).freeLearning);
     bp.sync({request: CTX.UpdateEvent("CloseTheLab", {lab: labs.get(0)})});
 
     var a = LocalDateTime.parse(test_times[2]);
+
     CTX.subscribeWithParameters("test - CloseTheLab command","SpecificTime", "Time_"+a, {"time": a},function(a) {
+
         var labs = CTX.getContextInstances("OpenLab");
         bp.log.info("labs size should be 0: " + labs.size());
         if (labs.size() !== 0) {
@@ -190,6 +195,10 @@ bp.registerBThread('test-db population', function(){
         bp.log.info("labs size should be 4: " + labs.size());
         if (labs.size() !== 4) {
             bp.ASSERT(false, "all labs should be closed ");
+        }
+
+        for(var i = 0; i<labs.size(); i++) {
+            bp.log.info("lab.freeLearning: "+labs.get(i).freeLearning);
         }
     });
 });*/

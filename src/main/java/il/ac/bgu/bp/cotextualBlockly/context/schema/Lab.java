@@ -13,16 +13,18 @@ import javax.persistence.*;
         @NamedQuery(name = "FreeLearningOpenLab", query = "SELECT l FROM Lab l WHERE l.freeLearning = true AND l.isLocked = false"),
         @NamedQuery(name = "FreeLearningEmptyLab", query = "SELECT l FROM Lab l WHERE (l.realOccupancy = 0 AND l.freeLearning = true)"),
         @NamedQuery(name = "LabNeedToBeEvacuated", query = "SELECT l FROM Lab l WHERE  l.isEvacuated = true "),
-        @NamedQuery(name = "IsOccupied", query = "SELECT l FROM Lab l WHERE (l.capacity - l.occupancy) < 5"),
+        @NamedQuery(name = "IsOccupied", query = "SELECT l FROM Lab l WHERE (l.capacity - l.realOccupancy) < 5"),
         @NamedQuery(name = "NotOccupied", query = "SELECT l FROM Lab l WHERE l.occupancy < l.capacity/2 "),
         @NamedQuery(name = "OpenTheLab", query = "Update Lab L set L.isLocked=false where L=:lab"),
-        @NamedQuery(name = "CloseTheLab", query = "Update Lab L set L.isLocked=true where L=:lab"),
+        @NamedQuery(name = "CloseTheLab", query = "Update Lab L set L.isLocked=true, L.freeLearning=false where L=:lab"),
         @NamedQuery(name = "EvacuateTheLab", query = "Update Lab L set L.isEvacuated=true where L=:lab"),
         @NamedQuery(name = "NotEvacuateTheLab", query = "Update Lab L set L.isEvacuated=false where L=:lab"),
         @NamedQuery(name = "FreeLearningLab", query = "Update Lab L set L.freeLearning=true where L=:lab"),
         @NamedQuery(name = "NotFreeLearningLab", query = "Update Lab L set L.freeLearning=false where L=:lab"),
         @NamedQuery(name = "UpdateOccupancy", query = "Update Lab L set L.occupancy = L.occupancy+:amount where L=:lab"),
-        @NamedQuery(name = "UpdateRealOccupancy", query = "Update Lab L set L.realOccupancy = L.realOccupancy+:amount where L=:lab")
+        @NamedQuery(name = "UpdateRealOccupancy", query = "Update Lab L set L.realOccupancy = L.realOccupancy+:amount where L=:lab"),
+        @NamedQuery(name = "NoAvailablePlaces", query = "SELECT case when((SUM(capacity-realOccupancy)) < 20) then true else false end FROM Lab WHERE isLocked = FALSE AND freeLearning=TRUE")
+
 })
 
 public class Lab extends BasicEntity {

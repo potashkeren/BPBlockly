@@ -2,7 +2,7 @@
 
 //enter Lab
 function enterALab(lab, amount) {
-    bp.log.info("enterALab activation");
+    //bp.log.info("enterALab activation");
     bp.sync({request: bp.Event("TryToEnterLab", {lab: lab, amount: amount})});
     bp.sync({request: bp.Event("Sensor", {type: "RealOccupancy", lab: lab, amount: amount})});
 }
@@ -11,7 +11,7 @@ CTX.subscribe('Handle door upon entrance', "Lab", function (lab) {
     while (true) {
         var e = bp.sync({waitFor: bp.EventSet("", function (e) {
                 return e.name.equals("TryToEnterLab") && e.data.lab.id.equals(lab.id)})});
-        bp.log.info("TryToEnterLab activation");
+        //bp.log.info("TryToEnterLab activation");
         bp.sync({request: bp.Event("Sensor", {type: "DoorOpened", id: lab.doorSensor.id, isClose: 1})});
         bp.sync({request: bp.Event("Sensor", {type: "DoorClosed", id: lab.doorSensor.id, isClose: 0})});
     }
