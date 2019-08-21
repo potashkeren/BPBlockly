@@ -90,17 +90,19 @@ bp.registerBThread('test-db population', function(){
     Labs.push(lab1, lab2, lab3, lab4);
 
     // add Schedules
-    Schedules.push(new Schedule('1', 'NLP',times[1],times[2],end_repeat , lab1));
+/*    Schedules.push(new Schedule('1', 'NLP',times[1],times[2],end_repeat , lab1));
     Schedules.push(new Schedule('2', 'ML1',times[2],times[3], end_repeat, lab1));
     Schedules.push(new Schedule('3', 'ML2',times[3],times[4], end_repeat, lab1));
     Schedules.push(new Schedule('4', 'NLP2',times[3],times[4], end_repeat, lab2));
-    Schedules.push(new Schedule('5', 'NLP3',times[0],times[1],end_repeat , lab1));
+    Schedules.push(new Schedule('5', 'NLP3',times[0],times[1],end_repeat , lab1));*/
 
 
     //add finished event
     bp.sync({ request: CTX.InsertEvent(System()) });
     bp.sync({ request: CTX.InsertEvent(Labs) });
+/*
     bp.sync({ request: CTX.InsertEvent(Schedules) });
+*/
     bp.sync({ request: CTX.InsertEvent(SoundSensors) });
     bp.sync({ request: CTX.InsertEvent(TemperatureSensors) });
     bp.sync({ request: CTX.InsertEvent(MotionSensors) });
