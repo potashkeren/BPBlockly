@@ -20,9 +20,7 @@ CTX.subscribe('Handle door upon entrance', "Lab", function (lab) {
 //exit lab
 function exitALab(lab, amount) {
     bp.sync({request: bp.Event("TryToExitLab", {lab: lab, amount: amount})});
-    // if (lab's door is close)
-    //     bp.sync({waitFor: bp.Event("Sensor", {type: "DoorOpened", id: door.id, isClose: 1})});
-    bp.sync({request: bp.Event("Sensor", {type: "RealOccupancy", lab: lab, amount: e.amount})});
+    bp.sync({request: bp.Event("Sensor", {type: "RealOccupancy", lab: lab, amount: -amount})});
 }
 
 CTX.subscribe('Handle door upon exit', "Lab", function (lab) {

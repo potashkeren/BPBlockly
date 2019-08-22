@@ -43,7 +43,7 @@ bp.registerBThread('handle external real occupancy events', function () {
     while (true) {
         var e = bp.sync({waitFor: eventSet});
         bp.sync({request: CTX.UpdateEvent("UpdateRealOccupancy", {lab: e.data.lab, amount: e.data.amount})});
-        bp.sync({request: bp.Event("People came into the lab")});
+        bp.sync({request: bp.Event("People came/leave the lab")});
     }
 });
 
@@ -72,21 +72,72 @@ bp.registerBThread('start after server init ', function () {
                 bp.sync({waitFor: CTX.AnyContextEndedEvent("FreeLearningOpenLab")});
             }
         }
-
     });
 // req 1.3
-    CTX.subscribe('try to lock the free learning open Lab', "FreeLearningOpenLab", function (c) {
+/*    bp.registerBThread('try to reduce the amount of free learning open Labs', function () {
+        while (true) {
+            var labs = CTX.getContextInstances("FreeLearningEmptyLab");
+            if (labs.size() > 1) {
+                bp.sync({request: CTX.UpdateEvent("CloseTheLab", {lab: labs.get(1)})});
+            }
+            else {
+                bp.sync({waitFor: CTX.AnyNewContextEvent("FreeLearningEmptyLab")});
+            }
+        }
+    });*/
+    CTX.subscribe('try to reduce the amount of free learning open Labs', "FreeLearningOpenLab", function (c) {
         bp.sync({request: CTX.UpdateEvent("CloseTheLab", {lab: c})});
     });
-
 // req 1.4
         CTX.subscribe('do not close labs with students', "NonEmptyLab", function (c) {
             bp.sync({
                 block: CTX.UpdateEvent("CloseTheLab", {lab: c}),
                 interrupt: CTX.AnyContextEndedEvent("NonEmptyLab", c)
             });
-
         });
+
+// req 1.5
+    bp.registerBThread('Update the amount of available places in the labs ', function () {
+        while (true) {
+            bp.sync({waitFor: bp.Event("People came/leave the lab")});
+            var count = 0;
+            var labs = CTX.getContextInstances("FreeLearningOpenLab");
+            for(var i = 0; i<labs.size(); i++){
+                count = count + (labs.get(i).capacity-labs.get(0).realOccupancy);
+            }
+            bp.log.info("available places:" + count);
+            if (count<20){
+                bp.sync({request: bp.Event("open another FreeLearningLab")});
+            }
+            if (count > 50 && labs.size()>1 ){
+                // ???
+            }
+        }
+    });
+
+// req 7.1
+    bp.registerBThread('open another FreeLearningLab  ', function () {
+        while (true) {
+            bp.sync({waitFor: bp.Event("open another FreeLearningLab")});
+            var labs = CTX.getContextInstances("LockedLab");
+
+            bp.sync({request: CTX.TransactionEvent(
+                        CTX.UpdateEvent("OpenTheLab", {lab: labs.get(0)}),
+                        CTX.UpdateEvent("FreeLearningLab", {lab: labs.get(0)}))
+                , block: CTX.UpdateEvent("CloseTheLab", {lab: labs.get(0)})
+            });
+            bp.log.info(labs.get(0) + " was opened");
+            bp.sync({request: bp.Event("another FreeLearningLab was opened")});
+        }
+    });
+
+    //req 17.1
+    CTX.subscribe('Do not allow more students to enter', "FullCapacity", function (c) {
+        bp.sync({block: CTX.UpdateEvent("UpdateRealOccupancy", {lab: c})});
+    });
+
+
+
     bp.sync({request: bp.Event("Finish loading lab requirements")});
 });
 

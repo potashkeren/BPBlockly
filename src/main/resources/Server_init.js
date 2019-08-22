@@ -8,8 +8,10 @@ bp.registerBThread('init', function() {
 
     bp.log.info("change lab to FreeLearningOpenLab:" + labs.get(0));
 
-    bp.sync({request: CTX.UpdateEvent("FreeLearningLab", {lab: labs.get(0)})});
-    bp.sync({request: CTX.UpdateEvent("OpenTheLab", {lab: labs.get(0)})});
+    bp.sync({request: CTX.TransactionEvent(
+            CTX.UpdateEvent("OpenTheLab", {lab: labs.get(0)}),
+            CTX.UpdateEvent("FreeLearningLab", {lab: labs.get(0)}))
+    });
 
     bp.log.info("req 1.1 -  At least one laboratory will be open free for students to learn independently");
 
