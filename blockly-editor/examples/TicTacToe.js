@@ -98,11 +98,8 @@ function addLinePermutationBthreads(l, p) {
     bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[2]].x, _col:l[p[2]].y}) ] });
-
             bp.sync({ request:[ bp.Event('XWin') ] }, 100);
 
         }
@@ -112,11 +109,8 @@ function addLinePermutationBthreads(l, p) {
     bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[2]].x, _col:l[p[2]].y}) ] });
-
             bp.sync({ request:[ bp.Event('OWin') ] }, 100);
 
         }
@@ -126,9 +120,7 @@ function addLinePermutationBthreads(l, p) {
     bp.registerBThread("AddThirdO(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('O',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
-
             bp.sync({ request:[ bp.Event('O',{_row:l[p[2]].x, _col:l[p[2]].y}) ] }, 50);
         }
     });
@@ -137,9 +129,7 @@ function addLinePermutationBthreads(l, p) {
     bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[0]].x, _col:l[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:l[p[1]].x, _col:l[p[1]].y}) ] });
-
             bp.sync({ request:[ bp.Event('O',{_row:l[p[2]].x, _col:l[p[2]].y}) ] }, 40);
         }
     });
@@ -170,9 +160,7 @@ function addFork22PermutationBthreads(f, p) {
     bp.registerBThread("PreventFork22X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
-
             bp.sync({ request:[ bp.Event('O',{_row:2, _col:2}),bp.Event('O',{_row:0, _col:2}),
                     bp.Event('O',{_row:2, _col:0})] }, 30);
 //			bp.sync({ block:[ O(0,0), O(0,1), O(1,0) ] },30); // Problematic - stays all the time
@@ -185,9 +173,7 @@ function addFork02PermutationBthreads(f, p) {
     bp.registerBThread("PreventFork02X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
-
             bp.sync({ request:[ bp.Event('O',{_row:0, _col:2}),bp.Event('O',{_row:0, _col:0}),
                     bp.Event('O',{_row:2, _col:2})] }, 30);
         }
@@ -199,9 +185,7 @@ function addFork20PermutationBthreads(f, p) {
     bp.registerBThread("PreventFork20X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
-
             bp.sync({ request:[ bp.Event('O',{_row:2, _col:0}),bp.Event('O',{_row:0, _col:0}),
                     bp.Event('O',{_row:2, _col:2})] }, 30);
         }
@@ -213,9 +197,7 @@ function addFork00PermutationBthreads(f, p) {
     bp.registerBThread("PreventFork00X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[0]].x, _col:f[p[0]].y}) ] });
-
             bp.sync({ waitFor:[ bp.Event('X',{_row:f[p[1]].x, _col:f[p[1]].y}) ] });
-
             bp.sync({ request:[ bp.Event('O',{_row:0, _col:0}),bp.Event('O',{_row:0, _col:2}),
                     bp.Event('O',{_row:2, _col:0})] }, 30);
         }
