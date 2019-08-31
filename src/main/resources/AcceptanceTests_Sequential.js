@@ -198,12 +198,12 @@ function test_1_1b() { //test req.1.1
     });
 }
 
-function test_1_5__7_1() { //test req. 1.5 + 7.1
+function test_1_5() { //test req. 1.5
 
-    bp.registerBThread('check req 1.5 + 7.1 ', function () {
+    bp.registerBThread('check req 1.5  ', function () {
 
         bp.sync({waitFor: bp.Event("test_1_1b was successfully completed")});
-        bp.log.info("start test_1_5__7_1");
+        bp.log.info("start test_1_5");
         bp.log.info(" 20 People will come into the lab_1");
         enterALab(Labs[0], 20);
 
@@ -237,17 +237,17 @@ function test_1_5__7_1() { //test req. 1.5 + 7.1
         bp.ASSERT(labs.size() === 1, "1 lab should be FreeLearningEmptyLab ");
         bp.ASSERT( labs.get(0).id.equals( "lab_2" ), "lab_2 should be FreeLearningEmptyLab");
 
-        bp.log.info("test_1_5__7_1 was successfully completed");
-        bp.sync({request: bp.Event("test_1_5__7_1 was successfully completed")});
+        bp.log.info("test_1_5 was successfully completed");
+        bp.sync({request: bp.Event("test_1_5 was successfully completed")});
     });
 }
 
-function test_1_5__7_1b() { //test req. 1.5 + 7.1
+function test_1_5b() { //test req. 1.5
 
-        bp.registerBThread('check req 1.5 + 7.1 b ', function () {
+        bp.registerBThread('check req 1.5 b ', function () {
 
-        bp.sync({waitFor: bp.Event("test_1_5__7_1 was successfully completed")});
-        bp.log.info("start test_1_5__7_1b");
+        bp.sync({waitFor: bp.Event("test_1_5 was successfully completed")});
+        bp.log.info("start test_1_5b");
 
         bp.log.info(" 20 People will come into the lab_2");
         enterALab(Labs[1], 20);
@@ -312,6 +312,6 @@ test_1_3();
 test_1_1__1_3();
 test_1_4();
 test_1_1b();
-test_1_5__7_1();
-//test_1_5__7_1b();
+test_1_5();
+test_1_5b();
 

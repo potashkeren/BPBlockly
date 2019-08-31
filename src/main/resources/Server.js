@@ -104,18 +104,15 @@ bp.registerBThread('start after server init ', function () {
             for(var i = 0; i<labs.size(); i++){
                 count = count + (labs.get(i).capacity - labs.get(i).realOccupancy);
             }
-            //bp.log.info("available places:" + count);
-            // if (count<20){
-                var blockList = [];
-                for(var i = 0; i<labs.size(); i++){
-                    if(count - (labs.get(i).capacity - labs.get(i).realOccupancy) < 20)
-                        blockList.push(anyContextUpdateEventWithParams("CloseTheLab", {lab: labs.get(i)}));
-                };
-                bp.sync({
-                    block: blockList,
-                    waitFor: [anyContextUpdateEvent("UpdateRealOccupancy"),anyContextUpdateEvent("OpenTheLab")]
-                });
-            // }
+            var blockList = [];
+            for(var i = 0; i<labs.size(); i++){
+                if(count - (labs.get(i).capacity - labs.get(i).realOccupancy) < 20)
+                    blockList.push(anyContextUpdateEventWithParams("CloseTheLab", {lab: labs.get(i)}));
+            };
+            bp.sync({
+                block: blockList,
+                waitFor: [anyContextUpdateEvent("UpdateRealOccupancy"),anyContextUpdateEvent("OpenTheLab")]
+            });
         }
     });
 // req 1.3
