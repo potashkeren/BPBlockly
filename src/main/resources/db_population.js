@@ -45,7 +45,7 @@ bp.registerBThread('test-db population', function(){
     bp.log.info("end_repeat: " + end_repeat);
 
     //create test times
-    var check_times = [2,2,2,2,2,52];
+    var check_times = [2,2,2,2,2,52,58];
     for (i = 0; i < check_times.length; i++) {
         curr_date.setMinutes(curr_date.getMinutes() + check_times[i]);
         time = ("0" + (curr_date.getHours())).slice(-2) + ":" + (curr_date.getMinutes()<10?'0':'')+curr_date.getMinutes() + ":00";

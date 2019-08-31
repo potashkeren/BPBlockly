@@ -55,9 +55,9 @@ function test_1_1() { //test req.1.1
 
         bp.log.info(" 2 People will come into the lab_1");
         enterALab(Labs[0], 2);
-
+        // bp.log.info(" here");
         // check that 2 people came into the FreeLearningOpenLab
-        bp.sync({waitFor: bp.Event("People came/leave the lab")});
+        bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
         bp.log.info("check that 2 people came into the FreeLearningOpenLab");
         labs = CTX.getContextInstances("FreeLearningOpenLab");
        // bp.log.info("labs.size(): " +labs.size());
@@ -179,7 +179,7 @@ function test_1_1b() { //test req.1.1
         exitALab(Labs[0], 2);
 
         // check that 2 people leave the FreeLearningOpenLab
-        bp.sync({waitFor: bp.Event("People came/leave the lab")});
+        bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
         bp.log.info("check that 2 people leave the FreeLearningOpenLab and the lab still open");
         labs = CTX.getContextInstances("FreeLearningOpenLab");
         // bp.log.info("labs.size(): " +labs.size());
@@ -208,7 +208,7 @@ function test_1_5__7_1() { //test req. 1.5 + 7.1
         enterALab(Labs[0], 20);
 
         // check that 20 people came into the FreeLearningOpenLab
-        bp.sync({waitFor: bp.Event("People came/leave the lab")});
+        bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
         bp.log.info("check that 20 people came into the FreeLearningOpenLab");
         var labs = CTX.getContextInstances("FreeLearningOpenLab");
         bp.ASSERT( labs.get(0).realOccupancy !== 20 , "20 people should be in lab_1 ");
@@ -217,13 +217,13 @@ function test_1_5__7_1() { //test req. 1.5 + 7.1
         enterALab(Labs[0], 15);
 
         // check that 20+15 people came into the FreeLearningOpenLab
-        bp.sync({waitFor: bp.Event("People came/leave the lab")});
+        bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
         bp.log.info("check that 20+15 people came into the FreeLearningOpenLab");
         labs = CTX.getContextInstances("FreeLearningOpenLab");
         bp.ASSERT( labs.get(0).realOccupancy !== 35 , "35 people should be in lab_1 ");
 
         //Check that 2 labs is open
-        bp.sync({waitFor: bp.Event("another FreeLearningLab was opened")});
+        bp.sync({waitFor: anyContextUpdateEvent("OpenTheLab")});
         bp.log.info("check that 2 labs is open");
         labs = CTX.getContextInstances("FreeLearningOpenLab");
         bp.log.info("labs.size(): "+ labs.size());
@@ -244,7 +244,7 @@ function test_1_5__7_1() { //test req. 1.5 + 7.1
 
 function test_1_5__7_1b() { //test req. 1.5 + 7.1
 
-    bp.registerBThread('check req 1.5 + 7.1 b ', function () {
+        bp.registerBThread('check req 1.5 + 7.1 b ', function () {
 
         bp.sync({waitFor: bp.Event("test_1_5__7_1 was successfully completed")});
         bp.log.info("start test_1_5__7_1b");
@@ -253,7 +253,7 @@ function test_1_5__7_1b() { //test req. 1.5 + 7.1
         enterALab(Labs[1], 20);
 
         // check that 20 people came into the FreeLearningOpenLab
-        bp.sync({waitFor: bp.Event("People came/leave the lab")});
+        bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
         bp.log.info("check that 20 people came into the FreeLearningOpenLab");
         var labs = CTX.getContextInstances("FreeLearningOpenLab");
         bp.ASSERT( labs.get(1).realOccupancy !== 20 , "20 people should be in lab_2 ");
@@ -262,13 +262,13 @@ function test_1_5__7_1b() { //test req. 1.5 + 7.1
         enterALab(Labs[1], 10);
 
         // check that 20+10 people came into the FreeLearningOpenLab
-        bp.sync({waitFor: bp.Event("People came/leave the lab")});
+        bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
         bp.log.info("check that 20+10 people came into the FreeLearningOpenLab");
         labs = CTX.getContextInstances("FreeLearningOpenLab");
         bp.ASSERT( labs.get(1).realOccupancy !== 30 , "30 people should be in lab_2 ");
 
         //Check that 3 labs is open
-        bp.sync({waitFor: bp.Event("another FreeLearningLab was opened")});
+        bp.sync({waitFor: anyContextUpdateEvent("OpenTheLab")});
         bp.log.info("check that 3 labs is open");
         labs = CTX.getContextInstances("FreeLearningOpenLab");
         bp.log.info("labs.size(): "+ labs.size());
@@ -289,9 +289,22 @@ function test_1_5__7_1b() { //test req. 1.5 + 7.1
 
         bp.log.info("test_1_5__7_1b was successfully completed");
         bp.sync({request: bp.Event("test_1_5__7_1b was successfully completed")});
+            bp.sync({request: bp.Event("last sequential test")});
     });
 }
 
+bp.registerBThread('check all tests finished ', function () {
+    bp.sync({waitFor: bp.Event("Finish loading lab requirements")});
+    var finished = false;
+    var a = LocalDateTime.parse(test_times[6]);
+    CTX.subscribeWithParameters("check after 2 hour","SpecificTime", "Time_"+a, {"time": a},function(a) {
+        if(!finished){
+            bp.ASSERT(false, "timeout last test");
+        }
+    });
+    bp.sync({wairFor: bp.Event("last sequential test")});
+    finished = true;
+});
 
 
 test_1_1();
@@ -300,5 +313,5 @@ test_1_1__1_3();
 test_1_4();
 test_1_1b();
 test_1_5__7_1();
-test_1_5__7_1b();
+//test_1_5__7_1b();
 
