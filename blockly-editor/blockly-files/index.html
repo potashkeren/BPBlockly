@@ -359,6 +359,7 @@
         </block>
         <block type="lists_sort"></block>
         <block type="list_includes"></block>
+        <block type="list_push"></block>
     </category>
     <category id="catColour" colour="20" name="Color">
         <block type="colour_picker"></block>
@@ -535,7 +536,8 @@
                 </block>
             </value>
         </block>
-        <block type="ctx_new_context"></block>
+        <block type="ctx_get_instances"></block>
+        <block type="ctx_any_new_context"></block>
         <block type="ctx_new_context_data">
             <value name="DATA">
                 <block type="variables_get">
@@ -543,8 +545,6 @@
                 </block>
             </value>
         </block>
-        <block type="ctx_get_instances"></block>
-        <block type="ctx_get_context"></block>
         <block type="ctx_context_ended"></block>
         <block type="ctx_context_ended_data">
             <value name="DATA">
@@ -553,8 +553,7 @@
                 </block>
             </value>
         </block>
-        <block type="ctx_any_new_context"></block>
-        <block type="ctx_any_context_ended"></block>
+        <block type="ctx_insert"></block>
         <block type="ctx_tick"></block>
         <block type="ctx_object_tick">
             <value name="OBJECT">
@@ -587,6 +586,13 @@
             </value>
         </block>
         <block type="object_create"></block>
+        <block type="new_object">
+            <value name="object_name">
+                <shadow type="text">
+                    <field name="TEXT">object name</field>
+                </shadow>
+            </value>
+        </block>
         <block type="get_object_value">
             <value name="PROPERTY">
                 <shadow type="text">
@@ -595,16 +601,6 @@
             </value>
         </block>
         <block type="get_array_list"></block>
-        <block type="context_created">
-            <value name="FIELDS">
-                <block type="variables_set">
-                    <value name="VALUE">
-                        <block type="ctx_get_instances"></block>
-                    </value>
-                </block>
-            </value>
-        </block>
-        <block type="context_get_property"></block>
     </category>
 
 </xml>

@@ -104,7 +104,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_bsync",
-    "message0": "bsync %1 Wait %2 Request %3 Block %4 Interrupt %5 Data %6",
+    "message0": "bsync %1 Wait %2 Request %3 Block %4 Interrupt %5 Priority %6",
     "args0": [
         {
             "type": "input_dummy"
@@ -143,7 +143,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_bsync_with_output",
-    "message0": "bsync %1 Wait %2 Request %3 Block %4 Interrupt %5 Data %6",
+    "message0": "bsync %1 Wait %2 Request %3 Block %4 Interrupt %5 Priority %6",
     "args0": [
         {
             "type": "input_dummy"
@@ -401,6 +401,26 @@ Blockly.defineBlocksWithJsonArray([
     "helpUrl": ""
 },
 {
+    "type": "list_push",
+    "message0": "%1 push %2",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "VAR1"
+        },
+        {
+            "type": "input_value",
+            "name": "VAR2"
+        }
+    ],
+    "inputsInline": true,
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 255,
+    "tooltip": "push element to the list",
+    "helpUrl": ""
+},
+{
         "type": "mathFloor",
         "message0": "Math.Floor %1",
         "args0": [
@@ -505,7 +525,7 @@ Blockly.defineBlocksWithJsonArray([
     ],
     "inputsInline": true,
     "output": "Boolean",
-    "colour": 220,
+    "colour": 160,
     "tooltip": "",
     "helpUrl": ""
 },
@@ -579,7 +599,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_data",
-    "message0": "Data %1",
+    "message0": "Priority %1",
     "args0": [
         {
             "type": "input_value",
@@ -588,7 +608,7 @@ Blockly.defineBlocksWithJsonArray([
     ],
     "previousStatement": null,
     "colour": 27,
-    "tooltip": "data",
+    "tooltip": "priority",
     "helpUrl": ""
 },
 {
@@ -603,7 +623,7 @@ Blockly.defineBlocksWithJsonArray([
     "previousStatement": null,
     "nextStatement": null,
     "colour": 27,
-    "tooltip": "data",
+    "tooltip": "interrupt",
     "helpUrl": ""
 },
 {
@@ -1015,7 +1035,7 @@ Blockly.JavaScript['bp_basic_bsync'] = function(block) {
     var value_request = Blockly.JavaScript.valueToCode(block, 'Request', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
     var value_block = Blockly.JavaScript.valueToCode(block, 'Block', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
     var value_interrupt = Blockly.JavaScript.valueToCode(block, 'Interrupt', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
-    var value_priority = Blockly.JavaScript.valueToCode(block, 'Data', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+    var value_priority = Blockly.JavaScript.valueToCode(block, 'Priority', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
 
     var set=[];
 
@@ -1050,7 +1070,7 @@ Blockly.JavaScript['bp_basic_bsync_output'] = function(block) {
     var value_request = Blockly.JavaScript.valueToCode(block, 'Request', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
     var value_block = Blockly.JavaScript.valueToCode(block, 'Block', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
     var value_interrupt = Blockly.JavaScript.valueToCode(block, 'Interrupt', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
-    var value_priority = Blockly.JavaScript.valueToCode(block, 'Data', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
+    var value_priority = Blockly.JavaScript.valueToCode(block, 'Priority', Blockly.JavaScript.ORDER_ATOMIC) || 'null';
 
     var set=[];
 
@@ -1216,6 +1236,13 @@ Blockly.JavaScript['list_includes'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+Blockly.JavaScript['list_push'] = function(block) {
+    var text = Blockly.JavaScript.valueToCode(block, 'VAR2', Blockly.JavaScript.ORDER_ATOMIC);
+    var _var = Blockly.JavaScript.valueToCode(block, 'VAR1', Blockly.JavaScript.ORDER_ATOMIC);
+    var code = _var+'.push('+text+')';
+    return code;
+};
+
 //#region Object Blocks
 Blockly.JavaScript['object'] = function(block) {
     var property_value = Blockly.JavaScript.statementToCode(block, 'LIST');
@@ -1263,6 +1290,26 @@ Blockly.JavaScript['object_create'] = function(block) {
         fieldInitCode += fieldName+ ":" +fieldValue+","
     }
     const code = "{" +fieldInitCode+ "}";
+    return [code, Blockly.JavaScript.ORDER_NONE];
+};
+
+Blockly.JavaScript['new_object'] = function(block) {
+    var object_name = Blockly.JavaScript.valueToCode(block, 'object_name', Blockly.JavaScript.ORDER_ATOMIC);
+    if (!block.numFields) {
+        return ['new '+eval(object_name)+'()', Blockly.JavaScript.ORDER_NONE];
+    }
+
+    var fieldInitCode = '';
+    var i = 1;
+    while( i <= block.numFields -1){
+        const fieldName = Blockly.JavaScript.valueToCode(block, 'field_input' + i, Blockly.JavaScript.ORDER_ATOMIC);
+        fieldInitCode += eval(fieldName)+ ", ";
+        i++
+    }
+    const fieldName = Blockly.JavaScript.valueToCode(block, 'field_input' + i, Blockly.JavaScript.ORDER_ATOMIC);
+    fieldInitCode += eval(fieldName);
+
+    const code = "new " +eval(object_name)+'('+fieldInitCode+ ")";
     return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
@@ -1339,10 +1386,6 @@ const objectCreateMutator = {
     numFields: 0,
     fields: [],
 
-    /**
-     * Standard function for Mutator mixin. It's called to update the block based on contents of the mutator's XML
-     * DOM element.
-     */
     domToMutation: function(xmlElement) {
         this.fields = [];
         for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
@@ -1354,10 +1397,6 @@ const objectCreateMutator = {
         this.updateShape();
     },
 
-    /**
-     * Standard function for Mutator mixin. It's called to generate the mutator's XML DOM element based on the content
-     * of the block.
-     */
     mutationToDom: function() {
         if (!this.numFields) {
             return null;
@@ -1372,10 +1411,6 @@ const objectCreateMutator = {
         return container;
     },
 
-    /**
-     * Standard function for Mutator mixin when the mutator uses the standard mutator UI. It's called to update the
-     * block based on changes to the mutator's UI.
-     */
     compose: function(topBlock) {
         var fieldBlock = topBlock.nextConnection && topBlock.nextConnection.targetBlock();
         this.numFields = 0;
@@ -1394,10 +1429,6 @@ const objectCreateMutator = {
         }
     },
 
-    /**
-     * Standard function for Mutator mixin when the mutator uses the standard mutator UI.  It's called to populate the
-     * mutator UI.
-     */
     decompose: function(workspace) {
         const topBlock = workspace.newBlock(CUSTOM_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME);
         topBlock.initSvg();
@@ -1412,14 +1443,6 @@ const objectCreateMutator = {
         return topBlock;
     },
 
-    /**
-     * Standard function for Mutator mixin when the mutator uses the standard mutator UI.  It's called on any changes to
-     * the block and is generally used to keep track of input connections (by saving them with their corresponding mutator
-     * blocks), so that if the mutator later causes changes to the block it can restore those input connections.
-     *
-     * We're also using this function to update the mutator block field name values if the user changes the name in the
-     * block.
-     */
     saveConnections: function(topBlock) {
         var fieldBlock = topBlock.nextConnection && topBlock.nextConnection.targetBlock();
         var i = 1;
@@ -1463,15 +1486,193 @@ const objectCreateMutator = {
 
 Blockly.Extensions.registerMutator('controls_create_mutator', objectCreateMutator, null, ['object_field']);
 
+//new object
+const NEW_OBJECT_CREATE_BLOCK_NAME = 'new_object';
+const NEW_OBJECT_MUTATOR_FIELD_BLOCK_NAME = 'new_object_field';
+const NEW_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME = 'new_object_create_mutator_top';
+
+const new_objectCreateBlockDef = {
+    "type": "new_object",
+    "message0": "new %1",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "object_name",
+            "text": "object name"
+        }
+    ],
+    "output": "Object",
+    "mutator": "controls_newObject_mutator",
+    "colour": 250,
+    "tooltip": "",
+    "helpUrl": ""
+};
+
+Blockly.Blocks[NEW_OBJECT_CREATE_BLOCK_NAME] = {
+    init: function () {
+        this.jsonInit(new_objectCreateBlockDef);
+    }
+};
+
+const new_objectFieldBlockDef = {
+    "type": "new_object_field",
+    "message0": "%1",
+    "args0": [
+        {
+            "type": "field_input",
+            "name": "field_name"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": ""
+};
+
+Blockly.Blocks[NEW_OBJECT_MUTATOR_FIELD_BLOCK_NAME] = {
+    init: function () {
+        this.jsonInit(new_objectFieldBlockDef);
+    }
+};
+
+const new_objectCreateMutatorBlockDef = {
+    "type": "object_create_mutator",
+    "message0": "new %1",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "object_name",
+            "text": "object name"
+        }
+    ],
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "",
+    "helpUrl": ""
+};
+
+Blockly.Blocks[NEW_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME] = {
+    init: function () {
+        this.jsonInit(new_objectCreateMutatorBlockDef);
+    }
+};
+
+const new_objectCreateMutator = {
+    numFields: 0,
+    fields: [],
+
+    domToMutation: function(xmlElement) {
+        this.fields = [];
+        for (var i = 0, childNode; childNode = xmlElement.childNodes[i]; i++) {
+            if (childNode.nodeName.toLowerCase() == 'field') {
+                this.fields.push(childNode.getAttribute('name'));
+            }
+        }
+        this.numFields = this.fields.length;
+        this.updateShape();
+    },
+
+    mutationToDom: function() {
+        if (!this.numFields) {
+            return null;
+        }
+        const container = document.createElement('mutation');
+        container.setAttribute('num_fields', '' + this.numFields);
+        for (var i = 0; i < this.fields.length; i++) {
+            const field = document.createElement('field');
+            field.setAttribute('name', this.fields[i]);
+            container.appendChild(field);
+        }
+        return container;
+    },
+
+    compose: function(topBlock) {
+        var fieldBlock = topBlock.nextConnection && topBlock.nextConnection.targetBlock();
+        this.numFields = 0;
+        this.fields = [];
+        var connectionsToRestore = [null];
+        while (fieldBlock) {
+            this.fields.push(fieldBlock.getFieldValue('field_name'));
+            this.numFields++;
+            connectionsToRestore.push(fieldBlock.savedConnection);
+            fieldBlock = fieldBlock.nextConnection && fieldBlock.nextConnection.targetBlock();
+        }
+        this.updateShape();
+        // Reconnect any child blocks.
+        for (var i = 1; i <= this.numFields; i++) {
+            Blockly.Mutator.reconnect(connectionsToRestore[i], this, 'field_input' + i);
+        }
+    },
+
+    decompose: function(workspace) {
+        const topBlock = workspace.newBlock(NEW_OBJECT_CREATE_MUTATOR_TOP_BLOCK_NAME);
+        topBlock.initSvg();
+        var connection = topBlock.nextConnection;
+        for (var i = 0; i < this.fields.length; i++) {
+            const fieldBlock = workspace.newBlock(NEW_OBJECT_MUTATOR_FIELD_BLOCK_NAME);
+            fieldBlock.initSvg();
+            fieldBlock.setFieldValue(this.fields[i], 'field_name');
+            connection.connect(fieldBlock.previousConnection);
+            connection = fieldBlock.nextConnection;
+        }
+        return topBlock;
+    },
+
+    saveConnections: function(topBlock) {
+        var fieldBlock = topBlock.nextConnection && topBlock.nextConnection.targetBlock();
+        var i = 1;
+        while (fieldBlock) {
+            const input = this.getInput('field_input' + i);
+            fieldBlock.savedConnection = input && input.connection.targetConnection;
+            // Set mutator block field name from the corresponding 'real' Object.create block
+            fieldBlock.setFieldValue(this.getFieldValue('field' + i), 'field_name');
+            i++;
+            fieldBlock = fieldBlock.nextConnection &&
+                fieldBlock.nextConnection.targetBlock();
+        }
+    },
+
+    updateShape: function() {
+        // Delete everything.
+        if (this.getInput('with')) {
+            this.removeInput('with');
+        }
+        var i = 1;
+        while (this.getInput('field_input' + i)) {
+            this.removeInput('field_input' + i);
+            i++;
+        }
+        // Rebuild block.
+        if (this.numFields > 0) {
+            this.appendDummyInput('with')
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField("with");
+        }
+        for (var i = 1; i <= this.numFields; i++) {
+            const fieldName = this.fields[i - 1];
+            this.appendValueInput("field_input" + i)
+                .setCheck(null)
+                .setAlign(Blockly.ALIGN_RIGHT)
+                .appendField(new Blockly.FieldTextInput(fieldName), "field" + i);
+        }
+    }
+
+};
+
+Blockly.Extensions.registerMutator('controls_newObject_mutator', new_objectCreateMutator, null, ['new_object_field']);
+
 //endregion Object Blocks
 
 //#region Context
-var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab",
-    "LabNeedToBeEvacuated", "IsOccupied", "NotOccupied", "Schedule", "TodaySchedules", "LabInPractice", "BeforePractice",
-    "AfterPractice", "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab"];
-var commands =["OpenTheLab","CloseTheLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab"];
-var context_name_TTT = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
-var commands_TTT =["UpdateCell","Finish the game"];
+ var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab",
+     "LabNeedToBeEvacuated", "IsOccupied", "NotOccupied", "Schedule", "TodaySchedules", "LabInPractice", "BeforePractice",
+     "AfterPractice", "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab", "EmergencyLab"];
+//var context_name = ["Context_#1","Context_#2","Context_#3"];
+//var commands = ["update_command_#1","update_command_#2","update_command_#3"];
+//var commands =["OpenTheLab","CloseTheLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab","TurnLightOff", "TurnLightOn","MotionDetected","MotionStopped", "LabIsEmpty","LabIsNotEmpty"];
+//var context_name = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
+var commands =["UpdateCell","Finish the game"];
 var context= {
     office: ['Motion Detector','Air Condition','Smoke Detector'],
     restroom:['Smart Light'],
@@ -1575,63 +1776,14 @@ function update_context(referenceBlock) {
     }
 };
 
-Blockly.Blocks['context_created'] = {
-    // Value input.
-    init: function() {
-        this.setColour(210);
-        this.appendDummyInput()
-            .appendField('context created')
-            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
-        this.appendStatementInput('FIELDS');
-        this.setPreviousStatement(true, 'Input');
-        this.setNextStatement(true, 'Input');
-        this.setOutput();
-        this.setTooltip('context created');
-    },
-    onchange: function() {
-        update_context_created(this);
-    }
-};
 
-Blockly.JavaScript['context_created'] = function (block) {
-    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
-    var property = Blockly.JavaScript.statementToCode(block, 'FIELDS');
-    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
-};
-
-Blockly.Blocks['context_get_property'] = {
-    init: function() {
-        this.setColour(210);
-        this.appendDummyInput()
-            .appendField('from context:')
-            .appendField(new Blockly.FieldDropdown(OPTIONS), 'CONTEXT');
-        this.appendDummyInput('dropDownField')
-            .appendField('get property:')
-            .appendField(new Blockly.FieldDropdown(PROPERTIES), 'PROPERTY');
-        this.setPreviousStatement(true, 'Input');
-        this.setNextStatement(true, 'Input');
-        this.setOutput();
-        this.setTooltip('context_get_property');
-    }
-    ,
-    onchange: function() {
-        update_context(this);
-    }
-
-};
-
-Blockly.JavaScript['context_get_property'] = function (block) {
-    var ctx = block.getFieldValue('CONTEXT').toLowerCase();
-    var property = block.getFieldValue('PROPERTY').toLowerCase();
-    return "<< from context " + ctx + ', update properties: \n' + property + ' >>';
-};
 
 Blockly.Blocks['ctx_get_instances'] = {
     // Value input.
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.getContextInstances')
+            .appendField('GetContextInstances')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'PROPERTY');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1649,7 +1801,7 @@ Blockly.Blocks['ctx_update_db'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.UpdateEvent')
+            .appendField('UpdateEvent')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1663,31 +1815,14 @@ Blockly.JavaScript['ctx_update_db'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['ctx_new_context'] = {
-    // Value input.
-    init: function () {
-        this.setColour(240);
-        this.appendDummyInput('dropDownField')
-            .appendField('CTX.NewContextEvent')
-            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
-        this.setOutput(true, null);
-        this.setTooltip('get the context name');
-    }
-};
 
-Blockly.JavaScript['ctx_new_context'] = function(block) {
-    var name = block.getFieldValue('CONTEXT_NAME');
-
-    var code = "CTX.NewContextEvent(\""+name+"\")";
-    return [code, Blockly.JavaScript.ORDER_ATOMIC];
-};
 
 Blockly.Blocks['ctx_update_db_data'] = {
     // Value input.
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.UpdateEvent')
+            .appendField('UpdateEvent')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -1710,7 +1845,7 @@ Blockly.Blocks['ctx_update_db_new'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.UpdateEvent')
+            .appendField('UpdateEvent')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.appendStatementInput("CONTENT")
             .appendField("data");
@@ -1734,7 +1869,7 @@ Blockly.Blocks['ctx_new_context_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.NewContextEvent')
+            .appendField('AnyNewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -1748,7 +1883,7 @@ Blockly.JavaScript['ctx_new_context_data'] = function(block) {
     var name = block.getFieldValue('CONTEXT_NAME');
     var data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
 
-    var code = "CTX.NewContextEvent(\""+name+"\","+data+".data)";
+    var code = "CTX.AnyNewContextEvent(\""+name+"\","+data+".data)";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -1757,7 +1892,7 @@ Blockly.Blocks['ctx_subscribe'] = {
     init: function () {
         this.setColour(240);
         this.appendValueInput("NAME")
-            .appendField("CTX.subscribe");
+            .appendField("b-thread");
         this.appendDummyInput('dropDownField')
             .appendField('context')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CTX_NAME');
@@ -1777,34 +1912,17 @@ Blockly.JavaScript['ctx_subscribe'] = function(block) {
     var ctx_var_name = Blockly.JavaScript.valueToCode(block, 'CTX_VAR_NAME', Blockly.JavaScript.ORDER_ATOMIC);
 
     var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
-    var code = 'CTX.subscribe('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
+    var code = 'bp.registerBThread('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
     return code;
 };
 
-Blockly.Blocks['ctx_get_context'] = {
-    // Value input.
-    init: function () {
-        this.setColour(240);
-        this.appendValueInput("NAME")
-            .appendField("CTX.getContextOfType");
-        this.setOutput(true, null);
-        this.setTooltip('get context');
-    }
-};
-
-Blockly.JavaScript['ctx_get_context'] = function(block) {
-    var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-
-    var code = "CTX.getContextOfType("+name+")";
-    return [code, Blockly.JavaScript.ORDER_ATOMIC];
-};
 
 Blockly.Blocks['ctx_context_ended'] = {
     // Value input.
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.AnyContextEndedEvent')
+            .appendField('AnyContextEndedEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -1824,7 +1942,7 @@ Blockly.Blocks['ctx_context_ended_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.AnyContextEndedEvent')
+            .appendField('AnyContextEndedEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -1847,7 +1965,7 @@ Blockly.Blocks['ctx_any_new_context'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('CTX.AnyNewContextEvent')
+            .appendField('AnyNewContextEvent')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -1862,25 +1980,6 @@ Blockly.JavaScript['ctx_any_new_context'] = function(block) {
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.Blocks['ctx_any_context_ended'] = {
-    // Value input.
-    init: function () {
-        this.setColour(240);
-        this.appendDummyInput('dropDownField')
-            .appendField('CTX.AnyContextEndedEvent')
-            .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
-        this.setOutput(true, null);
-        this.setInputsInline(true);
-        this.setTooltip('check when the context event was ended');
-    }
-};
-
-Blockly.JavaScript['ctx_any_context_ended'] = function(block) {
-    var command = block.getFieldValue('COMMAND');
-
-    var code = "CTX.AnyContextEndedEvent(\""+command+"\")";
-    return [code, Blockly.JavaScript.ORDER_ATOMIC];
-};
 
 Blockly.Blocks['ctx_tick'] = {
     // Value input.
@@ -1897,6 +1996,24 @@ Blockly.JavaScript['ctx_tick'] = function(block) {
     var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
 
     var code = "CTX.TickEvent("+name+")";
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks['ctx_insert'] = {
+    // Value input.
+    init: function () {
+        this.setColour(240);
+        this.appendValueInput("NAME")
+            .appendField("InsertEvent");
+        this.setOutput(true, null);
+        this.setTooltip('CTX.InsertEvent');
+    }
+};
+
+Blockly.JavaScript['ctx_insert'] = function(block) {
+    var name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = "CTX.InsertEvent("+name+")";
     return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
@@ -2073,7 +2190,7 @@ const objectCreateMutatorBsync = {
                         inputInterrupt && inputInterrupt.connection.targetConnection;
                     break;
                 case 'bp_data':
-                    var inputDo = this.getInput('Data');
+                    var inputDo = this.getInput('Priority');
                     clauseBlock.statementConnection_ =
                         inputDo && inputDo.connection.targetConnection;
                     break;
@@ -2094,8 +2211,8 @@ const objectCreateMutatorBsync = {
         var interruptConnections = null;
         var elseStatementConnection = null;
 
-        if (this.getInput('Data')) {
-            elseStatementConnection = this.getInput('Data').connection.targetConnection;
+        if (this.getInput('Priority')) {
+            elseStatementConnection = this.getInput('Priority').connection.targetConnection;
         }
         if (this.getInput('Block')) {
             blockConnections = this.getInput('Block').connection.targetConnection;
@@ -2120,8 +2237,8 @@ const objectCreateMutatorBsync = {
      */
     updateShape_: function() {
         // Delete everything.
-        if (this.getInput('Data')) {
-            this.removeInput('Data');
+        if (this.getInput('Priority')) {
+            this.removeInput('Priority');
         }
         if (this.getInput('Interrupt')) {
             this.removeInput('Interrupt');
@@ -2153,8 +2270,8 @@ const objectCreateMutatorBsync = {
                 .appendField('Interrupt');
         }
         if (this.dataCount_) {
-            this.appendValueInput('Data')
-                .appendField('Data');
+            this.appendValueInput('Priority')
+                .appendField('Priority');
         }
     },
     /**
@@ -2172,7 +2289,7 @@ const objectCreateMutatorBsync = {
         Blockly.Mutator.reconnect(requestConnections, this, 'Request');
         Blockly.Mutator.reconnect(blockConnections, this, 'Block');
         Blockly.Mutator.reconnect(interruptConnections, this, 'Interrupt');
-        Blockly.Mutator.reconnect(elseStatementConnection, this, 'Data');
+        Blockly.Mutator.reconnect(elseStatementConnection, this, 'Priority');
     }
 };
 
@@ -2348,7 +2465,7 @@ const objectCreateMutatorBsyncOutput = {
                         inputInterrupt && inputInterrupt.connection.targetConnection;
                     break;
                 case 'bp_data':
-                    var inputDo = this.getInput('Data');
+                    var inputDo = this.getInput('Priority');
                     clauseBlock.statementConnection_ =
                         inputDo && inputDo.connection.targetConnection;
                     break;
@@ -2369,8 +2486,8 @@ const objectCreateMutatorBsyncOutput = {
         var interruptConnections = null;
         var elseStatementConnection = null;
 
-        if (this.getInput('Data')) {
-            elseStatementConnection = this.getInput('Data').connection.targetConnection;
+        if (this.getInput('Priority')) {
+            elseStatementConnection = this.getInput('Priority').connection.targetConnection;
         }
         if (this.getInput('Interrupt')) {
             interruptConnections = this.getInput('Interrupt').connection.targetConnection;
@@ -2395,8 +2512,8 @@ const objectCreateMutatorBsyncOutput = {
      */
     updateShape_: function() {
         // Delete everything.
-        if (this.getInput('Data')) {
-            this.removeInput('Data');
+        if (this.getInput('Priority')) {
+            this.removeInput('Priority');
         }
         if (this.getInput('Interrupt')) {
             this.removeInput('Interrupt');
@@ -2428,8 +2545,8 @@ const objectCreateMutatorBsyncOutput = {
                 .appendField('Interrupt');
         }
         if (this.dataCount_) {
-            this.appendValueInput('Data')
-                .appendField('Data');
+            this.appendValueInput('Priority')
+                .appendField('Priority');
         }
     },
     /**
@@ -2447,7 +2564,7 @@ const objectCreateMutatorBsyncOutput = {
         Blockly.Mutator.reconnect(requestConnections, this, 'Request');
         Blockly.Mutator.reconnect(blockConnections, this, 'Block');
         Blockly.Mutator.reconnect(interruptConnections, this, 'Interrupt');
-        Blockly.Mutator.reconnect(elseStatementConnection, this, 'Data');
+        Blockly.Mutator.reconnect(elseStatementConnection, this, 'Priority');
     }
 };
 
@@ -2475,7 +2592,7 @@ Blockly.JavaScript['ctx_transaction'] = function(block) {
 
 const transactionDef = {
     "type": "ctx_transaction",
-    "message0": "CTX.TransactionEvent",
+    "message0": "TransactionEvent",
     "output": null,
     "mutator": "transaction_mutator",
     "colour": 240,
@@ -2513,7 +2630,7 @@ Blockly.Blocks['ctx_field'] = {
 
 const ctxTransactionMutatorBlockDef = {
     "type": "ctx_transaction_mutator",
-    "message0": "CTX.TransactionEvent",
+    "message0": "TransactionEvent",
     "nextStatement": null,
     "colour": 240,
     "tooltip": "",
