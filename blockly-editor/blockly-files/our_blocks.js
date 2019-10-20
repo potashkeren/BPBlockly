@@ -824,6 +824,56 @@ Blockly.defineBlocksWithJsonArray([
     "colour": 230,
     "tooltip": "",
     "helpUrl": ""
+},
+{
+    "type": "bp_assert",
+    "message0": "BP ASSERT %1 %2",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "VAR1"
+        },
+        {
+            "type": "input_value",
+            "name": "VAR2"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "BP ASSERT"
+},
+{
+    "type": "bp_simulateExternalData",
+    "message0": "BP simulateExternalData %1",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "NAME"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "BP simulateExternalData"
+},
+{
+    "type": "bp_simulateExternalData_data",
+    "message0": "BP simulateExternalData %1 data: %2",
+    "args0": [
+        {
+            "type": "input_value",
+            "name": "NAME"
+        },
+        {
+            "type": "input_value",
+            "name": "DATA"
+        }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "BP simulateExternalData"
 }
   ]);
 
@@ -1229,6 +1279,7 @@ Blockly.JavaScript['get_hour'] = function(block) {
 };
 //#endregion Scheduling Blocks
 
+//#region List Blocks
 Blockly.JavaScript['list_includes'] = function(block) {
     var text = Blockly.JavaScript.valueToCode(block, 'VAR2', Blockly.JavaScript.ORDER_ATOMIC);
     var _var = Blockly.JavaScript.valueToCode(block, 'VAR1', Blockly.JavaScript.ORDER_ATOMIC);
@@ -1242,6 +1293,38 @@ Blockly.JavaScript['list_push'] = function(block) {
     var code = _var+'.push('+text+')';
     return code;
 };
+//#endregion List Blocks
+
+//#region Test Blocks
+Blockly.JavaScript['bp_assert'] = function(block) {
+    var var1 = Blockly.JavaScript.valueToCode(block, 'VAR1', Blockly.JavaScript.ORDER_ATOMIC);
+    var var2 = Blockly.JavaScript.valueToCode(block, 'VAR2', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = 'bp.ASSERT('+var1+','+var2+');';
+    return code
+};
+
+Blockly.JavaScript['bp_simulateExternalData'] = function(block) {
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name === '\'\'')
+        event_name = '\'Anonymous event\'';
+
+    var code = 'bp.Event('+event_name+')';
+
+    return code
+};
+
+Blockly.JavaScript['bp_simulateExternalData_data'] = function(block) {
+    var event_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    if(event_name === '\'\'')
+        event_name = '\'Anonymous event\'';
+    var event_data = Blockly.JavaScript.valueToCode(block, 'DATA', Blockly.JavaScript.ORDER_ATOMIC);
+
+    var code = 'bp.Event('+event_name+','+event_data+')';
+    return code
+};
+
+//#endregion Scheduling Blocks
 
 //#region Object Blocks
 Blockly.JavaScript['object'] = function(block) {
