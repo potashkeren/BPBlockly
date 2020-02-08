@@ -1,7 +1,6 @@
 
 function anyContextUpdateEvent(name) {
     return bp.EventSet("", function (e) {
-        // bp.log.info("event is "+ e);
         if(e instanceof CTX.UpdateEvent && e.contextName.equals(name))
             return true;
         if(e instanceof CTX.TransactionEvent){
@@ -97,7 +96,6 @@ bp.registerBThread('start after server init ', function () {
 
 // req 1.1
     bp.registerBThread('At least 20 places will be open for free learning', function () {
-        // bp.sync({waitFor: [anyContextUpdateEvent("UpdateRealOccupancy"),anyContextUpdateEvent("OpenTheLab")]} );
         while (true) {
             var count = 0;
             var labs = CTX.getContextInstances("FreeLearningOpenLab");
@@ -116,31 +114,21 @@ bp.registerBThread('start after server init ', function () {
         }
     });
 // req 1.3
-/*    bp.registerBThread('try to reduce the amount of free learning open Labs', function () {
-        while (true) {
-            var labs = CTX.getContextInstances("FreeLearningEmptyLab");
-            if (labs.size() > 1) {
-                bp.sync({request: CTX.UpdateEvent("CloseTheLab", {lab: labs.get(1)})});
-            }
-            else {
-                bp.sync({waitFor: CTX.AnyNewContextEvent("FreeLearningEmptyLab")});
-            }
-        }
-    });*/
     CTX.subscribe('try to reduce the amount of free learning open Labs', "FreeLearningOpenLab", function (c) {
         bp.sync({request: CTX.UpdateEvent("CloseTheLab", {lab: c}),
             waitFor: CTX.AnyContextEndedEvent("FreeLearningOpenLab", c)});
     });
+
 // req 1.4
-        CTX.subscribe('do not close labs with students', "NonEmptyLab", function (c) {
-            bp.sync({
-                block: CTX.UpdateEvent("CloseTheLab", {lab: c}),
-                interrupt: CTX.AnyContextEndedEvent("NonEmptyLab", c)
-            });
+    CTX.subscribe('do not close labs with students', "NonEmptyLab", function (c) {
+        bp.sync({
+            block: CTX.UpdateEvent("CloseTheLab", {lab: c}),
+            interrupt: CTX.AnyContextEndedEvent("NonEmptyLab", c)
         });
+    });
 
 // req 1.5
-    bp.registerBThread('Update the amount of available places in the labs ', function () {
+    bp.registerBThread('open another lab for free learning', function () {
         while (true) {
                 bp.sync({waitFor: anyContextUpdateEvent("UpdateRealOccupancy")});
                 var count = 0;
@@ -150,24 +138,37 @@ bp.registerBThread('start after server init ', function () {
                 }
                 bp.log.info("available places:" + count);
                 if (count<20){
-                    // bp.log.info("here");
                     var labs = CTX.getContextInstances("LockedLab");
-                    // bp.log.info("labs: " + labs);
                     bp.sync({request: CTX.TransactionEvent(
                             CTX.UpdateEvent("OpenTheLab", {lab: labs.get(0)}),
                             CTX.UpdateEvent("FreeLearningLab", {lab: labs.get(0)}))
                         , block: anyContextUpdateEventWithParams("CloseTheLab", {lab: labs.get(0)})
                     });
                 }
-            if (count > 50 && labs.size()>1 ){
-                // ???
-            }
         }
+    });
+
+    //req 7 - change the bthread
+    CTX.subscribe('try to reduce the amount of low capacity Labs', "LowCapacity", function (c) {
+        var count = 0;
+        var labs = CTX.getContextInstances("FreeLearningOpenLab");
+        for(var i = 0; i<labs.size(); i++){
+            count = count + (labs.get(i).capacity - labs.get(i).realOccupancy);
+        }
+        var blockList = [];
+        for(var i = 0; i<labs.size(); i++){
+            if(count - (labs.get(i).capacity - labs.get(i).realOccupancy) < 20)
+                blockList.push(anyContextUpdateEventWithParams("CloseTheLab", {lab: labs.get(i)}));
+        };
+        bp.sync({
+            block: blockList,
+            waitFor: [anyContextUpdateEvent("UpdateRealOccupancy"),anyContextUpdateEvent("OpenTheLab")]
+        });
     });
 
 
 
-    //req 17.1
+
 /*    CTX.subscribe('Do not allow more students to enter', "FullCapacity", function (c) {
         bp.sync({block: CTX.UpdateEvent("UpdateRealOccupancy", {lab: c})});
     });*/

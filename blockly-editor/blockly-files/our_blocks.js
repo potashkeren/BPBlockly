@@ -2,7 +2,7 @@ Blockly.defineBlocksWithJsonArray([
 
 {
     "type": "bp_event",
-    "message0": "BP Event %1",
+    "message0": "Event %1",
     "args0": [
       {
         "type": "input_value",
@@ -16,7 +16,7 @@ Blockly.defineBlocksWithJsonArray([
   },
 {
         "type": "bp_event_with_data",
-        "message0": "BP Event %1 data: %2",
+        "message0": "Event %1 data: %2",
         "args0": [
             {
                 "type": "input_value",
@@ -34,7 +34,7 @@ Blockly.defineBlocksWithJsonArray([
     },
 {
     "type": "bp_event_no_output",
-    "message0": "BP Event %1",
+    "message0": "Event %1",
     "args0": [
         {
             "type": "input_value",
@@ -49,7 +49,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
     "type": "bp_event_with_data_no_output",
-    "message0": "BP Event %1 data: %2",
+    "message0": "Event %1 data: %2",
     "args0": [
         {
             "type": "input_value",
@@ -68,7 +68,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_event_of_list",
-  "message0": "BP Event %1",
+  "message0": "Event %1",
   "args0": [
     {
       "type": "input_value",
@@ -86,7 +86,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_event_list",
-  "message0": "List of BP Events %1 %2",
+  "message0": "List of Events %1 %2",
   "args0": [
     {
       "type": "input_dummy"
@@ -181,7 +181,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_register_bthread",
-  "message0": "BThread %1 %2",
+  "message0": "b-thread %1 %2",
   "args0": [
     {
       "type": "input_value",
@@ -217,7 +217,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
   "type": "bp_eventset",
-  "message0": "BP EventSet %1 name: %2 function(e): %3",
+  "message0": "EventSet %1 name: %2 function(e): %3",
   "args0": [
     {
       "type": "input_dummy"
@@ -241,7 +241,7 @@ Blockly.defineBlocksWithJsonArray([
 },
 {
         "type": "bp_eventset_var",
-        "message0": "BP EventSet %1 name: %2 function(e): %3 return: %4",
+        "message0": "EventSet %1 name: %2 function(e): %3 return: %4",
         "args0": [
             {
                 "type": "input_dummy"
@@ -1748,14 +1748,15 @@ Blockly.Extensions.registerMutator('controls_newObject_mutator', new_objectCreat
 //endregion Object Blocks
 
 //#region Context
- var context_name = ["Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab",
+ var context_name = ["NoStatusLabs", "MostVacantLab","Lab", "OpenLab", "LockedLab" , "NonEmptyLab", "EmptyLab","FreeLearningOpenLab", "FreeLearningEmptyLab",
      "LabNeedToBeEvacuated", "IsOccupied", "NotOccupied", "Schedule", "TodaySchedules", "LabInPractice", "BeforePractice",
-     "AfterPractice", "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab", "EmergencyLab"];
+    "AfterPractice", "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab", "EmergencyLab"];
 //var context_name = ["Context_#1","Context_#2","Context_#3"];
 //var commands = ["update_command_#1","update_command_#2","update_command_#3"];
-//var commands =["OpenTheLab","CloseTheLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab","TurnLightOff", "TurnLightOn","MotionDetected","MotionStopped", "LabIsEmpty","LabIsNotEmpty"];
+var commands =["OpenLab","CloseLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab","TurnLightOff",
+    "TurnLightOn","MotionDetected","MotionStopped", "LabIsEmpty","LabIsNotEmpty", "MarkUnlocked", "MarkLocked"];
 //var context_name = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
-var commands =["UpdateCell","Finish the game"];
+//var commands =["UpdateCell","Finish the game"];
 var context= {
     office: ['Motion Detector','Air Condition','Smoke Detector'],
     restroom:['Smart Light'],
@@ -1884,7 +1885,7 @@ Blockly.Blocks['ctx_update_db'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('UpdateEvent')
+            .appendField('Update')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.setOutput(true, null);
         this.setTooltip('get the context name');
@@ -1905,7 +1906,7 @@ Blockly.Blocks['ctx_update_db_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('UpdateEvent')
+            .appendField('Update')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -1928,7 +1929,7 @@ Blockly.Blocks['ctx_update_db_new'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('UpdateEvent')
+            .appendField('Update')
             .appendField(new Blockly.FieldDropdown(COMMAND), 'COMMAND');
         this.appendStatementInput("CONTENT")
             .appendField("data");
@@ -1952,7 +1953,7 @@ Blockly.Blocks['ctx_new_context_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('AnyNewContextEvent')
+            .appendField('NewContext')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'CONTEXT_NAME');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -1995,7 +1996,7 @@ Blockly.JavaScript['ctx_subscribe'] = function(block) {
     var ctx_var_name = Blockly.JavaScript.valueToCode(block, 'CTX_VAR_NAME', Blockly.JavaScript.ORDER_ATOMIC);
 
     var statements = Blockly.JavaScript.statementToCode(block, 'CONTENT');
-    var code = 'bp.registerBThread('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
+    var code = 'CTX.subscribe('+name+',\"'+ ctx_name +'\",'+ 'function('+ctx_var_name+'){\n'+statements+'\n});\n';
     return code;
 };
 
@@ -2005,7 +2006,7 @@ Blockly.Blocks['ctx_context_ended'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('AnyContextEndedEvent')
+            .appendField('ContextEnded')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -2025,7 +2026,7 @@ Blockly.Blocks['ctx_context_ended_data'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('AnyContextEndedEvent')
+            .appendField('ContextEnded')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.appendValueInput("DATA")
             .appendField("data");
@@ -2048,7 +2049,7 @@ Blockly.Blocks['ctx_any_new_context'] = {
     init: function () {
         this.setColour(240);
         this.appendDummyInput('dropDownField')
-            .appendField('AnyNewContextEvent')
+            .appendField('NewContext')
             .appendField(new Blockly.FieldDropdown(CONTEXT_NAME), 'COMMAND');
         this.setOutput(true, null);
         this.setInputsInline(true);
@@ -2675,7 +2676,7 @@ Blockly.JavaScript['ctx_transaction'] = function(block) {
 
 const transactionDef = {
     "type": "ctx_transaction",
-    "message0": "TransactionEvent",
+    "message0": "Transaction",
     "output": null,
     "mutator": "transaction_mutator",
     "colour": 240,
@@ -2713,7 +2714,7 @@ Blockly.Blocks['ctx_field'] = {
 
 const ctxTransactionMutatorBlockDef = {
     "type": "ctx_transaction_mutator",
-    "message0": "TransactionEvent",
+    "message0": "Transaction",
     "nextStatement": null,
     "colour": 240,
     "tooltip": "",

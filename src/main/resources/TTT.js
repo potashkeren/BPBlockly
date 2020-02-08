@@ -83,7 +83,8 @@ bp.registerBThread("DetectDraw", function() {
 
 function addLinePermutationBthreads(l, p) {
     // Represents when X wins
-    bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+    bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," +
+        l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ createEvent('X', l[p[0]].x, l[p[0]].y) ] });
             bp.sync({ waitFor:[ createEvent('X', l[p[1]].x, l[p[1]].y) ] });
@@ -93,7 +94,8 @@ function addLinePermutationBthreads(l, p) {
     });
 
     // Represents when O wins
-    bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+    bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," +
+        l[p[1]].y + ">," + "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
         while (true) {
             bp.sync({ waitFor:[ createEvent('O', l[p[0]].x, l[p[0]].y) ] });
             bp.sync({ waitFor:[ createEvent('O', l[p[1]].x, l[p[1]].y) ] });
