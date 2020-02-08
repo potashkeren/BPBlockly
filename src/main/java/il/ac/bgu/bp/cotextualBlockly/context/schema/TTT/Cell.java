@@ -1,4 +1,6 @@
-package il.ac.bgu.bp.cotextualBlockly.context.schema;
+package il.ac.bgu.bp.cotextualBlockly.context.schema.TTT;
+
+import il.ac.bgu.bp.cotextualBlockly.context.schema.BasicEntity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
