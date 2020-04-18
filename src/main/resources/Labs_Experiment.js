@@ -51,6 +51,7 @@ CTX.subscribe('do not close labs with students', "NonEmptyLab", function (c) {
 
 });
 
+//The system will open labs for practical sessions, 10 minutes ahead of its scheduled time.
 // req 3.2
     CTX.subscribe('open lab before practice', "BeforePracticeFreeLearningLab", function (c) {
     bp.sync({

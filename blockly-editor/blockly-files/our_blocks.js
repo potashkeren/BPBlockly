@@ -1753,10 +1753,10 @@ Blockly.Extensions.registerMutator('controls_newObject_mutator', new_objectCreat
     "AfterPractice", "BeforePracticeFreeLearningLab", "BeforePracticeLockedLab", "EmergencyLab"];
 //var context_name = ["Context_#1","Context_#2","Context_#3"];
 //var commands = ["update_command_#1","update_command_#2","update_command_#3"];
-var commands =["OpenLab","CloseLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab","TurnLightOff",
+var commands =["SetPracticeLab", "SetNoStatusLab", "OpenLab", "CloseLab", "EvacuateTheLab","NotEvacuateTheLab", "FreeLearningLab","NotFreeLearningLab","TurnLightOff",
     "TurnLightOn","MotionDetected","MotionStopped", "LabIsEmpty","LabIsNotEmpty", "MarkUnlocked", "MarkLocked"];
-//var context_name = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Triple"];
-//var commands =["UpdateCell","Finish the game"];
+var context_name = ["Cell","CornerCell","SpecificCell","EmptyCell","NonEmptyCell","Line"];
+var commands =["UpdateCell","Finish the game"];
 var context= {
     office: ['Motion Detector','Air Condition','Smoke Detector'],
     restroom:['Smart Light'],
