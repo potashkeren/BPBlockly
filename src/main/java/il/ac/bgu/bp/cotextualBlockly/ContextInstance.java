@@ -49,8 +49,8 @@ public class ContextInstance {
         contextService = ContextService.getInstance();
 
 //		Use contextService.initFromString to init from the blockly code
-        contextService.initFromResources("ContextDB",  programs);
-//		contextService.initFromString("ContextDB", code);
+ //       contextService.initFromResources("ContextDB",  programs);
+		contextService.initFromString("ContextDB", RunServlet.code);
         contextService.addEntityManagerCreateHook(em -> {
             Session session = em.unwrap(Session.class);
 

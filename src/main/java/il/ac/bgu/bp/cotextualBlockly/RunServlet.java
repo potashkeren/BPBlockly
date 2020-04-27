@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RunServlet extends HttpServlet {
-	private static String code;
+	public static String code;
 	final static Logger LOG = LoggerFactory.getLogger(RunServlet.class);
 	private ContextInstance contextInstance;
 
